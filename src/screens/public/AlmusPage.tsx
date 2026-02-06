@@ -2,20 +2,19 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Moon, Sun, ArrowRight } from "lucide-react";
-import svgPaths from "../../components/icons/IconSeparator";
-const imgImageAlmusSmartHydrationStation = "/assets/images/Hydrationstation.png";
-const imgImageAlmusInstalledInProfessionalTrainingFacility = "/assets/images/trainingfacility.png";
+const imgImageAlmusSmartHydrationStation = "/assets/images/almus.jpg";
+const imgImageAlmusInstalledInProfessionalTrainingFacility = "/assets/images/hydrationsolution.jpg";
 const imgImageLemonFlavor = "/assets/images/lemon.png";
-const imgImageBerryFlavor = "/assets/images/berry.png";
+const imgImageBerryFlavor = "/assets/images/berry.webp";
 const imgImageCitrusFlavor = "/assets/images/citrus.png";
-const imgImageTropicalFlavor = "/assets/images/tropical.png";
+const imgImageTropicalFlavor = "/assets/images/tropical.avif";
 const imgImageGymsFitnessCenters = "/assets/images/fitnesscenters.png";
-const imgImageTrainingFacilities = "/assets/images/trainingfacilities.png";
+const imgImageTrainingFacilities = "/assets/images/trainingcenters.jpg";
 const imgImageSportsClubs = "/assets/images/sportclubs.jpg";
-const imgImageWellnessSpaces = "/assets/images/wellnessSpaces.png";
+const imgImageWellnessSpaces = "/assets/images/wellness.webp";
 export function AlmusPage() {
 
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     facility: "",

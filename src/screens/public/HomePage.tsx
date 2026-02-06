@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { Moon, Sun, ArrowRight, Check } from "lucide-react";
+import { Moon, Sun, ArrowRight } from "lucide-react";
 import svgPaths from "../../components/icons/IconMainLogo";
 const imgImageSummaPadelSportsDashboard = "/assets/images/image1.png";
-const imgImageAlmusSmartDispenserStation = "/assets/images/image2.png";
-
+const imgImageAlmusSmartDispenserStation = "/assets/images/machinedispenser.webp";
 export function HomePage() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -60,7 +59,7 @@ export function HomePage() {
             {/* Center Links */}
             <div className="hidden md:flex items-center gap-8">
               <Link
-                to="/"
+                to="/solutions"
                 className="font-['Poppins',sans-serif] font-medium text-[16px] text-white/80 hover:text-white transition-colors"
               >
                 Solutions
@@ -114,7 +113,7 @@ export function HomePage() {
 
               <Link
                 to="/signup"
-                className="bg-[#39FF14] hover:bg-[#32E012] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-black flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.3)]"
+                className="bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-black flex items-center justify-center shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)]"
               >
                 Sign Up
               </Link>

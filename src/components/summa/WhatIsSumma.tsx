@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export function WhatIsSumma() {
   const scoringSystemImage =
-    "https://images.unsplash.com/photo-1736729654379-daa07a3629cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzcG9ydHMlMjB0ZWNobm9sb2d5JTIwc2NvcmluZyUyMHN5c3RlbXxlbnwxfHx8fDE3NzAxMzkxOTF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+    "/assets/images/scoringsystem.avif";
 
   return (
     <section className="relative py-24 px-6 lg:px-20 bg-black dark:bg-white overflow-hidden transition-colors duration-300">

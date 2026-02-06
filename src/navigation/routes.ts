@@ -1,22 +1,27 @@
 import { createBrowserRouter } from "react-router";
 import { HomePage } from "../screens/public/HomePage";
+import { Solutions } from "../components/Solutions";
 import { SummaPage } from "../screens/public/SummaPage";
 import { AlmusPage } from "../screens/public/AlmusPage";
 import { LoginPage } from "../screens/public/LoginPage";
 import { SignUpPage } from "../screens/public/SignUpPage";
 import { ForgotPasswordPage } from "../screens/public/ForgotPasswordPage";
-import { DashboardWrapper } from "../components/dashboard/DashboardWrapper";
 import { OverviewPage } from "../components/dashboard/OverviewPage";
 import { LiveMatchesPage } from "../components/dashboard/LiveMatchesPage";
 import { CourtsManagementPage } from "../components/dashboard/CourtsManagementPage";
 import { AnalyticsPage } from "../components/dashboard/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
 import { SettingsPage } from "../components/dashboard/SettingsPage";
+import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: HomePage,
+  },
+  {
+    path: "/solutions",
+    Component: Solutions,
   },
   {
     path: "/summa",
@@ -40,7 +45,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    Component: DashboardWrapper,
+    Component: ProtectedDashboard,
     children: [
       {
         index: true,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router";
 import {
   LayoutDashboard,
   Zap,
@@ -15,6 +15,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import { useAuth } from "../../services/AuthContext";
 
 interface DashboardLayoutProps {
   isDark: boolean;
@@ -32,8 +33,15 @@ const navItems = [
 
 export function DashboardLayout({ isDark, setIsDark }: DashboardLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -156,6 +164,7 @@ export function DashboardLayout({ isDark, setIsDark }: DashboardLayoutProps) {
           {/* Logout */}
           <Link
             to="/login"
+            onClick={handleSignOut}
             className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-8"
           >
             <LogOut className="w-5 h-5 text-red-500 flex-shrink-0" />
@@ -210,7 +219,7 @@ export function DashboardLayout({ isDark, setIsDark }: DashboardLayoutProps) {
             {/* Logout */}
             <Link
               to="/login"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={handleSignOut}
               className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-8"
             >
               <LogOut className="w-5 h-5 text-red-500" />

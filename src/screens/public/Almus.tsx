@@ -4,11 +4,11 @@ const imgImageAlmusInstalledInProfessionalTrainingFacility = "/assets/images/tra
 const imgImageLemonFlavor = "/assets/images/lemon.png";
 const imgImageBerryFlavor = "/assets/images/berry.png";
 const imgImageCitrusFlavor = "/assets/images/citrus.png";
-const imgImageTropicalFlavor = "/assets/images/tropical.png";
+const imgImageTropicalFlavor = "/assets/images/tropical.avif";
 const imgImageGymsFitnessCenters = "/assets/images/fitnesscenters.png";
 const imgImageTrainingFacilities = "/assets/images/trainingfacilities.png";
 const imgImageSportsClubs = "/assets/images/sportclubs.jpg";
-const imgImageWellnessSpaces = "/assets/images/wellnessSpaces.png";
+const imgImageWellnessSpaces = "/assets/images/wellness.webp";
 
 function Container() {
   return <div className="absolute bg-[rgba(0,229,255,0.1)] blur-[140px] left-[274px] rounded-[33554400px] size-[500px] top-[202.5px]" data-name="Container" />;

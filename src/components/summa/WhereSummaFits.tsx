@@ -4,22 +4,22 @@ const environments = [
   {
     title: "Padel clubs",
     image:
-      "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/assets/images/padelclubs.jpg",
   },
   {
     title: "Sports and fitness centers",
     image:
-      "https://images.unsplash.com/photo-1682241367368-6387d5d4921a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBmaXRuZXNzJTIwY2VudGVyJTIwZ3ltfGVufDF8fHx8MTc3MDEzOTMzM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/assets/images/fitnesscenters.png",
   },
   {
     title: "Training academies",
     image:
-      "https://images.unsplash.com/photo-1761039807688-f5b154a8827a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFpbmluZyUyMGFjYWRlbXklMjBzcG9ydHN8ZW58MXx8fHwxNzcwMTM5MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/assets/images/trainingacademie.avif",
   },
   {
     title: "Competition venues",
     image:
-      "https://images.unsplash.com/photo-1765261176106-6076a63ee433?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21wZXRpdGlvbiUyMHNwb3J0cyUyMHZlbnVlJTIwc3RhZGl1bXxlbnwxfHx8fDE3NzAxMzkzMzR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "/assets/images/competitionvenues.webp",
   },
 ];
 

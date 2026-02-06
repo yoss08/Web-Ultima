@@ -20,7 +20,7 @@ export function SummaHero() {
           alt="SUMMA Smart Scoring System"
           className="w-full h-full object-cover opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black"></div>
+        
       </div>
 
       <div className="max-w-[1200px] mx-auto w-full px-8 lg:px-12 pt-32 pb-16 relative z-10">
