@@ -3,10 +3,7 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Moon, Sun, ArrowRight } from "lucide-react";
 
-import almusImg from "../../../assets/images/almus.jpg";
-
-const imgImageAlmusSmartHydrationStation = almusImg;
-
+const imgImageAlmusSmartHydrationStation = "/assets/images/almus.jpg";
 const imgImageAlmusInstalledInProfessionalTrainingFacility = "/assets/images/hydrationsolution.jpg";
 const imgImageLemonFlavor = "/assets/images/lemon.png";
 const imgImageBerryFlavor = "/assets/images/berry.webp";
