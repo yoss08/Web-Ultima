@@ -1,4 +1,0 @@
-{
-  "installCommand": "npm ci --ignore-scripts",
-  "buildCommand": "npm run build"
-}
