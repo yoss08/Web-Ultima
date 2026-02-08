@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import { HomePage } from "../screens/public/HomePage";
-import { Solutions } from "../components/Solutions";
+import { Solutions } from "../screens/public/Solutions";
 import { SummaPage } from "../screens/public/SummaPage";
 import { AlmusPage } from "../screens/public/AlmusPage";
 import { LoginPage } from "../screens/public/LoginPage";

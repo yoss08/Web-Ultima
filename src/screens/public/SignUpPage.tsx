@@ -1,8 +1,9 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { ArrowLeft, Mail, Lock, User, Phone } from "lucide-react";
+import { ArrowLeft, Mail, Lock, User, Phone, Users, Dumbbell } from "lucide-react";
 import { authHelpers } from "../../config/supabase";
+import { useTheme } from '../../services/ThemeContext';
 
 const accountTypes = ["Player", "Coach", "Facility"];
 
@@ -17,7 +18,7 @@ export function SignUpPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+ const { theme } = useTheme();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -55,7 +56,7 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A1F2E] via-[#0A0E1A] to-[#000000] dark:bg-gradient-to-b dark:from-[#E8EBF0] dark:via-[#F5F7FA] dark:to-[#FFFFFF] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-[#E8EBF0] via-[#F5F7FA] to-[#FFFFFF] dark:from-[#0A1F2E] dark:via-[#0A0E1A] dark:to-[#000000] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
       {/* Logo at top */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -63,10 +64,10 @@ export function SignUpPage() {
         transition={{ duration: 0.6 }}
         className="mb-12"
       >
-        <h1 className="font-['Arial',sans-serif] font-bold text-[32px] text-white dark:text-[#0A0E1A] tracking-[1.6px]">
-          ULTIMA
-        </h1>
-      </motion.div>
+      <h1 className="font-['Arial',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white tracking-[1.6px]">
+        ULTIMA
+      </h1>
+    </motion.div>
 
       {/* Sign Up Card */}
       <motion.div
@@ -75,13 +76,13 @@ export function SignUpPage() {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="relative w-full max-w-[420px]"
       >
-        <div className="bg-[#0D1117]/95 dark:bg-white/95 backdrop-blur-xl transition-colors duration-300 rounded-[32px] p-12 shadow-2xl border border-white/5 dark:border-black/5">
+        <div className="bg-white/95 dark:bg-[#0D1117]/95 backdrop-blur-xl transition-colors duration-300 rounded-[32px] p-12 shadow-2xl border border-black/5 dark:border-white/5">
           {/* Title */}
           <div className="text-center mb-10">
-            <h2 className="font-['Poppins',sans-serif] font-bold text-[32px] text-white dark:text-[#0A0E1A] mb-3">
+            <h2 className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white mb-3">
               Create Account
             </h2>
-            <p className="font-['Poppins',sans-serif] text-[14px] text-white/50 dark:text-[#0A0E1A]/50">
+            <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/50 dark:text-white/50">
               Join the ULTIMA ecosystem
             </p>
           </div>
@@ -101,12 +102,12 @@ export function SignUpPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="fullName"
-                className="font-['Poppins',sans-serif] font-medium text-[14px] text-white dark:text-[#0A0E1A]"
+                className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A] dark:text-white"
               >
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 dark:text-[#0A0E1A]/30" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 dark:text-white/30 text-[#0A0E1A]/30" />
                 <input
                   type="text"
                   id="fullName"
@@ -114,7 +115,7 @@ export function SignUpPage() {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full bg-[#1C2128]/50 dark:bg-[#F0F2F5] h-[52px] pl-12 pr-4 rounded-[16px] border border-[#2D333B]/50 dark:border-[#D1D5DB] focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-white dark:text-[#0A0E1A] placeholder:text-white/30 dark:placeholder:text-[#0A0E1A]/30 font-['Poppins',sans-serif] text-[14px]"
+                  className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -124,12 +125,12 @@ export function SignUpPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="email"
-                className="font-['Poppins',sans-serif] font-medium text-[14px] text-white dark:text-[#0A0E1A]"
+                className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A] dark:text-white"
               >
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 dark:text-[#0A0E1A]/30" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 dark:text-white/30 text-[#0A0E1A]/30" />
                 <input
                   type="email"
                   id="email"
@@ -137,7 +138,7 @@ export function SignUpPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-[#1C2128]/50 dark:bg-[#F0F2F5] h-[52px] pl-12 pr-4 rounded-[16px] border border-[#2D333B]/50 dark:border-[#D1D5DB] focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-white dark:text-[#0A0E1A] placeholder:text-white/30 dark:placeholder:text-[#0A0E1A]/30 font-['Poppins',sans-serif] text-[14px]"
+                  className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
                   placeholder="Enter your email"
                 />
               </div>
@@ -147,12 +148,12 @@ export function SignUpPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="phoneNumber"
-                className="font-['Poppins',sans-serif] font-medium text-[14px] text-white dark:text-[#0A0E1A]"
+                className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A] dark:text-white"
               >
                 Phone Number
               </label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 dark:text-[#0A0E1A]/30" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 dark:text-white/30 text-[#0A0E1A]/30" />
                 <input
                   type="tel"
                   id="phoneNumber"
@@ -160,7 +161,7 @@ export function SignUpPage() {
                   required
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  className="w-full bg-[#1C2128]/50 dark:bg-[#F0F2F5] h-[52px] pl-12 pr-4 rounded-[16px] border border-[#2D333B]/50 dark:border-[#D1D5DB] focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-white dark:text-[#0A0E1A] placeholder:text-white/30 dark:placeholder:text-[#0A0E1A]/30 font-['Poppins',sans-serif] text-[14px]"
+                  className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -170,12 +171,12 @@ export function SignUpPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="password"
-                className="font-['Poppins',sans-serif] font-medium text-[14px] text-white dark:text-[#0A0E1A]"
+                className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A] dark:text-white"
               >
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 dark:text-[#0A0E1A]/30" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 dark:text-white/30 text-[#0A0E1A]/30" />
                 <input
                   type="password"
                   id="password"
@@ -183,34 +184,66 @@ export function SignUpPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full bg-[#1C2128]/50 dark:bg-[#F0F2F5] h-[52px] pl-12 pr-4 rounded-[16px] border border-[#2D333B]/50 dark:border-[#D1D5DB] focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-white dark:text-[#0A0E1A] placeholder:text-white/30 dark:placeholder:text-[#0A0E1A]/30 font-['Poppins',sans-serif] text-[14px]"
+                  className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
                   placeholder="Enter your password"
                 />
               </div>
             </div>
 
-            {/* Account Type */}
-            <div className="flex flex-col gap-3">
-              <label className="font-['Poppins',sans-serif] font-medium text-[14px] text-white dark:text-[#0A0E1A]">
-                Account Type
+            {/* Account Type Selection */}
+            <div className="flex flex-col gap-4 mb-6">
+              <label className="font-['Poppins',sans-serif] text-[12px] uppercase tracking-wider dark:text-white/60 text-[#0A0E1A]/60 ml-1">
+                Select Role
               </label>
-              <div className="flex gap-2">
-                {accountTypes.map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, accountType: type })
-                    }
-                    className={`flex-1 h-[42px] rounded-[21px] font-['Poppins',sans-serif] font-medium text-[13px] transition-all duration-300 ${
-                      formData.accountType === type
-                        ? "bg-white dark:bg-[#0A0E1A] text-black dark:text-white shadow-[0_0_16px_rgba(255,255,255,0.3)]"
-                        : "bg-[#1C2128]/50 dark:bg-[#F0F2F5] text-white/50 dark:text-[#0A0E1A]/50 hover:text-white/70 dark:hover:text-[#0A0E1A]/70 border border-[#2D333B]/50 dark:border-[#D1D5DB]"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Player Option */}
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, accountType: "Player" })}
+                  className={`relative flex flex-col items-center justify-center gap-3 h-[120px] rounded-[24px] transition-all duration-300 group border-2 ${
+                    formData.accountType === "Player"
+                      ? "bg-[#0D121F] border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.2)]"
+                      : "bg-[#F0F2F5] dark:bg-[#0D121F]/40 border-transparent hover:border-[#00E5FF]/50"
+                  }`}
+                >
+                  <Users className={`w-8 h-8 transition-colors ${
+                    formData.accountType === "Player" ? "text-[#00E5FF]" : "text-[#0A0E1A]/40 dark:text-white/30"
+                  }`} />
+                  <span className={`font-['Poppins',sans-serif] font-bold text-[13px] tracking-widest uppercase ${
+                    formData.accountType === "Player" ? "text-white" : "text-[#0A0E1A]/60 dark:text-white/50"
+                  }`}>
+                    Player
+                  </span>
+                  {/* Subtle inner glow for active state */}
+                  {formData.accountType === "Player" && (
+                    <div className="absolute inset-0 rounded-[22px] bg-[#00E5FF]/5 pointer-events-none" />
+                  )}
+                </button>
+
+                {/* Coach Option */}
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, accountType: "Coach" })}
+                  className={`relative flex flex-col items-center justify-center gap-3 h-[120px] rounded-[24px] transition-all duration-300 group border-2 ${
+                    formData.accountType === "Coach"
+                      ? "bg-[#0D121F] border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.2)]"
+                      : "bg-[#F0F2F5] dark:bg-[#0D121F]/40 border-transparent hover:border-[#00E5FF]/50"
+                  }`}
+                >
+                  <Dumbbell className={`w-8 h-8 transition-colors ${
+                    formData.accountType === "Coach" ? "text-[#00E5FF]" : "text-[#0A0E1A]/40 dark:text-white/30"
+                  }`} />
+                  <span className={`font-['Poppins',sans-serif] font-bold text-[13px] tracking-widest uppercase ${
+                    formData.accountType === "Coach" ? "text-white" : "text-[#0A0E1A]/60 dark:text-white/50"
+                  }`}>
+                    Coach
+                  </span>
+                  {/* Subtle inner glow for active state */}
+                  {formData.accountType === "Coach" && (
+                    <div className="absolute inset-0 rounded-[22px] bg-[#00E5FF]/5 pointer-events-none" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -226,11 +259,11 @@ export function SignUpPage() {
 
           {/* Login Link */}
           <div className="mt-8 text-center">
-            <p className="font-['Poppins',sans-serif] text-[14px] text-white/50 dark:text-[#0A0E1A]/50">
+            <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/50 dark:text-white/50">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-white dark:text-[#0A0E1A] font-semibold hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors"
+                className="text-[#0A0E1A] dark:text-white font-semibold hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors"
               >
                 Log in
               </Link>
@@ -248,7 +281,7 @@ export function SignUpPage() {
       >
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-white/40 dark:text-[#0A0E1A]/40 hover:text-white/60 dark:hover:text-[#0A0E1A]/60 transition-colors"
+          className="inline-flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/40 dark:text-white/40 hover:text-white/60 dark:hover:text-[#0A0E1A]/60 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
