@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "prepare": "is-ci || husky install"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
