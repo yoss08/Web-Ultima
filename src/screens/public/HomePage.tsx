@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { Moon, Sun, ArrowRight } from "lucide-react";
 import svgPaths from "../../components/icons/IconMainLogo";
 
-const imgImageSummaPadelSportsDashboard = "https://t3.ftcdn.net/jpg/15/02/11/04/360_F_1502110441_aOAhoJDchCmHiHkqPA1GfZKsveC1hLUy.jpg";
+const imgImageSummaPadelSportsDashboard = "https://images.unsplash.com/photo-1657704358775-ed705c7388d2?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const imgImageAlmusSmartDispenserStation = "https://www.thoughtco.com/thmb/BVnoDc9J_65SCnuAQ9fvciTSyLQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/splashing-165192_1280-7879d2914dfb4e5d8dbf2e943669bd92.jpg";
 
 export function HomePage() {

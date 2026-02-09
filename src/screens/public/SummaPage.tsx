@@ -5,12 +5,12 @@ import { Moon, Sun, ArrowRight, Check, Activity, Zap, LayoutDashboard, Smartphon
 
 // Images
 const padelCourtImage = "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
-const scoringSystemImage = "/assets/images/scoringsystem.avif";
-const athleteImage = "/assets/images/athleteimage.avif";
-const padelClubImage = "https://whsports.nl/en/wp-content/uploads/sites/3/2021/07/padel-scoreboard-1.jpg";
+const scoringSystemImage = "https://images.unsplash.com/photo-1741478551723-4b7ce95cf395?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const athleteImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const padelClubImage = "https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFkZWx8ZW58MHx8MHx8fDA%3D";
 const fitnessCenterImage = "https://images.pexels.com/photos/34761566/pexels-photo-34761566/free-photo-of-salle-de-sport-interieure-moderne-avec-equipements-cardio.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
-const trainingAcademyImage = "https://www.timeoutriyadh.com/cloud/timeoutriyadh/2025/12/08/image-1200x900-2025-12-08T222754.423.png";
-const competitionVenueImage = "https://cdn.prod.website-files.com/639778ab6f2e51ed2139df9a/67a332d3ef2eed873451ac9f_66fd5bda262b1283b1bb9c7b_mejorset-paris-premier-padel-2024-court.webp";
+const trainingAcademyImage = "https://images.unsplash.com/photo-1676312827534-21947df045ac?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const competitionVenueImage = "https://plus.unsplash.com/premium_photo-1721755951157-b055a8de6de3?q=80&w=1324&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 export function SummaPage() {
   const [isDark, setIsDark] = useState(() => {
