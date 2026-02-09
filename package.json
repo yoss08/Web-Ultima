@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "test": "echo 'No tests' && exit 0",
-    "test:ci": "exit 0"
+  "build": "npx vite build",
+  "dev": "vite",
+  "test": "echo 'No tests' && exit 0",
+  "test:ci": "exit 0"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
