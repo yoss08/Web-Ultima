@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
+  "dev": "vite",
+  "build": "node node_modules/vite/bin/vite.js build",
+  "preview": "vite preview",
     "test": "echo 'No tests' && exit 0",
     "test:ci": "exit 0"
   },
