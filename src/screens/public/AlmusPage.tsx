@@ -3,16 +3,16 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Moon, Sun, ArrowRight } from "lucide-react";
 
-const imgImageAlmusSmartHydrationStation = "/assets/images/almus.jpg";
-const imgImageAlmusInstalledInProfessionalTrainingFacility = "/assets/images/hydrationsolution.jpg";
-const imgImageLemonFlavor = "/assets/images/lemon.png";
-const imgImageBerryFlavor = "/assets/images/berry.webp";
-const imgImageCitrusFlavor = "/assets/images/citrus.png";
-const imgImageTropicalFlavor = "/assets/images/tropical.avif";
-const imgImageGymsFitnessCenters = "/assets/images/fitnesscenters.png";
-const imgImageTrainingFacilities = "/assets/images/trainingcenters.jpg";
-const imgImageSportsClubs = "/assets/images/sportclubs.jpg";
-const imgImageWellnessSpaces = "/assets/images/wellness.webp";
+const imgImageAlmusSmartHydrationStation = "https://images.unsplash.com/photo-1517093911940-08cb5b3952e7?q=80&w=744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dpg";
+const imgImageAlmusInstalledInProfessionalTrainingFacility = "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const imgImageLemonFlavor = "https://images.unsplash.com/photo-1718196917011-801cddb84334?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const imgImageBerryFlavor = "https://images.unsplash.com/photo-1600718374662-0483d2b9da44?q=80&w=685&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const imgImageCitrusFlavor = "https://images.unsplash.com/photo-1671920090611-9a40303b52cb?q=80&w=765&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const imgImageTropicalFlavor = "https://plus.unsplash.com/premium_photo-1661454443043-36b5c6b66e62?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const imgImageGymsFitnessCenters = "https://www.bezons-coeurdeville.com/-/media/bezonscoeurdeville/images/enseignes/photos/one_fitness_club/one_fitness_club.jpg?as=0&w=650&hash=98AFCE93C3812107AEE8D899A608250E";
+const imgImageTrainingFacilities = "https://static1.gensler.com/uploads/image/93317/AustinFC_StDavids_Performance_Center_N16_1722635367.jpg";
+const imgImageSportsClubs = "https://static.actu.fr/uploads/2025/09/padel-patinoire-boulogne-sport-13-960x640.jpg";
+const imgImageWellnessSpaces = "https://www.cinqmondes.com/media/contentmanager/content/helvetia_hammam_render.png";
 
 export function AlmusPage() {
   const [isDark, setIsDark] = useState(() => {

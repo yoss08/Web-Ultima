@@ -42,7 +42,7 @@ export function Solutions() {
         "Comprehensive court management and analytics platform for padel facilities. Monitor live matches, track player performance, and optimize facility operations.",
       color: "#10B981", // Émeraude pour light mode
       darkColor: "#39FF14", // Néon vert pour dark mode
-      image: "/assets/images/padel2.png",
+      image: "https://images.unsplash.com/photo-1646651105454-6c167ea6f83b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       features: [
         "Live match monitoring",
         "Court management system",
@@ -60,7 +60,7 @@ export function Solutions() {
         "On-site hydration solution delivering flavored, low-calorie beverages designed for active environments. Enhance user experience while maintaining facility standards.",
       color: "#3B82F6", // Bleu pour light mode
       darkColor: "#00E5FF", // Bleu néon pour dark mode
-      image: "/assets/images/waterdispanse.jpg",
+      image: "https://images.unsplash.com/flagged/photo-1553353799-a992825b0d07?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       features: [
         "Multiple flavor options",
         "Low-calorie formulas",

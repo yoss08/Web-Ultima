@@ -7,10 +7,10 @@ import { Moon, Sun, ArrowRight, Check, Activity, Zap, LayoutDashboard, Smartphon
 const padelCourtImage = "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 const scoringSystemImage = "/assets/images/scoringsystem.avif";
 const athleteImage = "/assets/images/athleteimage.avif";
-const padelClubImage = "/assets/images/padelclubs.jpg";
-const fitnessCenterImage = "/assets/images/fitnesscenters.png";
-const trainingAcademyImage = "/assets/images/trainingacademie.avif";
-const competitionVenueImage = "/assets/images/competitionvenues.webp";
+const padelClubImage = "https://whsports.nl/en/wp-content/uploads/sites/3/2021/07/padel-scoreboard-1.jpg";
+const fitnessCenterImage = "https://images.pexels.com/photos/34761566/pexels-photo-34761566/free-photo-of-salle-de-sport-interieure-moderne-avec-equipements-cardio.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
+const trainingAcademyImage = "https://www.timeoutriyadh.com/cloud/timeoutriyadh/2025/12/08/image-1200x900-2025-12-08T222754.423.png";
+const competitionVenueImage = "https://cdn.prod.website-files.com/639778ab6f2e51ed2139df9a/67a332d3ef2eed873451ac9f_66fd5bda262b1283b1bb9c7b_mejorset-paris-premier-padel-2024-court.webp";
 
 export function SummaPage() {
   const [isDark, setIsDark] = useState(() => {
