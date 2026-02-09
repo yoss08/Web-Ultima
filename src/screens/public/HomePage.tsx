@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { Moon, Sun, ArrowRight } from "lucide-react";
+import { Moon, Sun, ArrowRight, Eye, Brain } from "lucide-react";
 import svgPaths from "../../components/icons/IconMainLogo";
 
 const imgImageSummaPadelSportsDashboard = "https://images.unsplash.com/photo-1657704358775-ed705c7388d2?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -216,7 +216,75 @@ export function HomePage() {
           </div>
         </div>
       </section>
+{/* PersonaVision AI Section - Integrated Design */}
+<section className="relative py-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+  <div className="max-w-[1096px] mx-auto px-12">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="relative group bg-white dark:bg-[#0D121F] border border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden"
+    >
+      {/* Background Decorative Glow (Matching your existing style) */}
+      <div className="absolute bg-purple-500/5 dark:bg-[rgba(192,192,192,0.03)] blur-[80px] -right-20 -top-20 rounded-full w-[300px] h-[300px]" />
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+        {/* Left: Content */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 text-blue-500 dark:text-[#00e5ff]">
+            <Eye size={28} className="drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]" />
+            <span className="font-['Poppins',sans-serif] text-[12px] uppercase tracking-[0.2rem] font-bold">
+              Featured Platform
+            </span>
+          </div>
+          
+          <h3 className="font-['Playfair_Display',serif] font-bold text-[48px] leading-[1.1] text-gray-900 dark:text-white">
+            PersonaVision AI
+          </h3>
+          
+          <p className="font-['Poppins',sans-serif] text-gray-700 dark:text-white/80 text-[18px] leading-relaxed">
+            Revolutionary computer vision platform powered by advanced neural networks. 
+            Real-time movement analysis, biomechanical intelligence, and performance 
+            optimization at the intersection of AI and human capability.
+          </p>
+
+          <div className="flex flex-wrap gap-4 pt-4">
+            <Link
+              to="https://personavision.net/"
+              className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg hover:scale-105"
+            >
+              Explore Platform
+            </Link>
+            <button className="bg-transparent border border-gray-300 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-gray-700 dark:text-white flex items-center justify-center">
+              Learn More
+            </button>
+          </div>
+        </div>
+
+        {/* Right: Visual Element */}
+        <div className="relative h-80 rounded-[24px] overflow-hidden border border-gray-200 dark:border-[#00e5ff]/20 bg-gray-100 dark:bg-black/50 shadow-inner">
+          <img 
+            src="https://images.unsplash.com/photo-1673255745677-e36f618550d1?q=80&w=1080&auto=format&fit=crop"
+            alt="PersonaVision AI Visualization"
+            className="w-full h-full object-cover opacity-80 dark:opacity-60 group-hover:scale-110 transition-transform duration-700"
+          />
+          {/* Overlay gradient matching your SUMMA/ALMUS cards */}
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent dark:from-black/80" />
+          
+          <div className="absolute bottom-6 left-6 flex items-center gap-3">
+            <div className="bg-blue-500 dark:bg-[#00e5ff] p-2 rounded-lg">
+              <Brain size={20} className="text-white dark:text-black" />
+            </div>
+            <span className="font-['Poppins',sans-serif] text-white text-[14px] font-semibold uppercase tracking-wider">
+              AI Powered Analysis
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</section>
       {/* About Section */}
       <section id="about" className="relative bg-white dark:bg-[#060910] py-24 overflow-hidden transition-colors duration-300 border-gray-100 dark:border-white/5">
         <div className="absolute bg-blue-400/5 dark:bg-[rgba(0,229,255,0.02)] blur-[100px] h-[400px] left-1/2 -translate-x-1/2 rounded-full top-0 w-[800px]" />
