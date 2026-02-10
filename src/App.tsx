@@ -1,16 +1,15 @@
-import { RouterProvider } from "react-router";
-import { router } from "./navigation/routes";
-import { AuthProvider } from "./services/AuthContext";
-import { ThemeProvider } from './services/ThemeContext';
+import { RouterProvider } from 'react-router';
+import { router } from './navigation/routes';
+import { AuthProvider } from './services/AuthContext'; // Ajoutez cet import
 
-export default function App() {
+function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    
+      <AuthProvider> 
         <RouterProvider router={router} />
       </AuthProvider>
-    </ThemeProvider>
-
-
+   
   );
 }
+
+export default App;

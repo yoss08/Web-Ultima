@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft, Mail, Lock, User, Phone, Users, Dumbbell } from "lucide-react";
 import { authHelpers } from "../../config/supabase";
-import { useTheme } from '../../services/ThemeContext';
+import { useTheme } from "../../styles/useTheme";
 
 const accountTypes = ["Player", "Coach", "Facility"];
 
@@ -18,7 +18,7 @@ export function SignUpPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
- const { theme } = useTheme();
+    const { isDark, setIsDark } = useTheme();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

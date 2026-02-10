@@ -3,14 +3,14 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Mail, ArrowLeft } from "lucide-react";
 import { authHelpers } from "../../config/supabase";
-import { useTheme } from '../../services/ThemeContext';
+import { useTheme } from "../../styles/useTheme";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const { theme } = useTheme();
+    const { isDark } = useTheme();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

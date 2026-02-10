@@ -110,12 +110,12 @@ export function CourtsManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1
-            className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-white dark:text-[#0A0E1A] mb-2"
+            className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >
             Courts Management
           </h1>
-          <p className="font-['Poppins',sans-serif] text-[16px] text-white/60 dark:text-[#0A0E1A]/60">
+          <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
             Monitor and manage all courts in your facility
           </p>
         </div>
@@ -132,17 +132,17 @@ export function CourtsManagementPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
         >
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-[10px] bg-[#39FF14]/10 border border-[#39FF14] flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-[#39FF14]" />
             </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-white dark:text-[#0A0E1A]">
+            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
               Available
             </h3>
           </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-white dark:text-[#0A0E1A]">
+          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
             {statusCounts.available}
           </p>
         </motion.div>
@@ -151,17 +151,17 @@ export function CourtsManagementPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
         >
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-[10px] bg-[#00E5FF]/10 border border-[#00E5FF] flex items-center justify-center">
               <AlertCircle className="w-5 h-5 text-[#00E5FF]" />
             </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-white dark:text-[#0A0E1A]">
+            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
               In Use
             </h3>
           </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-white dark:text-[#0A0E1A]">
+          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
             {statusCounts.inUse}
           </p>
         </motion.div>
@@ -170,17 +170,17 @@ export function CourtsManagementPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
         >
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-[10px] bg-[#FF6B00]/10 border border-[#FF6B00] flex items-center justify-center">
               <Wrench className="w-5 h-5 text-[#FF6B00]" />
             </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-white dark:text-[#0A0E1A]">
+            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
               Maintenance
             </h3>
           </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-white dark:text-[#0A0E1A]">
+          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
             {statusCounts.maintenance}
           </p>
         </motion.div>
@@ -198,11 +198,11 @@ export function CourtsManagementPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`bg-black/80 dark:bg-white/90 backdrop-blur-xl border ${statusConfig.border} rounded-[20px] p-6 hover:scale-[1.02] transition-transform cursor-pointer`}
+              className={`bg-white dark:bg-black/40 backdrop-blur-xl border ${statusConfig.border} rounded-[20px] p-6 hover:scale-[1.02] transition-transform cursor-pointer`}
             >
               {/* Court Header */}
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-white dark:text-[#0A0E1A]">
+                <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white">
                   {court.name}
                 </h3>
                 <div
@@ -235,23 +235,23 @@ export function CourtsManagementPage() {
               {/* Court Details */}
               {court.status === "in-use" && (
                 <div className="space-y-2">
-                  <p className="font-['Poppins',sans-serif] text-[13px] text-white/60 dark:text-[#0A0E1A]/60">
+                  <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
                     {court.currentMatch}
                   </p>
-                  <p className="font-['Poppins',sans-serif] text-[12px] text-white/40 dark:text-[#0A0E1A]/40">
+                  <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/40 dark:text-white/40">
                     Next: {court.nextAvailable}
                   </p>
                 </div>
               )}
 
               {court.status === "available" && (
-                <p className="font-['Poppins',sans-serif] text-[13px] text-white/60 dark:text-[#0A0E1A]/60">
+                <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
                   Ready for booking
                 </p>
               )}
 
               {court.status === "maintenance" && (
-                <p className="font-['Poppins',sans-serif] text-[13px] text-white/60 dark:text-[#0A0E1A]/60">
+                <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
                   Scheduled maintenance in progress
                 </p>
               )}

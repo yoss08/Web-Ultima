@@ -3,7 +3,7 @@ import { useState} from "react";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft, Mail, Lock } from "lucide-react";
 import { authHelpers } from "../../config/supabase";
-import { useTheme } from '../../services/ThemeContext';
+import { useTheme } from "../../styles/useTheme";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -12,8 +12,8 @@ export function LoginPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+   const { isDark, setIsDark } = useTheme();
   const [error, setError] = useState("");
- const { theme } = useTheme();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -46,7 +46,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E8EBF0] via-[#F5F7FA] to-[#FFFFFF] dark:from-[#0A1F2E] dark:via-[#0A0E1A] dark:to-[#000000] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
+    <div   className="min-h-screen bg-gradient-to-b from-[#E8EBF0] via-[#F5F7FA] to-[#FFFFFF] dark:from-[#0A1F2E] dark:via-[#0A0E1A] dark:to-[#000000] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

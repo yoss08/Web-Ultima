@@ -112,12 +112,12 @@ export function LiveMatchesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1
-            className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-white dark:text-[#0A0E1A] mb-2"
+            className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >
             Live Matches
           </h1>
-          <p className="font-['Poppins',sans-serif] text-[16px] text-white/60 dark:text-[#0A0E1A]/60">
+          <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
             Monitor ongoing matches in real time
           </p>
         </div>
@@ -138,12 +138,12 @@ export function LiveMatchesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
-            className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+            className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-white dark:text-[#0A0E1A]">
+                <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white">
                   {match.court}
                 </h3>
                 <span
@@ -157,7 +157,7 @@ export function LiveMatchesPage() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-1 text-white/60 dark:text-[#0A0E1A]/60">
+              <div className="flex items-center gap-1 text-[#0A0E1A]/60 dark:text-white/60">
                 <Clock className="w-4 h-4" />
                 <span className="font-['Poppins',sans-serif] text-[14px] font-mono">
                   {match.time}
@@ -173,7 +173,7 @@ export function LiveMatchesPage() {
                   <div className="w-8 h-8 rounded-full bg-[#39FF14]/20 border border-[#39FF14] flex items-center justify-center">
                     <Users className="w-4 h-4 text-[#39FF14]" />
                   </div>
-                  <span className="font-['Poppins',sans-serif] text-[15px] text-white dark:text-[#0A0E1A]">
+                  <span className="font-['Poppins',sans-serif] text-[15px] text-[#0A0E1A] dark:text-white">
                     {match.players.team1.join(" / ")}
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export function LiveMatchesPage() {
                   {match.score.sets.map((set, idx) => (
                     <span
                       key={idx}
-                      className="w-10 h-10 rounded-[8px] bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/20 dark:border-[#0A0E1A]/20 flex items-center justify-center font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-[#0A0E1A]"
+                      className="w-10 h-10 rounded-[8px] bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/20 dark:border-[#0A0E1A]/20 flex items-center justify-center font-['Poppins',sans-serif] font-bold text-[16px] text-[#0A0E1A] dark:text-white"
                     >
                       {set.team1}
                     </span>
@@ -195,7 +195,7 @@ export function LiveMatchesPage() {
                   <div className="w-8 h-8 rounded-full bg-[#00E5FF]/20 border border-[#00E5FF] flex items-center justify-center">
                     <Users className="w-4 h-4 text-[#00E5FF]" />
                   </div>
-                  <span className="font-['Poppins',sans-serif] text-[15px] text-white dark:text-[#0A0E1A]">
+                  <span className="font-['Poppins',sans-serif] text-[15px] text-[#0A0E1A] dark:text-white">
                     {match.players.team2.join(" / ")}
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export function LiveMatchesPage() {
                   {match.score.sets.map((set, idx) => (
                     <span
                       key={idx}
-                      className="w-10 h-10 rounded-[8px] bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/20 dark:border-[#0A0E1A]/20 flex items-center justify-center font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-[#0A0E1A]"
+                      className="w-10 h-10 rounded-[8px] bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/20 dark:border-[#0A0E1A]/20 flex items-center justify-center font-['Poppins',sans-serif] font-bold text-[16px] text-[#0A0E1A] dark:text-white"
                     >
                       {set.team2}
                     </span>
@@ -218,7 +218,7 @@ export function LiveMatchesPage() {
                 <Play className="w-4 h-4" />
                 Resume
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 h-10 bg-white/5 hover:bg-white/10 dark:bg-[#0A0E1A]/5 dark:hover:bg-[#0A0E1A]/10 border border-white/20 dark:border-[#0A0E1A]/20 rounded-[10px] transition-all font-['Poppins',sans-serif] text-[14px] font-semibold text-white dark:text-[#0A0E1A]">
+              <button className="flex-1 flex items-center justify-center gap-2 h-10 bg-white/5 hover:bg-white/10 dark:bg-[#0A0E1A]/5 dark:hover:bg-[#0A0E1A]/10 border border-white/20 dark:border-[#0A0E1A]/20 rounded-[10px] transition-all font-['Poppins',sans-serif] text-[14px] font-semibold text-[#0A0E1A] dark:text-white">
                 <Pause className="w-4 h-4" />
                 Pause
               </button>

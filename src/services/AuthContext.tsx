@@ -1,9 +1,16 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User as SupabaseUser } from '@supabase/supabase-js'; // On renomme l'import pour éviter le conflit
 import { supabase } from '../config/supabase';
 
+// 1. On définit l'interface pour vos données personnalisées
+interface CustomUser extends SupabaseUser {
+  fullName?: string;
+  phoneNumber?: string;
+  role?: string;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: CustomUser | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -23,13 +30,24 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CustomUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Fonction pour fusionner les données de session avec les métadonnées
+  const mapUserWithMetadata = (supabaseUser: SupabaseUser | null): CustomUser | null => {
+    if (!supabaseUser) return null;
+    return {
+      ...supabaseUser,
+      fullName: supabaseUser.user_metadata?.fullName,
+      phoneNumber: supabaseUser.user_metadata?.phoneNumber,
+      role: supabaseUser.user_metadata?.accountType?.toLowerCase(), // On récupère le rôle stocké au SignUp
+    };
+  };
 
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      setUser(mapUserWithMetadata(session?.user ?? null));
       setLoading(false);
     });
 
@@ -37,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      setUser(mapUserWithMetadata(session?.user ?? null));
       setLoading(false);
     });
 

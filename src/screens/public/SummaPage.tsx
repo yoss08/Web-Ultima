@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Moon, Sun, ArrowRight, Check, Activity, Zap, LayoutDashboard, Smartphone, Shield, Play, RefreshCw, MonitorPlay, Monitor, Globe, Users, AlertCircle, Sliders, Award } from "lucide-react";
+import { useAuth } from "../../services/AuthContext";
+import { useTheme } from "../../styles/useTheme";
 
 // Images
 const padelCourtImage = "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
@@ -13,28 +15,10 @@ const trainingAcademyImage = "https://images.unsplash.com/photo-1534438327276-14
 const competitionVenueImage = "https://cdn.prod.website-files.com/639778ab6f2e51ed2139df9a/67a332d3ef2eed873451ac9f_66fd5bda262b1283b1bb9c7b_mejorset-paris-premier-padel-2024-court.webp";
 
 export function SummaPage() {
-  const [isDark, setIsDark] = useState(() => {
-    // Dark mode par défaut
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'light') return false;
-      return true; // Par défaut dark
-    }
-    return true;
-  });
+ 
+  const { isDark, setIsDark } = useTheme();
 
-  useEffect(() => {
-    // Appliquer le thème au document
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -179,7 +163,7 @@ export function SummaPage() {
     { title: "Training academies", image: trainingAcademyImage },
     { title: "Competition venues", image: competitionVenueImage },
   ];
-
+ const { user } = useAuth();
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       {/* Navigation */}
@@ -246,6 +230,18 @@ export function SummaPage() {
                 )}
               </button>
 
+              {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
               <Link
                 to="/login"
                 className="text-gray-700 dark:text-white/70 hover:text-blue-600 dark:hover:text-white transition-colors duration-300 font-['Poppins',sans-serif] font-semibold text-[14px]"
@@ -259,6 +255,8 @@ export function SummaPage() {
               >
                 Sign Up
               </Link>
+              </>
+              )}
             </div>
           </div>
         </div>

@@ -101,12 +101,12 @@ export function OverviewPage() {
       {/* Header */}
       <div>
         <h1
-          className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-white dark:text-[#0A0E1A] mb-2"
+          className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2"
           style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
         >
           Overview
         </h1>
-        <p className="font-['Poppins',sans-serif] text-[16px] text-white/60 dark:text-[#0A0E1A]/60">
+        <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
           Monitor your facility performance at a glance
         </p>
       </div>
@@ -121,7 +121,7 @@ export function OverviewPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+              className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
             >
               <div className="flex items-start justify-between mb-4">
                 <div
@@ -131,13 +131,13 @@ export function OverviewPage() {
                   <Icon className="w-6 h-6" style={{ color: card.color }} />
                 </div>
               </div>
-              <h3 className="font-['Poppins',sans-serif] text-[14px] text-white/60 dark:text-[#0A0E1A]/60 mb-1">
+              <h3 className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60 mb-1">
                 {card.label}
               </h3>
-              <p className="font-['Poppins',sans-serif] font-bold text-[28px] text-white dark:text-[#0A0E1A] mb-2">
+              <p className="font-['Poppins',sans-serif] font-bold text-[28px] text-[#0A0E1A] dark:text-white mb-2">
                 {card.value}
               </p>
-              <p className="font-['Poppins',sans-serif] text-[12px] text-white/40 dark:text-[#0A0E1A]/40">
+              <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/40 dark:text-white/40">
                 {card.change}
               </p>
             </motion.div>
@@ -151,10 +151,10 @@ export function OverviewPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-white dark:text-[#0A0E1A]">
+            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white">
               Live Matches
             </h2>
             <div className="flex items-center gap-2">
@@ -181,17 +181,17 @@ export function OverviewPage() {
                         Live
                       </span>
                     </div>
-                    <p className="font-['Poppins',sans-serif] text-[13px] text-white/60 dark:text-[#0A0E1A]/60">
+                    <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
                       {match.teams}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-[#0A0E1A]">
+                    <p className="font-['Poppins',sans-serif] font-bold text-[16px] text-[#0A0E1A] dark:text-white">
                       {match.score}
                     </p>
                     <div className="flex items-center gap-1 justify-end mt-1">
                       <Clock className="w-3 h-3 text-white/40 dark:text-[#0A0E1A]/40" />
-                      <span className="font-['Poppins',sans-serif] text-[12px] text-white/40 dark:text-[#0A0E1A]/40">
+                      <span className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/40 dark:text-white/40">
                         {match.time}
                       </span>
                     </div>
@@ -207,10 +207,10 @@ export function OverviewPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-white dark:text-[#0A0E1A]">
+            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white">
               Weekly Activity
             </h2>
             <TrendingUp className="w-5 h-5 text-[#39FF14]" />
@@ -253,14 +253,14 @@ export function OverviewPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="bg-black/80 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-[#0A0E1A]/10 rounded-[20px] p-6"
+        className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-white dark:text-[#0A0E1A] mb-1">
+            <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-1">
               Peak Hours Analysis
             </h2>
-            <p className="font-['Poppins',sans-serif] text-[14px] text-white/60 dark:text-[#0A0E1A]/60">
+            <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60">
               Court usage throughout the day
             </p>
           </div>

@@ -1,32 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { Moon, Sun, ArrowRight, Check } from "lucide-react";
+import { Moon, Sun, ArrowRight, Check, LayoutDashboard } from "lucide-react";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
+import { useAuth } from "../../services/AuthContext";
+import { useTheme } from "../../styles/useTheme";
 
 export function Solutions() {
-  const [isDark, setIsDark] = useState(() => {
-    // Vérifier la préférence système ou le thème stocké
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme) return storedTheme === 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return true; // Par défaut dark si SSR
-  });
 
-  useEffect(() => {
-    // Appliquer le thème au document
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+  const { isDark, setIsDark } = useTheme();
   const scrollToContact = () => {
     const contactSection = document.getElementById("solution-cta");
     if (contactSection) {
@@ -85,7 +67,7 @@ export function Solutions() {
   const getSolutionColor = (solution: typeof solutions[0]) => {
     return isDark ? solution.darkColor : solution.color;
   };
-
+ const { user } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0A0E1A] dark:to-black transition-colors duration-300">
       {/* Navigation */}
@@ -152,6 +134,18 @@ export function Solutions() {
                 )}
               </button>
 
+              {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
               <Link
                 to="/login"
                 className="text-gray-700 dark:text-white/70 hover:text-blue-600 dark:hover:text-white transition-colors duration-300 font-['Poppins',sans-serif] font-semibold text-[14px]"
@@ -165,6 +159,8 @@ export function Solutions() {
               >
                 Sign Up
               </Link>
+              </>
+              )}
             </div>
           </div>
         </div>

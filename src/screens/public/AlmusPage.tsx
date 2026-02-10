@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { Moon, Sun, ArrowRight } from "lucide-react";
+import { Moon, Sun, ArrowRight, LayoutDashboard } from "lucide-react";
+import { useAuth } from "../../services/AuthContext";
+import { useTheme } from "../../styles/useTheme";
 
 const imgImageAlmusSmartHydrationStation = "https://images.unsplash.com/photo-1517093911940-08cb5b3952e7?q=80&w=744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dpg";
 const imgImageAlmusInstalledInProfessionalTrainingFacility = "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -15,15 +17,8 @@ const imgImageSportsClubs = "https://static.actu.fr/uploads/2025/09/padel-patino
 const imgImageWellnessSpaces = "https://www.cinqmondes.com/media/contentmanager/content/helvetia_hammam_render.png";
 
 export function AlmusPage() {
-  const [isDark, setIsDark] = useState(() => {
-    // Dark mode par défaut
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'light') return false;
-      return true; // Par défaut dark
-    }
-    return true;
-  });
+  
+  const { isDark, setIsDark } = useTheme();
 
   const [currentStep, setCurrentStep] = useState(0);
   
@@ -35,19 +30,6 @@ export function AlmusPage() {
   const prevStep = () => {
     setCurrentStep((prev) => (prev === 0 ? steps.length - 1 : prev - 1));
   };
-
-  useEffect(() => {
-    // Appliquer le thème au document
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -161,10 +143,10 @@ export function AlmusPage() {
       description: "Light, low-calorie refreshment on demand",
     },
   ];
-
+ const { user } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0A0E1A] dark:to-black transition-colors duration-300">
-      {/* Navigation - Laissée inchangée comme demandé */}
+      {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -228,7 +210,18 @@ export function AlmusPage() {
                   <Moon className="w-5 h-5 text-gray-700" />
                 )}
               </button>
-
+            {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
               <Link
                 to="/login"
                 className="text-gray-700 dark:text-white/70 hover:text-blue-600 dark:hover:text-white transition-colors duration-300 font-['Poppins',sans-serif] font-semibold text-[14px]"
@@ -242,6 +235,8 @@ export function AlmusPage() {
               >
                 Sign Up
               </Link>
+              </>
+              )}
             </div>
           </div>
         </div>

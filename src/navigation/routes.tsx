@@ -1,3 +1,4 @@
+import React from "react";
 import { createBrowserRouter } from "react-router";
 import { HomePage } from "../screens/public/HomePage";
 import { Solutions } from "../screens/public/Solutions";
@@ -13,6 +14,18 @@ import { AnalyticsPage } from "../components/dashboard/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
 import { SettingsPage } from "../components/dashboard/SettingsPage";
 import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
+import { PlayerDashboard } from "../screens/player/playerdashboard";
+import { useAuth } from "../services/AuthContext";
+
+
+const DashboardIndex = () => {
+  const { user } = useAuth();
+  
+ if (user?.role === 'player') {
+    return <PlayerDashboard />;
+  }
+  return <OverviewPage />;
+};
 
 export const router = createBrowserRouter([
   {
@@ -49,7 +62,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: OverviewPage,
+        Component: DashboardIndex,
       },
       {
         path: "live-matches",

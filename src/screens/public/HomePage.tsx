@@ -1,32 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
-import { Moon, Sun, ArrowRight, Eye, Brain } from "lucide-react";
+import { Moon, Sun, ArrowRight, Eye, Brain, LayoutDashboard } from "lucide-react";
 import svgPaths from "../../components/icons/IconMainLogo";
+import { useAuth } from "../../services/AuthContext";
+import { useTheme } from "../../styles/useTheme";
 
 const imgImageSummaPadelSportsDashboard = "https://images.unsplash.com/photo-1657704358775-ed705c7388d2?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const imgImageAlmusSmartDispenserStation = "https://www.thoughtco.com/thmb/BVnoDc9J_65SCnuAQ9fvciTSyLQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/splashing-165192_1280-7879d2914dfb4e5d8dbf2e943669bd92.jpg";
 
 export function HomePage() {
-  const [isDark, setIsDark] = useState(() => {
-    // Vérifier la préférence système ou le thème stocké
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) return storedTheme === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  useEffect(() => {
-    // Appliquer le thème au document
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+  
+  const { user } = useAuth();
+  const { isDark, setIsDark } = useTheme();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -116,7 +102,18 @@ export function HomePage() {
                   <Moon className="w-5 h-5 text-gray-700" />
                 )}
               </button>
-
+              {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
               <Link
                 to="/login"
                 className="text-gray-700 dark:text-white/70 hover:text-blue-600 dark:hover:text-white transition-colors duration-300 font-['Poppins',sans-serif] font-semibold text-[14px]"
@@ -130,6 +127,8 @@ export function HomePage() {
               >
                 Sign Up
               </Link>
+              </>
+              )}
             </div>
           </div>
         </div>
