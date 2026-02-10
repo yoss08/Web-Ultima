@@ -14,7 +14,7 @@ import { AnalyticsPage } from "../components/dashboard/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
 import { SettingsPage } from "../components/dashboard/SettingsPage";
 import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
-import { PlayerDashboard } from "../screens/player/playerdashboard";
+import { PlayerDashboard } from "../screens/player/PlayerDashboard";
 import { useAuth } from "../services/AuthContext";
 
 
