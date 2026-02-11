@@ -1,72 +1,149 @@
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Trophy, Calendar, Droplet, Clock, ChevronRight, PlayCircle } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { 
+  Calendar, 
+  Trophy, 
+  Activity, 
+  Plus, 
+  ArrowRight, 
+  Droplet, 
+  TrendingUp,
+  Clock
+} from "lucide-react";
+import { Link } from "react-router";
+import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
-
-
-const performanceData = [
-  { day: "Mon", rating: 1200 }, { day: "Tue", rating: 1250 },
-  { day: "Wed", rating: 1230 }, { day: "Thu", rating: 1300 },
-  { day: "Fri", rating: 1350 }, { day: "Sat", rating: 1420 },
-  { day: "Sun", rating: 1400 },
-];
 
 export function PlayerDashboard() {
   const { user } = useAuth();
+  const [hasData, setHasData] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkActivity() {
+      if (!user) return;
+      // Vérifier s'il existe au moins une réservation
+      const { count } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      setHasData(!!count && count > 0);
+      setLoading(false);
+    }
+    checkActivity();
+  }, [user]);
 
   return (
-    <div className="p-8 space-y-8">
-      {/* Header Dynamique */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <h1 className="font-['Playfair_Display',serif] font-bold text-[32px] text-white dark:text-[#0A0E1A]">
-            Welcome back, {user?.fullName || "Player"}!
+    <div className="space-y-8 animate-in fade-in duration-700">
+      {/* Welcome Header */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-['Playfair_Display'] font-bold text-3xl dark:text-white">
+            Hello, {user?.user_metadata?.full_name?.split(' ')[0] || "Player"}! 👋
           </h1>
-          <p className="font-['Poppins',sans-serif] text-white/60 dark:text-[#0A0E1A]/60">
-            {user?.email} • Level 4 Player
+          <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
+            Ready for your next match? Here's your activity overview.
           </p>
-        </motion.div>
-        <button className="bg-[#39FF14] text-black font-bold px-6 py-3 rounded-[12px] flex items-center gap-2 shadow-[0_0_20px_rgba(57,255,20,0.3)]">
-          <Calendar size={20} /> Book a Court
-        </button>
-      </div>
+        </div>
+        <Link 
+          to="/dashboard/courts"
+          className="bg-[#39FF14] text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-[#39FF14]/20 w-fit"
+        >
+          <Plus size={20} /> Book a Court
+        </Link>
+      </header>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { icon: Trophy, label: "Win Rate", value: "68%", color: "#39FF14" },
-          { icon: Calendar, label: "Next Match", value: "Today, 4 PM", color: "#00E5FF" },
-          { icon: Droplet, label: "Hydration", value: "85%", color: "#39FF14" }
-        ].map((stat, i) => (
-          <motion.div key={i} className="bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/10 p-6 rounded-[24px]">
-            <stat.icon className="mb-4" size={24} color={stat.color} />
-            <p className="text-white/60 dark:text-[#0A0E1A]/60 text-sm">{stat.label}</p>
-            <h3 className="text-2xl font-bold text-white dark:text-[#0A0E1A]">{stat.value}</h3>
-          </motion.div>
-        ))}
-      </div>
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Left Column: Stats Cards & Progress */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatCard icon={Trophy} label="Wins" value={hasData ? "0" : "--"} color="#39FF14" />
+            <StatCard icon={Activity} label="Matches" value={hasData ? "0" : "--"} color="#00E5FF" />
+            <StatCard icon={TrendingUp} label="Rank" value="Newbie" color="#FFD700" />
+          </div>
 
-      {/* Performance Chart */}
-      <div className="bg-white/5 dark:bg-[#0A0E1A]/5 border border-white/10 rounded-[24px] p-6">
-        <h2 className="text-white dark:text-[#0A0E1A] font-semibold mb-6">Performance Rating</h2>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={performanceData}>
-              <defs>
-                <linearGradient id="colorRating" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#39FF14" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#39FF14" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-              <XAxis dataKey="day" stroke="#ffffff40" />
-              <YAxis stroke="#ffffff40" />
-              <Tooltip contentStyle={{ backgroundColor: '#111', border: 'none' }} />
-              <Area type="monotone" dataKey="rating" stroke="#39FF14" fillOpacity={1} fill="url(#colorRating)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {/* Performance Placeholder or Data */}
+          <section className="bg-white dark:bg-white/5 p-8 rounded-[32px] border border-gray-200 dark:border-white/10 min-h-[300px] flex flex-col justify-center items-center text-center">
+            {!hasData ? (
+              <div className="max-w-md space-y-4">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto">
+                  <TrendingUp className="text-gray-400" size={32} />
+                </div>
+                <h3 className="text-xl font-bold">No Performance Data Yet</h3>
+                <p className="text-sm opacity-60">
+                  Complete your first match to start tracking your win rate and skill progression.
+                </p>
+                <Link to="/dashboard/courts" className="text-[#39FF14] font-bold text-sm inline-flex items-center gap-2 hover:underline">
+                  Find a court nearby <ArrowRight size={16} />
+                </Link>
+              </div>
+            ) : (
+              <p>Your charts will appear here...</p>
+            )}
+          </section>
+        </div>
+
+        {/* Right Column: Quick Access & Shared Pages */}
+        <div className="space-y-6">
+          
+          {/* Next Booking Card (Adaptive State) */}
+         <div className="bg-white dark:bg-[#0A0E1A] text-[#0A0E1A] dark:text-white p-8 rounded-[32px] border border-gray-100 dark:border-white/5 overflow-hidden relative group transition-colors duration-300">
+          <div className="relative z-10">
+           <h3 className="font-bold text-lg mb-2">Next Booking</h3>
+             <p className="text-[#0A0E1A]/40 dark:text-white/40 text-sm mb-6">
+               You have no upcoming matches.
+            </p>
+               <Link 
+                 to="/dashboard/courts"
+                 className="w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 border border-gray-200 dark:border-white/10 rounded-xl flex items-center justify-center gap-2 transition-all font-semibold"
+                 >
+                 Schedule Now
+               </Link>
+           </div>
+           {/* L'icône change aussi d'opacité selon le mode */}
+            <Calendar className="absolute -bottom-4 -right-4 text-black/[0.03] dark:text-white/5 w-32 h-32 group-hover:scale-110 transition-transform" />
+         </div>
+
+          {/* Quick Links to Shared Pages */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider opacity-50 px-2">Quick Access</h4>
+            <SharedPageLink to="/dashboard/hydration" icon={Droplet} label="Water Tracker" color="#00E5FF" />
+            <SharedPageLink to="/dashboard/profile" icon={Plus} label="Complete Profile" color="#39FF14" />
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Sub-components
+function StatCard({ icon: Icon, label, value, color }: any) {
+  return (
+    <div className="bg-white dark:bg-white/5 p-6 rounded-[24px] border border-gray-200 dark:border-white/10">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}15` }}>
+          <Icon size={18} style={{ color }} />
+        </div>
+        <span className="text-sm opacity-60 font-medium">{label}</span>
+      </div>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
+  );
+}
+
+function SharedPageLink({ to, icon: Icon, label, color }: any) {
+  return (
+    <Link to={to} className="flex items-center justify-between p-4 bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:border-[#39FF14] transition-all group">
+      <div className="flex items-center gap-3">
+        <Icon size={20} style={{ color }} />
+        <span className="font-medium">{label}</span>
+      </div>
+      <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+    </Link>
   );
 }

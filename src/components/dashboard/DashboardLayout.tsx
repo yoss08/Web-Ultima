@@ -14,55 +14,91 @@ import {
   Sun,
   Moon,
   Trophy,
-  Dumbbell,
   ShieldCheck,
+  Dumbbell,
+  User,
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
-  { icon: Zap, label: "Live Matches", path: "/dashboard/live-matches" },
-  { icon: Grid3X3, label: "Courts Management", path: "/dashboard/courts" },
-  { icon: BarChart3, label: "Analytics", path: "/dashboard/analytics" },
-  { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
-  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-];
-
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isDark, setIsDark } = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isDark, setIsDark } = useTheme();
-
-  // Fonction pour obtenir les infos du badge selon le rôle
+ 
   const getRoleBadge = () => {
     const role = user?.role?.toLowerCase();
     switch (role) {
       case 'admin':
-      case 'facility':
         return { icon: ShieldCheck, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/30" };
       case 'coach':
         return { icon: Dumbbell, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/30" };
       default: 
         return { icon: Trophy, color: "text-[#39FF14]", bg: "bg-[#39FF14]/20", border: "border-[#39FF14]" };
   };
-} 
+  } 
+  
+  const role = user?.user_metadata?.account_type || "Player";
   const badge = getRoleBadge();
+  // Construction dynamique du menu de navigation
+  const navItems = [
+    { 
+      icon: LayoutDashboard, 
+      label: "Overview", 
+      path: "/dashboard" 
+    },
+    { 
+      icon: Zap, 
+      label: role === "Player" ? "My Matches" : "Live Matches", 
+      path: "/dashboard/live-matches" 
+    },
+    // Ajout de "Competitions" uniquement pour les joueurs
+    ...(role === "Player" ? [
+      { 
+        icon: Trophy, 
+        label: "Competitions", 
+        path: "/dashboard/competitions" 
+      }
+    ] : []),
+    { 
+      icon: Grid3X3, 
+      label: role === "Player" ? "Court Booking" : "Court Management", 
+      path: "/dashboard/courts"
+    },
+    { 
+      icon: BarChart3, 
+      label: role === "Player" ? "My Stats" : "Analytics", 
+      path: "/dashboard/analytics" 
+    },
+    { 
+      icon: Droplet, 
+      label: "Hydration", 
+      path: "/dashboard/hydration" 
+    },
+    { 
+      icon: User, 
+      label: "Profile", 
+      path: "/dashboard/profile" 
+    },
+    { 
+      icon: Settings, 
+      label: "Settings", 
+      path: "/dashboard/settings" 
+    },
+  ];
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? "bg-[#0A0E1A]" : "bg-gray-50"
-    }`}>
-      {/* Top Bar */}
+    <div className={`min-h-screen ${isDark ? "bg-[#0A0E1A]" : "bg-gray-50"} transition-colors duration-300`}>
+      {/* Top Navigation Bar */}
       <header className={`fixed top-0 left-0 right-0 h-16 backdrop-blur-xl border-b z-50 ${
         isDark 
           ? "bg-black/80 border-white/10" 
@@ -83,15 +119,15 @@ export function DashboardLayout() {
               className="lg:hidden flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-white dark:text-[#0A0E1A]" />
+                <X className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
               ) : (
-                <Menu className="w-5 h-5 text-white dark:text-[#0A0E1A]" />
+                <Menu className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
               )}
             </button>
 
             <Link to="/">
               <h1
-                className="font-['Playfair_Display',serif] font-bold text-[28px] text-[#0A0E1A] dark:text-white cursor-pointer hover:opacity-80 transition-opacity"
+                className="font-['Arial',sans-serif] font-bold text-[24px] text-gray-900 dark:text-white tracking-[1.2px] transition-colors duration-300"
               >
                 ULTIMA
               </h1>
@@ -123,9 +159,9 @@ export function DashboardLayout() {
               <span className="absolute top-2 right-2 w-2 h-2 bg-[#39FF14] rounded-full"></span>
             </button>
 
-            {/* User Profile Link to Settings */}
+            {/* User Profile */}
             <Link 
-              to="/dashboard/settings" 
+              to="/dashboard/profile" 
               className="flex items-center gap-3 pl-2 pr-4 h-12 rounded-[16px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-all border border-transparent hover:border-white/10 group"
             >
               <div className={`w-9 h-9 rounded-full ${badge.bg} border ${badge.border} flex items-center justify-center transition-transform group-hover:scale-105`}>
@@ -136,10 +172,10 @@ export function DashboardLayout() {
                 <span className={`font-['Poppins',sans-serif] text-[14px] font-bold ${
                                       isDark ? "text-white" : "text-[#0A0E1A]"
                                       } leading-tight`}>
-                                      {user?.fullName || "User"}
+                                      {user?.user_metadata?.full_name || "User"}
                 </span>
                 <span className={`text-[10px] uppercase tracking-wider font-bold ${badge.color}`}>
-                  {user?.role || "Player"}
+                  {user?.user_metadata?.account_type || "Player"}
                 </span>
               </div>
             </Link>
@@ -147,135 +183,98 @@ export function DashboardLayout() {
         </div>
       </header>
 
-      {/* Sidebar - Desktop */}
+      {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:block fixed top-16 left-0 bottom-0 backdrop-blur-xl border-r transition-all duration-300 z-40 ${
-        sidebarOpen ? "w-64" : "w-20"
-      } ${
-        isDark 
-          ? "bg-black/80 border-white/10" 
-          : "bg-white/90 border-[#0A0E1A]/10"
-      }`}
+        className={`fixed left-0 top-16 bottom-0 w-64 ${isDark ? "bg-[#0A0E1A] border-white/10" : "bg-white border-gray-200"} border-r z-40 transition-transform duration-300 transform hidden lg:block ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-64"
+        }`}
       >
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-2 py-6">
           {navItems.map((item) => {
-            const Icon = item.icon;
-            // Correction de "active"
             const active = location.pathname === item.path;
-
+            const Icon = item.icon;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all group ${
+                className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all ${
                   active
-                    ? isDark
-                      ? "bg-gradient-to-r from-[#39FF14]/20 to-[#00E5FF]/20 border border-[#39FF14]/40"
-                      : "bg-gradient-to-r from-[#39FF14]/15 to-[#00E5FF]/15 border border-[#39FF14]/30"
-                    : isDark
-                    ? "hover:bg-white/5 hover:border hover:border-white/10"
-                    : "hover:bg-[#0A0E1A]/5 hover:border hover:border-gray-200"
+                    ? "bg-[#39FF14]/10 border border-[#39FF14]/30"
+                    : "hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
                 <Icon
-                  className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                    active
-                      ? "text-[#39FF14]"
-                      : isDark 
-                        ? "text-white/70 group-hover:text-[#39FF14]" 
-                        : "text-gray-600 group-hover:text-[#39FF14]"
+                  className={`w-5 h-5 ${
+                    active ? "text-[#39FF14]" : isDark ? "text-white/60" : "text-[#0A0E1A]/60"
                   }`}
                 />
-                {sidebarOpen && (
-                  <span
-                    className={`font-['Poppins',sans-serif] text-[14px] font-medium transition-colors ${
-                      active
-                        ? "text-[#39FF14]"
-                        : isDark 
-                          ? "text-white/90 group-hover:text-[#39FF14]" 
-                          : "text-gray-800 group-hover:text-[#39FF14]"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                )}
+                <span
+                  className={`font-['Poppins'] text-[14px] font-medium ${
+                    active ? "text-[#39FF14]" : isDark ? "text-white" : "text-[#0A0E1A]"
+                  }`}
+                >
+                  {item.label}
+                </span>
               </Link>
             );
           })}
-
-          {/* Logout */}
-          <Link
-            to="/"
-            onClick={handleSignOut}
-            className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all mt-8 group ${
-              isDark
-                ? "hover:bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:border hover:border-red-500/40"
-                : "hover:bg-gradient-to-r from-red-500/15 to-pink-500/15 hover:border hover:border-red-500/30"
-            }`}
-          >
-            <LogOut className={`w-5 h-5 transition-colors ${
-              isDark ? "text-red-400 group-hover:text-red-500" : "text-red-500"
-            }`} />
-            {sidebarOpen && (
-              <span className={`font-['Poppins',sans-serif] text-[14px] font-medium ${
-                isDark ? "text-red-400 group-hover:text-red-500" : "text-red-600"
-              }`}>
-                Logout
-              </span>
-            )}
-          </Link>
         </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 px-4 h-12 w-full rounded-[12px] text-red-500 hover:bg-red-500/10 transition-all"
+          >
+            <LogOut size={20} />
+            <span className="font-['Poppins'] text-[14px] font-medium">Log Out</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile Menu */}
+      {/* Mobile Sidebar (Overlay) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 bg-white/95 dark:bg-[#0A0E1A]/95 backdrop-blur-xl z-40">
-          <nav className="p-6 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = location.pathname === item.path;
-
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all ${
-                    active
-                      ? "bg-[#39FF14]/10 border border-[#39FF14]/30"
-                      : "hover:bg-black/10 dark:hover:bg-[#0A0E1A]/10"
-                  }`}
-                >
-                  <Icon
-                    className={`w-5 h-5 ${
-                      active
-                        ? "text-[#39FF14]"
-                        : "text-[#0A0E1A]/60 dark:text-white/60"
-                    }`}
-                  />
-                  <span
-                    className={`font-['Poppins',sans-serif] text-[14px] font-medium ${
-                      active
-                        ? "text-[#39FF14]"
-                        : "text-[#0A0E1A] dark:text-white"
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
+          <nav className={`absolute left-0 top-0 bottom-0 w-72 ${isDark ? "bg-[#0A0E1A]" : "bg-white"} p-6 shadow-2xl`}>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-[#39FF14] rounded-lg flex items-center justify-center font-bold text-black">A</div>
+                <span className={`font-['Playfair_Display'] font-bold text-xl ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>ALMUS</span>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} className={isDark ? "text-white" : "text-black"}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {navItems.map((item) => {
+                const active = location.pathname === item.path;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 h-12 rounded-[12px] ${
+                      active ? "bg-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14]" : isDark ? "text-white/60" : "text-[#0A0E1A]/60"
                     }`}
                   >
-                    {item.label}
-                  </span>
-                </Link>
-              );
-            })}
+                    <Icon size={20} />
+                    <span className="font-['Poppins'] text-[14px] font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
         </div>
       )}
 
       {/* Main Content Area */}
       <main
-        className={`pt-16 ${isDark ? "text-white" : "text-[#0A0E1A]"} transition-all duration-300 ${
-          sidebarOpen ? "lg:pl-64" : "lg:pl-20"
+        className={`pt-16 min-h-screen transition-all duration-300 ${
+          sidebarOpen ? "lg:pl-64" : "lg:pl-0"
         }`}
       >
-        <div className="p-6 lg:p-8">
+        <div className="p-4 lg:p-8 max-w-[1600px] mx-auto">
           <Outlet />
         </div>
       </main>

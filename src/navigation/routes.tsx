@@ -1,5 +1,5 @@
-import React from "react";
-import { createBrowserRouter } from "react-router";
+import React, { JSX } from "react";
+import { createBrowserRouter, Navigate } from "react-router";
 import { HomePage } from "../screens/public/HomePage";
 import { Solutions } from "../screens/public/Solutions";
 import { SummaPage } from "../screens/public/SummaPage";
@@ -14,19 +14,29 @@ import { AnalyticsPage } from "../components/dashboard/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
 import { SettingsPage } from "../components/dashboard/SettingsPage";
 import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
+import { Profile } from "../components/dashboard/Profile";
 import { PlayerDashboard } from "../screens/player/PlayerDashboard";
 import { useAuth } from "../services/AuthContext";
+import { CourtBooking } from "../screens/player/CourtBooking";
+import { PlayerStats } from "../screens/player/PlayerStats";
+import { Matches } from "../screens/player/Matches";
+import { Competitions } from "../screens/player/Competitions";
 
 
 const DashboardIndex = () => {
   const { user } = useAuth();
+  const role = user?.user_metadata?.account_type?.toLowerCase();
   
- if (user?.role === 'player') {
+ if (role === 'player') {
     return <PlayerDashboard />;
   }
   return <OverviewPage />;
 };
-
+function RoleBasedRoute({ playerComponent, adminComponent }: { playerComponent: JSX.Element, adminComponent: JSX.Element }) {
+  const { user } = useAuth();
+  const role = user?.user_metadata?.account_type;
+  return role === 'Player' ? playerComponent : adminComponent;
+}
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -66,19 +76,30 @@ export const router = createBrowserRouter([
       },
       {
         path: "live-matches",
-        Component: LiveMatchesPage,
-      },
-      {
-        path: "courts",
-        Component: CourtsManagementPage,
+        // Si Player -> Matches, sinon -> LiveMatchesPage
+        element: <RoleBasedRoute playerComponent={<Matches />} adminComponent={<LiveMatchesPage />} />,
       },
       {
         path: "analytics",
-        Component: AnalyticsPage,
+        // Si Player -> PlayerStats, sinon -> AnalyticsPage
+        element: <RoleBasedRoute playerComponent={<PlayerStats />} adminComponent={<AnalyticsPage />} />,
       },
+      {
+        path: "competitions",
+        // Uniquement accessible par les joueurs
+        element: <RoleBasedRoute playerComponent={<Competitions />} adminComponent={<Navigate to="/dashboard" />} />,
+      },
+      {
+        path: "courts",
+
+        element: <RoleBasedRoute playerComponent={<CourtBooking />} adminComponent={<CourtsManagementPage />} />      },
       {
         path: "hydration",
         Component: HydrationPage,
+      },
+      {
+        path: "profile",
+        Component: Profile,
       },
       {
         path: "settings",

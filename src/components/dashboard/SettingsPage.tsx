@@ -5,28 +5,10 @@ import {
   Shield,
   Save,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useAuth } from "../../services/AuthContext";
+import { useState } from "react";
 
 export function SettingsPage() {
-  const { user } = useAuth();
-  const [userData, setUserData] = useState({
-    fullName: "",
-    email: "",
-    role: "",
-    phone: "",
-  });
 
-  useEffect(() => {
-    if (user) {
-      setUserData({
-        fullName: user.fullName || "",
-        email: user.email || "",
-        role: user.role || "Player",
-        phone: user.phoneNumber || "",
-      });
-    }
-  }, [user]);
 
   const [notifications, setNotifications] = useState({
     emailAlerts: true,
@@ -36,12 +18,7 @@ export function SettingsPage() {
     weeklyReports: false,
   });
 
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData({
-      ...userData,
-      [e.target.name]: e.target.value,
-    });
-  };
+
 
   const handleNotificationToggle = (key: string) => {
     setNotifications({
@@ -53,9 +30,7 @@ export function SettingsPage() {
   const handleSave = () => {
     alert("Settings saved successfully!");
   };
-
-  // Style commun pour les champs de saisie
-  const inputClassName = "w-full bg-gray-50 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#39FF14] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white font-['Poppins',sans-serif]";
+  
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -65,83 +40,9 @@ export function SettingsPage() {
           Settings
         </h1>
         <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
-          Manage your account and preferences
+          Manage your settings preferences
         </p>
       </div>
-      
-      {/* User Account Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 lg:p-8 shadow-sm"
-      >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-[12px] bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center">
-            <User className="w-6 h-6 text-[#00E5FF]" />
-          </div>
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[22px] text-[#0A0E1A] dark:text-white">
-            User Account
-          </h2>
-        </div>
-
-        <div className="space-y-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A]/70 dark:text-white/70 ml-1">
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="fullName"
-              value={userData.fullName}
-              onChange={handleUserChange}
-              className={inputClassName}
-              placeholder="Your full name"
-            />
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A]/70 dark:text-white/70 ml-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
-                onChange={handleUserChange}
-                className={inputClassName}
-                placeholder="name@example.com"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A]/70 dark:text-white/70 ml-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={userData.phone}
-                onChange={handleUserChange}
-                className={inputClassName}
-                placeholder="+1 (555) 000-0000"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="font-['Poppins',sans-serif] font-medium text-[14px] text-[#0A0E1A]/70 dark:text-white/70 ml-1">
-              Account Role
-            </label>
-            <div className="w-full bg-gray-100 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 flex items-center cursor-not-allowed">
-              <span className="font-['Poppins',sans-serif] text-[15px] text-[#0A0E1A]/40 dark:text-white/40">
-                {userData.role}
-              </span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
 
       {/* Notifications Section */}
       <motion.div

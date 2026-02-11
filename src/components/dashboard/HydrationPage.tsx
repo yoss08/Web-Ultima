@@ -1,15 +1,15 @@
-import { motion } from "motion/react";
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Droplet,
   Activity,
-  AlertTriangle,
   CheckCircle,
   TrendingUp,
-  Wrench,
+  Plus,
+  History,
+  RefreshCw,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -18,178 +18,238 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useTheme } from "../../styles/useTheme"; // Import du hook de thème
+import { useTheme } from "../../styles/useTheme";
+import { toast } from "react-hot-toast";
 
 const machines = [
-  { id: 1, name: "ALMUS Station 1", location: "Court Area A", status: "active", waterLevel: 85, dailyUsage: 142, totalDispensed: "1,840L" },
-  { id: 2, name: "ALMUS Station 2", location: "Court Area B", status: "active", waterLevel: 45, dailyUsage: 98, totalDispensed: "1,520L" },
-  { id: 3, name: "ALMUS Station 3", location: "Lobby", status: "warning", waterLevel: 15, dailyUsage: 76, totalDispensed: "980L" },
-  { id: 4, name: "ALMUS Station 4", location: "Training Area", status: "maintenance", waterLevel: 0, dailyUsage: 0, totalDispensed: "2,240L" },
-];
-
-const weeklyUsageData = [
-  { day: "Mon", usage: 320 }, { day: "Tue", usage: 340 }, { day: "Wed", usage: 310 },
-  { day: "Thu", usage: 380 }, { day: "Fri", usage: 420 }, { day: "Sat", usage: 480 }, { day: "Sun", usage: 450 },
-];
-
-const hourlyUsageData = [
-  { hour: "6am", usage: 12 }, { hour: "9am", usage: 28 }, { hour: "12pm", usage: 65 },
-  { hour: "3pm", usage: 85 }, { hour: "6pm", usage: 110 }, { hour: "9pm", usage: 75 },
-];
-
-const stats = [
-  { icon: Droplet, label: "Total Usage Today", value: "342L", change: "+18%" },
-  { icon: Activity, label: "Active Stations", value: "2 / 4", change: "50%" },
-  { icon: TrendingUp, label: "Avg. Daily Usage", value: "385L", change: "+12%" },
-  { icon: AlertTriangle, label: "Alerts", value: "1", change: "Low water" },
+  { id: 1, name: "ALMUS Station 1", location: "Main Court Area", status: "active", waterLevel: 92, dailyUsage: 142, totalDispensed: "1,840L" },
 ];
 
 export function HydrationPage() {
   const { isDark } = useTheme();
 
-  // Variables dynamiques pour les graphiques
-  const chartGridColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(10,14,26,0.1)";
-  const chartAxisColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(10,14,26,0.4)";
-  const tooltipBg = isDark ? "#000" : "#fff";
-  const tooltipBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(10,14,26,0.1)";
+  // --- ÉTATS ---
+  const [goal] = useState(2500);
+  const [consumed, setConsumed] = useState(0);
+  const [history, setHistory] = useState<{ time: string; amount: number }[]>([]);
+  const [weeklyStats, setWeeklyStats] = useState<Record<string, number>>({});
 
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "active":
-        return { icon: CheckCircle, color: "#39FF14", bg: "bg-[#39FF14]/10", border: "border-[#39FF14]/30", text: "text-[#39FF14]", label: "Active" };
-      case "warning":
-        return { icon: AlertTriangle, color: "#FFD700", bg: "bg-[#FFD700]/10", border: "border-[#FFD700]/30", text: "text-[#FFD700]", label: "Low Water" };
-      case "maintenance":
-        return { icon: Wrench, color: "#FF6B00", bg: "bg-[#FF6B00]/10", border: "border-[#FF6B00]/30", text: "text-[#FF6B00]", label: "Maintenance" };
-      default:
-        return { icon: CheckCircle, color: "#39FF14", bg: "bg-[#39FF14]/10", border: "border-[#39FF14]/30", text: "text-[#39FF14]", label: "Active" };
+  // --- LOGIQUE DE CHARGEMENT ---
+  useEffect(() => {
+    const saved = localStorage.getItem("my_hydration_v2");
+    const today = new Date().toDateString();
+    
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Charger la consommation du jour
+      if (parsed.currentDate === today) {
+        setConsumed(parsed.consumed || 0);
+        setHistory(parsed.history || []);
+      }
+      // Charger les stats de la semaine
+      setWeeklyStats(parsed.weeklyStats || {});
+    }
+  }, []);
+
+  // --- SAUVEGARDE ET MISE À JOUR DE LA SEMAINE ---
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const dayName = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+
+    const updatedWeekly = { 
+      ...weeklyStats, 
+      [dayName]: consumed // Met à jour le jour actuel dans le graphique
+    };
+
+    localStorage.setItem("my_hydration_v2", JSON.stringify({
+      currentDate: today,
+      consumed,
+      history,
+      weeklyStats: updatedWeekly
+    }));
+
+    setWeeklyStats(updatedWeekly);
+  }, [consumed, history]);
+
+  const addWater = (amount: number) => {
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setConsumed(prev => prev + amount);
+    setHistory(prev => [{ time: now, amount }, ...prev].slice(0, 5));
+    toast.success(`+${amount}ml logged`, { icon: '💧' });
+  };
+
+  const resetProgress = () => {
+    if (confirm("Reset today's progress? (Weekly stats will be updated with 0)")) {
+      setConsumed(0);
+      setHistory([]);
     }
   };
 
+  // --- PRÉPARATION DES DONNÉES DU GRAPHIQUE ---
+  const chartData = useMemo(() => {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    return days.map(day => ({
+      day,
+      usage: weeklyStats[day] || 0
+    }));
+  }, [weeklyStats]);
+
+  // --- STYLES GRAPHIQUES ---
+  const chartGridColor = isDark ? "rgba(255,255,255,0.05)" : "rgba(10,14,26,0.05)";
+  const chartAxisColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(10,14,26,0.4)";
+
+  const stats = [
+    { icon: Droplet, label: "My Intake", value: `${consumed}ml`, change: `Goal: ${goal}ml` },
+    { icon: Activity, label: "Station Status", value: "Online", change: "Station 1 Active" },
+    { icon: TrendingUp, label: "Weekly Progress", value: `${Math.round(chartData.reduce((acc, curr) => acc + curr.usage, 0)/1000)}L`, change: "This week" },
+    { icon: CheckCircle, label: "Water Quality", value: "Optimal", change: "System OK" },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div>
-        <h1 className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2">
-          Hydration — ALMUS
-        </h1>
-        <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
-          Monitor your smart hydration stations
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] dark:text-white">Hydration Tracker</h1>
+          <p className="font-['Poppins'] opacity-60">Personal intake & Almus Station monitoring.</p>
+        </div>
+        <button onClick={resetProgress} className="p-3 rounded-full hover:bg-red-500/10 text-red-500 transition-all">
+          <RefreshCw size={20} />
+        </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6 shadow-sm"
-            >
-              <div className="w-12 h-12 rounded-[12px] bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6 text-[#00E5FF]" />
-              </div>
-              <h3 className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60 mb-1">{stat.label}</h3>
-              <p className="font-['Poppins',sans-serif] font-bold text-[28px] text-[#0A0E1A] dark:text-white mb-2">{stat.value}</p>
-              <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/40 dark:text-white/40">{stat.change}</p>
-            </motion.div>
-          );
-        })}
+        {stats.map((stat, index) => (
+          <div key={index} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[24px] p-6 shadow-sm">
+            <stat.icon className="w-6 h-6 text-[#00E5FF] mb-4" />
+            <h3 className="text-xs opacity-50 uppercase font-bold tracking-wider mb-1">{stat.label}</h3>
+            <p className="text-2xl font-bold dark:text-white">{stat.value}</p>
+            <p className="text-[10px] opacity-40 mt-1 font-medium">{stat.change}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Machines Status */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {machines.map((machine, index) => {
-          const statusConfig = getStatusConfig(machine.status);
-          const StatusIcon = statusConfig.icon;
-
-          return (
-            <motion.div
-              key={machine.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-              className={`bg-white dark:bg-black/80 backdrop-blur-xl border ${statusConfig.border} dark:border-white/10 rounded-[20px] p-6 shadow-sm`}
-            >
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white mb-1">{machine.name}</h3>
-                  <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60">{machine.location}</p>
-                </div>
-                <div className={`flex items-center gap-2 px-3 py-1 ${statusConfig.bg} border border-current rounded-full`}>
-                  <StatusIcon className="w-4 h-4" style={{ color: statusConfig.color }} />
-                  <span className={`font-['Poppins',sans-serif] text-[10px] font-bold ${statusConfig.text} uppercase tracking-wider`}>
-                    {statusConfig.label}
-                  </span>
-                </div>
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Left: Tracker & Log */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-10 flex flex-col items-center">
+            <div className="relative w-56 h-56 rounded-full border-8 border-[#00E5FF]/10 flex items-center justify-center overflow-hidden mb-10">
+              <motion.div 
+                initial={{ height: 0 }}
+                animate={{ height: `${Math.min((consumed/goal)*100, 100)}%` }}
+                className="absolute bottom-0 w-full bg-gradient-to-t from-[#00E5FF]/40 to-[#00E5FF]/10"
+                transition={{ type: "spring", bounce: 0, duration: 1 }}
+              />
+              <div className="relative z-10 text-center">
+                <span className="text-5xl font-black dark:text-white">{Math.round((consumed/goal)*100)}%</span>
+                <p className="text-[10px] font-bold opacity-50 uppercase tracking-[2px] mt-1">{consumed}ML / {goal}ML</p>
               </div>
+            </div>
 
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60">Water Level</span>
-                  <span className="font-['Poppins',sans-serif] text-[14px] font-bold text-[#0A0E1A] dark:text-white">{machine.waterLevel}%</span>
-                </div>
-                <div className="h-2.5 bg-[#0A0E1A]/5 dark:bg-white/10 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${machine.waterLevel}%` }}
-                    className={`h-full rounded-full ${machine.waterLevel > 50 ? "bg-[#00E5FF]" : machine.waterLevel > 20 ? "bg-[#FFD700]" : "bg-red-500"}`}
+            <div className="flex gap-4">
+              {[250, 500, 750].map(amount => (
+                <button
+                  key={amount}
+                  onClick={() => addWater(amount)}
+                  className="px-8 py-4 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 hover:bg-[#00E5FF] hover:text-black transition-all font-bold flex flex-col items-center group"
+                >
+                  <Plus size={18} className="mb-1 group-hover:scale-125 transition-transform" />
+                  {amount}ml
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* WEEK TRACKER CHART */}
+          <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
+            <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+              <TrendingUp size={20} className="text-[#00E5FF]" /> Weekly Intake Tracker
+            </h3>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+                  <XAxis 
+                    dataKey="day" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    stroke={chartAxisColor} 
+                    style={{ fontSize: "12px", fontFamily: "Poppins" }} 
                   />
-                </div>
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    stroke={chartAxisColor} 
+                    style={{ fontSize: "12px", fontFamily: "Poppins" }} 
+                  />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0, 229, 255, 0.05)' }}
+                    contentStyle={{ 
+                      backgroundColor: isDark ? "#0A0E1A" : "#fff", 
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "#eee"}`,
+                      borderRadius: "12px",
+                      fontSize: "12px"
+                    }} 
+                  />
+                  <Bar 
+                    dataKey="usage" 
+                    fill="#00E5FF" 
+                    radius={[10, 10, 0, 0]} 
+                    barSize={40}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: History & Station */}
+        <div className="space-y-6">
+          {/* Station 1 Card */}
+          <div className="bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-[24px] p-6 relative overflow-hidden group">
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="font-bold dark:text-white">Station 1</h3>
+                <span className="bg-[#39FF14] text-black text-[9px] font-black px-2 py-0.5 rounded-full">ACTIVE</span>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/60 dark:text-white/60 mb-1">Daily Usage</p>
-                  <p className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white">{machine.dailyUsage}L</p>
-                </div>
-                <div>
-                  <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/60 dark:text-white/60 mb-1">Total Dispensed</p>
-                  <p className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white">{machine.totalDispensed}</p>
-                </div>
+              <p className="text-xs opacity-50 mb-4">{machines[0].location}</p>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span>Water Level</span>
+                <span className="text-[#39FF14]">{machines[0].waterLevel}%</span>
               </div>
-            </motion.div>
-          );
-        })}
-      </div>
+              <div className="h-1.5 bg-[#39FF14]/10 rounded-full overflow-hidden">
+                <div className="h-full bg-[#39FF14]" style={{ width: `${machines[0].waterLevel}%` }} />
+              </div>
+            </div>
+          </div>
 
-      {/* Charts Section */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-          className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6 shadow-sm"
-        >
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-6">Weekly Usage</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={weeklyUsageData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-              <XAxis dataKey="day" stroke={chartAxisColor} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <YAxis stroke={chartAxisColor} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <Tooltip contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: "8px", color: isDark ? "#fff" : "#000" }} />
-              <Bar dataKey="usage" fill="#00E5FF" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
-          className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6 shadow-sm"
-        >
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-6">Today's Hourly Usage</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={hourlyUsageData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-              <XAxis dataKey="hour" stroke={chartAxisColor} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <YAxis stroke={chartAxisColor} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <Tooltip contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: "8px" }} />
-              <Line type="monotone" dataKey="usage" stroke="#00E5FF" strokeWidth={3} dot={{ fill: "#00E5FF", r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </motion.div>
+          {/* History */}
+          <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[24px] p-6">
+            <h3 className="font-bold text-xs uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
+              <History size={14} /> Today's Logs
+            </h3>
+            <div className="space-y-3">
+              <AnimatePresence>
+                {history.length === 0 ? (
+                  <p className="text-[11px] opacity-30 italic">No logs recorded yet.</p>
+                ) : (
+                  history.map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex justify-between items-center p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-transparent hover:border-[#00E5FF]/20 transition-all"
+                    >
+                      <span className="text-[10px] font-bold opacity-40">{item.time}</span>
+                      <span className="text-sm font-bold text-[#00E5FF]">+{item.amount}ml</span>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

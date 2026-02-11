@@ -5,7 +5,7 @@ import { ArrowLeft, Mail, Lock, User, Phone, Users, Dumbbell } from "lucide-reac
 import { authHelpers } from "../../config/supabase";
 import { useTheme } from "../../styles/useTheme";
 
-const accountTypes = ["Player", "Coach", "Facility"];
+const accountTypes = ["Player", "Coach", "Admin"];
 
 export function SignUpPage() {
   const navigate = useNavigate();
