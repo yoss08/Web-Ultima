@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
 import { Moon, Sun, ArrowRight, Check, LayoutDashboard } from "lucide-react";
-import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
+import { ImageWithFallback } from "../../components/Design/ImageWithFallback";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 
