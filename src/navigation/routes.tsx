@@ -8,7 +8,7 @@ import { LoginPage } from "../screens/public/LoginPage";
 import { SignUpPage } from "../screens/public/SignUpPage";
 import { ForgotPasswordPage } from "../screens/public/ForgotPasswordPage";
 import { OverviewPage } from "../screens/admin/OverviewPage";
-import { LiveMatchesPage } from "../screens/admin/LiveMatchesPage";
+import { LiveMatchesPage } from "../components/dashboard/LiveMatchesPage";
 import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
@@ -21,17 +21,21 @@ import { CourtBooking } from "../screens/player/CourtBooking";
 import { PlayerStats } from "../screens/player/PlayerStats";
 import { Matches } from "../screens/player/Matches";
 import { Competitions } from "../screens/player/Competitions";
+import { CoachDashboard } from "../screens/coach/CoachDashboard";
+import { StudentList } from "../screens/coach/StudentList";
+import { SessionScheduler } from "../screens/coach/SessionScheduler";
+import { StudentDetails } from "../screens/coach/StudentDetails";
+import { AdminCourtConfig } from "../screens/admin/AdminConfig";
 
 
 const DashboardIndex = () => {
   const { user } = useAuth();
   const role = user?.user_metadata?.account_type?.toLowerCase();
   
- if (role === 'player') {
-    return <PlayerDashboard />;
-  }
+  if (role === 'player') return <PlayerDashboard />;
+  if (role === 'coach') return <CoachDashboard />;
   return <OverviewPage />;
-};
+  };
 function RoleBasedRoute({ playerComponent, adminComponent }: { playerComponent: JSX.Element, adminComponent: JSX.Element }) {
   const { user } = useAuth();
   const role = user?.user_metadata?.account_type;
@@ -75,9 +79,27 @@ export const router = createBrowserRouter([
         Component: DashboardIndex,
       },
       {
-        path: "live-matches",
-        // Si Player -> Matches, sinon -> LiveMatchesPage
-        element: <RoleBasedRoute playerComponent={<Matches />} adminComponent={<LiveMatchesPage />} />,
+        path: "admin/overview",
+        Component: OverviewPage,
+      },
+      // --- ROUTES COACH ---
+      {
+        path: "coach/home",
+        Component: CoachDashboard,
+      },
+
+      // --- ROUTES PLAYER ---
+      {
+        path: "player/home",
+        Component: PlayerDashboard,
+      },
+      {
+       path: "live-matches",
+       Component: LiveMatchesPage, // Plus besoin de RoleBasedRoute ici car le composant gère les rôles en interne
+      },
+      {
+       path: "admin/courts-config",
+       Component: AdminCourtConfig, // Nouvelle page Admin
       },
       {
         path: "analytics",
@@ -92,7 +114,11 @@ export const router = createBrowserRouter([
       {
         path: "courts",
 
-        element: <RoleBasedRoute playerComponent={<CourtBooking />} adminComponent={<CourtsManagementPage />} />      },
+        element: <RoleBasedRoute playerComponent={<CourtBooking />} adminComponent={<CourtsManagementPage />} />     
+      },
+      { path: "coach/students", Component: StudentList },
+      { path: "coach/students/:id", Component: StudentDetails },
+      { path: "coach/schedule", Component: SessionScheduler },
       {
         path: "hydration",
         Component: HydrationPage,

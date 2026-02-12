@@ -1,264 +1,191 @@
-import { motion } from "motion/react";
-import { CheckCircle, AlertCircle, Wrench, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { 
+  CheckCircle, 
+  AlertCircle, 
+  Wrench, 
+  Plus, 
+  Loader2, 
+  RefreshCw,
+  Trash2
+} from "lucide-react";
+import { supabase } from "../../config/supabase"; 
+import { Link } from "react-router";
+import { toast } from "react-hot-toast";
 
 type CourtStatus = "available" | "in-use" | "maintenance";
 
 interface Court {
-  id: number;
+  id: string | number;
   name: string;
   status: CourtStatus;
-  currentMatch?: string;
-  nextAvailable?: string;
+  type: string;
+  current_match?: string;
 }
 
-const courtsData: Court[] = [
-  {
-    id: 1,
-    name: "Court 1",
-    status: "in-use",
-    currentMatch: "Rodriguez / Silva vs. Martinez / Lopez",
-    nextAvailable: "3:30 PM",
-  },
-  {
-    id: 2,
-    name: "Court 2",
-    status: "in-use",
-    currentMatch: "Johnson / Smith vs. Williams / Jones",
-    nextAvailable: "4:00 PM",
-  },
-  {
-    id: 3,
-    name: "Court 3",
-    status: "in-use",
-    currentMatch: "Anderson / White vs. Taylor / Brown",
-    nextAvailable: "3:45 PM",
-  },
-  { id: 4, name: "Court 4", status: "available" },
-  {
-    id: 5,
-    name: "Court 5",
-    status: "in-use",
-    currentMatch: "Garcia / Perez vs. Wilson / Davis",
-    nextAvailable: "4:15 PM",
-  },
-  { id: 6, name: "Court 6", status: "available" },
-  {
-    id: 7,
-    name: "Court 7",
-    status: "in-use",
-    currentMatch: "Miller / Moore vs. Jackson / Martin",
-    nextAvailable: "3:20 PM",
-  },
-  {
-    id: 8,
-    name: "Court 8",
-    status: "in-use",
-    currentMatch: "Thompson / Harris vs. Clark / Lewis",
-    nextAvailable: "4:30 PM",
-  },
-  { id: 9, name: "Court 9", status: "available" },
-  { id: 10, name: "Court 10", status: "maintenance" },
-  { id: 11, name: "Court 11", status: "available" },
-  { id: 12, name: "Court 12", status: "maintenance" },
-];
-
 export function CourtsManagementPage() {
-  const [courts] = useState(courtsData);
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const statusCounts = {
-    available: courts.filter((c) => c.status === "available").length,
-    inUse: courts.filter((c) => c.status === "in-use").length,
-    maintenance: courts.filter((c) => c.status === "maintenance").length,
+  // 1. Récupération des données réelles
+  const fetchCourts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('courts')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      setCourts(data || []);
+    } catch (error: any) {
+      toast.error("Error fetching courts: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourts();
+  }, []);
+
+  // 2. Action Admin : Changer le statut (Maintenance / Available)
+  const toggleMaintenance = async (courtId: string | number, currentStatus: CourtStatus) => {
+    const newStatus = currentStatus === "maintenance" ? "available" : "maintenance";
+    
+    try {
+      const { error } = await supabase
+        .from('courts')
+        .update({ status: newStatus })
+        .eq('id', courtId);
+
+      if (error) throw error;
+      
+      // Mise à jour locale de l'état
+      setCourts(courts.map(c => c.id === courtId ? { ...c, status: newStatus } : c));
+      toast.success(`Court set to ${newStatus}`);
+    } catch (error: any) {
+      toast.error("Failed to update status");
+    }
   };
 
   const getStatusConfig = (status: CourtStatus) => {
     switch (status) {
       case "available":
-        return {
-          icon: CheckCircle,
-          color: "#39FF14",
-          bg: "bg-[#39FF14]/10",
-          border: "border-[#39FF14]",
-          text: "text-[#39FF14]",
-          label: "Available",
-        };
+        return { color: "#39FF14", icon: CheckCircle, label: "Available", bg: "bg-[#39FF14]/10" };
       case "in-use":
-        return {
-          icon: AlertCircle,
-          color: "#00E5FF",
-          bg: "bg-[#00E5FF]/10",
-          border: "border-[#00E5FF]",
-          text: "text-[#00E5FF]",
-          label: "In Use",
-        };
+        return { color: "#00E5FF", icon: AlertCircle, label: "In Use", bg: "bg-[#00E5FF]/10" };
       case "maintenance":
-        return {
-          icon: Wrench,
-          color: "#FF6B00",
-          bg: "bg-[#FF6B00]/10",
-          border: "border-[#FF6B00]",
-          text: "text-[#FF6B00]",
-          label: "Maintenance",
-        };
+        return { color: "#FF3B30", icon: Wrench, label: "Maintenance", bg: "bg-[#FF3B30]/10" };
+      default:
+        return { color: "#999", icon: AlertCircle, label: "Unknown", bg: "bg-gray-500/10" };
     }
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header avec bouton d'ajout */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1
-            className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2"
-            style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
-          >
-            Courts Management
-          </h1>
-          <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
-            Monitor and manage all courts in your facility
-          </p>
+          <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display']">Courts Management</h1>
+          <p className="text-gray-500">Real-time status and maintenance control.</p>
         </div>
-
-        <button className="flex items-center gap-2 px-6 h-12 bg-[#39FF14] hover:bg-[#32E012] rounded-[12px] shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:shadow-[0_0_30px_rgba(57,255,20,0.6)] transition-all font-['Poppins',sans-serif] text-[14px] font-semibold text-black">
-          <Plus className="w-5 h-5" />
-          Schedule Match
-        </button>
+        
+        <div className="flex gap-2">
+          <button 
+            onClick={fetchCourts}
+            className="p-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white hover:bg-gray-50 transition-all"
+          >
+            <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+          </button>
+          <Link 
+            to="/dashboard/admin/courts-config" 
+            className="flex items-center gap-2 px-6 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-transform"
+          >
+            <Plus size={20} /> Add Court
+          </Link>
+        </div>
       </div>
 
-      {/* Status Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-[10px] bg-[#39FF14]/10 border border-[#39FF14] flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-[#39FF14]" />
-            </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
-              Available
-            </h3>
-          </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
-            {statusCounts.available}
-          </p>
-        </motion.div>
+      {/* Grid des Courts */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="w-12 h-12 text-[#39FF14] animate-spin mb-4" />
+          <p className="text-gray-500">Loading your infrastructure...</p>
+        </div>
+      ) : courts.length === 0 ? (
+        <div className="bg-white dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-20 text-center">
+          <h2 className="text-xl font-bold dark:text-white">No courts configured</h2>
+          <p className="text-gray-500 mt-2">Click "Add Court" to initialize your tennis club facilities.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courts.map((court) => {
+            const config = getStatusConfig(court.status);
+            const Icon = config.icon;
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-[10px] bg-[#00E5FF]/10 border border-[#00E5FF] flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-[#00E5FF]" />
-            </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
-              In Use
-            </h3>
-          </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
-            {statusCounts.inUse}
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white dark:bg-black/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[20px] p-6 transition-colors"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-[10px] bg-[#FF6B00]/10 border border-[#FF6B00] flex items-center justify-center">
-              <Wrench className="w-5 h-5 text-[#FF6B00]" />
-            </div>
-            <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-[#0A0E1A] dark:text-white">
-              Maintenance
-            </h3>
-          </div>
-          <p className="font-['Poppins',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white">
-            {statusCounts.maintenance}
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Courts Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {courts.map((court, index) => {
-          const statusConfig = getStatusConfig(court.status);
-          const StatusIcon = statusConfig.icon;
-
-          return (
-            <motion.div
-              key={court.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`bg-white dark:bg-black/40 backdrop-blur-xl border ${statusConfig.border} rounded-[20px] p-6 hover:scale-[1.02] transition-transform cursor-pointer`}
-            >
-              {/* Court Header */}
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] text-[#0A0E1A] dark:text-white">
-                  {court.name}
-                </h3>
-                <div
-                  className={`w-10 h-10 rounded-[10px] ${statusConfig.bg} border ${statusConfig.border} flex items-center justify-center`}
-                >
-                  <StatusIcon
-                    className="w-5 h-5"
-                    style={{ color: statusConfig.color }}
-                  />
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div
-                className={`inline-flex items-center gap-2 px-3 py-1 ${statusConfig.bg} border ${statusConfig.border} rounded-full mb-4`}
+            return (
+              <motion.div
+                key={court.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[28px] p-6 relative overflow-hidden group shadow-sm hover:shadow-xl transition-all"
               >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    court.status === "in-use" ? "animate-pulse" : ""
-                  }`}
-                  style={{ backgroundColor: statusConfig.color }}
-                ></span>
-                <span
-                  className={`font-['Poppins',sans-serif] text-[12px] font-semibold ${statusConfig.text} uppercase`}
-                >
-                  {statusConfig.label}
-                </span>
-              </div>
-
-              {/* Court Details */}
-              {court.status === "in-use" && (
-                <div className="space-y-2">
-                  <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
-                    {court.currentMatch}
-                  </p>
-                  <p className="font-['Poppins',sans-serif] text-[12px] text-[#0A0E1A]/40 dark:text-white/40">
-                    Next: {court.nextAvailable}
-                  </p>
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold dark:text-white group-hover:text-[#39FF14] transition-colors">
+                      {court.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">{court.type}</p>
+                  </div>
+                  <div className={`p-2 rounded-lg ${config.bg}`}>
+                    <Icon size={20} style={{ color: config.color }} />
+                  </div>
                 </div>
-              )}
 
-              {court.status === "available" && (
-                <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
-                  Ready for booking
-                </p>
-              )}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }}></span>
+                    <span className="text-sm font-bold dark:text-white uppercase tracking-tighter">
+                      {config.label}
+                    </span>
+                  </div>
 
-              {court.status === "maintenance" && (
-                <p className="font-['Poppins',sans-serif] text-[13px] text-[#0A0E1A]/60 dark:text-white/60">
-                  Scheduled maintenance in progress
-                </p>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+                  {court.status === "in-use" ? (
+                    <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                      <p className="text-[10px] text-blue-500 font-bold uppercase">Current Match</p>
+                      <p className="text-sm dark:text-white font-medium truncate">{court.current_match || "No data"}</p>
+                    </div>
+                  ) : (
+                    <div className="h-[52px] flex items-center">
+                       <p className="text-sm text-gray-500 italic">
+                         {court.status === "maintenance" ? "Under technical review" : "Available for booking"}
+                       </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* --- ACTIONS ADMIN --- */}
+                <div className="mt-6 pt-6 border-t border-gray-50 dark:border-white/5 flex gap-2">
+                  <button 
+                    onClick={() => toggleMaintenance(court.id, court.status)}
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
+                      court.status === "maintenance" 
+                      ? "bg-[#39FF14] text-black" 
+                      : "bg-gray-100 dark:bg-white/10 dark:text-white hover:bg-red-500 hover:text-white"
+                    }`}
+                  >
+                    {court.status === "maintenance" ? "End Maintenance" : "Set Maintenance"}
+                  </button>
+                  <button className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   TrendingUp,
   Users,
@@ -6,6 +7,9 @@ import {
   Calendar,
   Download,
   BarChart3,
+  Loader2,
+  Filter,
+  PieChart as PieChartIcon
 } from "lucide-react";
 import {
   LineChart,
@@ -23,157 +27,130 @@ import {
   Legend,
 } from "recharts";
 import { useTheme } from "../../styles/useTheme";
-
-const monthlyData = [
-  { month: "Jan", matches: 420, revenue: 8400 },
-  { month: "Feb", matches: 450, revenue: 9000 },
-  { month: "Mar", matches: 480, revenue: 9600 },
-  { month: "Apr", matches: 510, revenue: 10200 },
-  { month: "May", matches: 560, revenue: 11200 },
-  { month: "Jun", matches: 590, revenue: 11800 },
-];
-
-const courtUsageData = [
-  { name: "Court 1", usage: 95 },
-  { name: "Court 2", usage: 88 },
-  { name: "Court 3", usage: 92 },
-  { name: "Court 4", usage: 78 },
-  { name: "Court 5", usage: 85 },
-  { name: "Court 6", usage: 72 },
-  { name: "Court 7", usage: 90 },
-  { name: "Court 8", usage: 86 },
-];
-
-const peakHoursData = [
-  { name: "Morning", value: 25, color: "#39FF14" },
-  { name: "Afternoon", value: 45, color: "#00E5FF" },
-  { name: "Evening", value: 30, color: "#FF6B00" },
-];
-
-const kpis = [
-  { icon: BarChart3, label: "Total Matches", value: "2,610", change: "+12.5%", trend: "up" },
-  { icon: Users, label: "Active Players", value: "1,284", change: "+8.3%", trend: "up" },
-  { icon: Clock, label: "Avg. Match Time", value: "48 min", change: "-3.2%", trend: "down" },
-  { icon: Calendar, label: "Bookings", value: "3,142", change: "+15.7%", trend: "up" },
-];
+import { supabase } from "../../config/supabase";
 
 export function AnalyticsPage() {
   const { isDark } = useTheme();
-  const chartStroke = isDark ? "rgba(255,255,255,0.1)" : "rgba(10,14,26,0.1)";
-  const textStroke = isDark ? "rgba(255,255,255,0.4)" : "rgba(10,14,26,0.4)";
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    monthlyRevenue: [],
+    courtUsage: [],
+    memberGrowth: [],
+    matchDistribution: []
+  });
 
-  const tooltipStyle = {
-    backgroundColor: isDark ? "#000" : "#fff",
-    border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(10,14,26,0.1)"}`,
-    borderRadius: "12px",
-    fontFamily: "Poppins, sans-serif",
-    fontSize: "12px",
-    color: isDark ? "#fff" : "#0A0E1A"
-  };
+  useEffect(() => {
+    // Simulation du chargement des données réelles
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      try {
+        // Ici, vous ferez vos appels Supabase :
+        // const { data: revenue } = await supabase.rpc('get_monthly_revenue');
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
+  const chartStroke = isDark ? "#ffffff10" : "#0A0E1A10";
+  const textStroke = isDark ? "#ffffff60" : "#0A0E1A60";
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header avec Actions */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-['Playfair_Display',serif] font-bold text-[36px] lg:text-[42px] text-[#0A0E1A] dark:text-white mb-2">
-            Analytics & Stats
-          </h1>
-          <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
-            Insights and performance metrics for your facility
-          </p>
+          <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display']">Analytics & Reports</h1>
+          <p className="text-gray-500">Deep dive into club performance and usage patterns.</p>
+        </div>
+        
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white text-sm font-semibold">
+            <Filter size={18} /> Filter Period
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#39FF14] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
+            <Download size={18} /> Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Main Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Graphique 1: Revenus ou Activité Mensuelle */}
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
+          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
+            <TrendingUp size={20} className="text-[#39FF14]" /> Monthly Activity
+          </h3>
+          <div className="h-[300px] w-full flex items-center justify-center">
+            {loading ? (
+              <Loader2 className="animate-spin text-gray-400" />
+            ) : data.monthlyRevenue.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data.monthlyRevenue}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} vertical={false} />
+                  <XAxis dataKey="month" stroke={textStroke} />
+                  <YAxis stroke={textStroke} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#39FF14" strokeWidth={3} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-gray-500 text-sm italic">No activity recorded for this period.</p>
+            )}
+          </div>
         </div>
 
-        <button className="flex items-center justify-center gap-2 px-6 h-12 bg-[#0A0E1A]/5 dark:bg-white/5 hover:bg-[#0A0E1A]/10 dark:hover:bg-white/10 border border-[#0A0E1A]/10 dark:border-white/20 rounded-[12px] transition-all font-['Poppins',sans-serif] text-[14px] font-semibold text-[#0A0E1A] dark:text-white">
-          <Download className="w-4 h-4" />
-          Export Report
-        </button>
-      </div>
+        {/* Graphique 2: Utilisation des Courts */}
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
+          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
+            <BarChart3 size={20} className="text-[#00E5FF]" /> Court Usage %
+          </h3>
+          <div className="h-[300px] w-full flex items-center justify-center">
+            {loading ? (
+              <Loader2 className="animate-spin text-gray-400" />
+            ) : data.courtUsage.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.courtUsage}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} vertical={false} />
+                  <XAxis dataKey="name" stroke={textStroke} />
+                  <YAxis stroke={textStroke} />
+                  <Tooltip />
+                  <Bar dataKey="usage" fill="#00E5FF" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-gray-500 text-sm italic">Waiting for booking data to analyze usage.</p>
+            )}
+          </div>
+        </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {kpis.map((kpi, index) => {
-          const Icon = kpi.icon;
-          return (
-            <motion.div
-              key={kpi.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6 shadow-sm"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-[12px] bg-[#39FF14]/10 border border-[#39FF14]/20 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-[#39FF14]" />
+        {/* Graphique 3: Distribution par type de match */}
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8 lg:col-span-2">
+          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
+            <PieChartIcon size={20} className="text-purple-400" /> Member Segment Distribution
+          </h3>
+          <div className="h-[300px] w-full flex items-center justify-center">
+            {loading ? (
+              <Loader2 className="animate-spin text-gray-400" />
+            ) : (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="text-purple-500" />
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${kpi.trend === "up" ? "bg-[#39FF14]/10 text-[#39FF14]" : "bg-red-500/10 text-red-500"}`}>
-                  <TrendingUp className={`w-3 h-3 ${kpi.trend === "down" ? "rotate-180" : ""}`} />
-                  <span className="font-['Poppins',sans-serif] text-[12px] font-bold">{kpi.change}</span>
-                </div>
+                <p className="text-gray-500 text-sm">Analyze your member database growth and categories here.</p>
+                <button className="mt-4 text-[#39FF14] text-sm font-bold underline">Generate Member Report</button>
               </div>
-              <h3 className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60 mb-1">{kpi.label}</h3>
-              <p className="font-['Poppins',sans-serif] font-bold text-[28px] text-[#0A0E1A] dark:text-white">{kpi.value}</p>
-            </motion.div>
-          );
-        })}
+            )}
+          </div>
+        </div>
+
       </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Monthly Performance */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6"
-        >
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-6">Monthly Performance</h2>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} />
-              <XAxis dataKey="month" stroke={textStroke} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <YAxis yAxisId="left" stroke={textStroke} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <YAxis yAxisId="right" orientation="right" stroke={textStroke} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? "#fff" : "#0A0E1A" }} />
-              <Legend iconType="circle" />
-              <Line yAxisId="left" type="monotone" dataKey="matches" stroke="#39FF14" strokeWidth={3} dot={{ fill: "#39FF14", r: 4 }} name="Matches" />
-              <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#00E5FF" strokeWidth={3} dot={{ fill: "#00E5FF", r: 4 }} name="Revenue ($)" />
-            </LineChart>
-          </ResponsiveContainer>
-        </motion.div>
-
-        {/* Peak Hours Distribution */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}
-          className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6"
-        >
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-6">Peak Hours</h2>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={peakHoursData} cx="50%" cy="50%" labelLine={false} outerRadius={80} dataKey="value" 
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
-                {peakHoursData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-              </Pie>
-              <Tooltip contentStyle={tooltipStyle} />
-              <Legend verticalAlign="bottom" height={36}/>
-            </PieChart>
-          </ResponsiveContainer>
-        </motion.div>
-      </div>
-
-      {/* Court Usage */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
-        className="bg-white dark:bg-black/80 backdrop-blur-xl border border-[#0A0E1A]/10 dark:border-white/10 rounded-[20px] p-6"
-      >
-        <h2 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-[#0A0E1A] dark:text-white mb-6">Court Usage Statistics</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={courtUsageData}>
-            <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} />
-            <XAxis dataKey="name" stroke={textStroke} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-            <YAxis stroke={textStroke} style={{ fontSize: "12px", fontFamily: "Poppins" }} />
-            <Tooltip contentStyle={tooltipStyle} cursor={{fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}} />
-            <Bar dataKey="usage" fill="#39FF14" radius={[6, 6, 0, 0]} barSize={40} />
-          </BarChart>
-        </ResponsiveContainer>
-      </motion.div>
     </div>
   );
 }

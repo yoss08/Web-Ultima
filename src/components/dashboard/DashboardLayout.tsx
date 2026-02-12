@@ -17,6 +17,9 @@ import {
   ShieldCheck,
   Dumbbell,
   User,
+  Users,
+  CalendarDays, 
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
@@ -30,6 +33,44 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const role = user?.user_metadata?.account_type || "Player";
+
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
+  const navItems = [
+    { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
+
+    // MENU JOUEUR (Basé sur vos fichiers folder 'player')
+    ...(role === "Player" ? [
+      { icon: Zap, label: "My Matches", path: "/dashboard/live-matches" },
+      { icon: Trophy, label: "Competitions", path: "/dashboard/competitions" },
+      { icon: Grid3X3, label: "Court Booking", path: "/dashboard/courts" },
+      { icon: BarChart3, label: "My Stats", path: "/dashboard/analytics" },
+    ] : []),
+
+    // MENU COACH (Basé sur vos fichiers folder 'coach')
+    ...(role === "Coach" ? [
+      { icon: Users, label: "My Students", path: "/dashboard/coach/students" },
+      { icon: CalendarDays, label: "Schedule Session", path: "/dashboard/coach/schedule" },
+      { icon: BarChart3, label: "Student Analytics", path: "/dashboard/coach/students/:id" },
+      { icon: Zap, label: "Live Matches", path: "/dashboard/live-matches" },
+    ] : []),
+
+    // MENU ADMIN (Basé sur vos fichiers folder 'admin')
+    ...(role === "Admin" ? [
+      { icon: Zap, label: "Live Matches", path: "/dashboard/live-matches" },
+      { icon: Grid3X3, label: "Court Management", path: "/dashboard/courts" },
+      { icon: BarChart3, label: "System Analytics", path: "/dashboard/analytics" },
+    ] : []),
+
+    { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
+    { icon: User, label: "Profile", path: "/dashboard/profile" },
+    { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+  ];
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
@@ -52,61 +93,7 @@ export function DashboardLayout() {
         return { icon: Trophy, color: "text-[#39FF14]", bg: "bg-[#39FF14]/20", border: "border-[#39FF14]" };
   };
   } 
-  
-  const role = user?.user_metadata?.account_type || "Player";
   const badge = getRoleBadge();
-  // Construction dynamique du menu de navigation
-  const navItems = [
-    { 
-      icon: LayoutDashboard, 
-      label: "Overview", 
-      path: "/dashboard" 
-    },
-    { 
-      icon: Zap, 
-      label: role === "Player" ? "My Matches" : "Live Matches", 
-      path: "/dashboard/live-matches" 
-    },
-    // Ajout de "Competitions" uniquement pour les joueurs
-    ...(role === "Player" ? [
-      { 
-        icon: Trophy, 
-        label: "Competitions", 
-        path: "/dashboard/competitions" 
-      }
-    ] : []),
-    { 
-      icon: Grid3X3, 
-      label: role === "Player" ? "Court Booking" : "Court Management", 
-      path: "/dashboard/courts"
-    },
-    { 
-      icon: BarChart3, 
-      label: role === "Player" ? "My Stats" : "Analytics", 
-      path: "/dashboard/analytics" 
-    },
-    { 
-      icon: Droplet, 
-      label: "Hydration", 
-      path: "/dashboard/hydration" 
-    },
-    { 
-      icon: User, 
-      label: "Profile", 
-      path: "/dashboard/profile" 
-    },
-    { 
-      icon: Settings, 
-      label: "Settings", 
-      path: "/dashboard/settings" 
-    },
-  ];
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#0A0E1A]" : "bg-gray-50"} transition-colors duration-300`}>
       {/* Top Navigation Bar */}
