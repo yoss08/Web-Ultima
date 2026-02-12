@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router";
 import {
   LayoutDashboard,
@@ -28,8 +28,19 @@ export function DashboardLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  const activities = [];
 
- 
   const getRoleBadge = () => {
     const role = user?.role?.toLowerCase();
     switch (role) {
@@ -137,12 +148,71 @@ export function DashboardLayout() {
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
 
-            {/* Notifications */}
-            <button className="flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors relative">
-              <Bell className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#39FF14] rounded-full"></span>
-            </button>
+              {/* Notifications */}
+<div className="relative" ref={notificationRef}>
+  <button 
+    onClick={() => setNotificationsOpen(!notificationsOpen)}
+    className={`flex items-center justify-center w-10 h-10 rounded-[12px] transition-colors relative ${
+      notificationsOpen ? "bg-[#39FF14]/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+    }`}
+  >
+    <Bell className={`w-5 h-5 ${isDark ? "text-white" : "text-[#0A0E1A]"}`} />
+    {/* On n'affiche la pastille verte que s'il y a des activités */}
+    {activities.length > 0 && (
+      <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#39FF14] rounded-full border-2 border-black"></span>
+    )}
+  </button>
 
+  {/* Dropdown Menu */}
+  {notificationsOpen && (
+    <div className={`absolute right-0 mt-3 w-80 rounded-[24px] shadow-2xl border backdrop-blur-xl z-[100] animate-in fade-in zoom-in duration-200 ${
+      isDark ? "bg-black/95 border-white/10 shadow-black/50" : "bg-white border-gray-200"
+    }`}>
+      <div className="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
+        <h3 className={`font-bold text-sm ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>
+          Notifications
+        </h3>
+        <span className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">
+          Feed
+        </span>
+      </div>
+
+      <div className="py-8 px-6 flex flex-col items-center justify-center text-center">
+        {activities.length > 0 ? (
+          /* Liste des activités si elles existent */
+          <div className="w-full">
+            {/* ... map des activités ... */}
+          </div>
+        ) : (
+          /* ÉTAT VIDE (NULL) */
+          <div className="space-y-4">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto">
+              <Bell className="w-8 h-8 text-gray-300 dark:text-white/20" />
+            </div>
+            <div className="space-y-1">
+              <p className={`font-semibold text-sm ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>
+                All caught up!
+              </p>
+              <p className="text-xs text-gray-400 max-w-[180px] mx-auto leading-relaxed">
+                Matches and competitions will appear here once the season starts.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {activities.length > 0 && (
+        <Link 
+          to="/dashboard/notifications" 
+          onClick={() => setNotificationsOpen(false)}
+          className="block p-4 text-center text-xs font-bold text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors border-t border-white/5 rounded-b-[24px]"
+        >
+          View All Activity
+        </Link>
+      )}
+    </div>
+  )}
+</div>
             {/* User Profile */}
             <Link 
               to="/dashboard/profile" 
