@@ -1,52 +1,203 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { TrendingUp, Target, BarChart2 } from "lucide-react";
+import { useAuth } from "../../services/AuthContext";
+import { 
+  TrendingUp, Target, BarChart2, Star, Send, 
+  ChevronLeft, Loader2, User, Award, Activity 
+} from "lucide-react";
+import { supabase } from "../../config/supabase";
+import { toast } from "react-hot-toast";
 
 export function StudentDetails() {
-  // On simule une liste de données vide
-  const performanceData = []; 
+  const { id } = useParams(); // ID de l'élève
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const [student, setStudent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
+  // État pour le nouveau feedback
+  const [note, setNote] = useState("");
+  const [rating, setRating] = useState(5);
+
+  // État pour les scores techniques (Skills)
+  const [skills, setSkills] = useState({
+    speed: 50,
+    power: 50,
+    technique: 50,
+    stamina: 50,
+    mental: 50
+  });
+  useEffect(() => {
+  async function fetchStudentData() {
+    // 1. On s'assure que l'ID existe avant de faire quoi que ce soit
+    if (!id) {
+      console.error("ID manquant dans l'URL");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      console.log("Chargement des données pour l'étudiant ID:", id);
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle(); // maybeSingle est plus stable que single() pour éviter les erreurs 406
+
+      if (error) throw error;
+
+      if (!data) {
+        console.warn("Aucun étudiant trouvé avec cet ID");
+        toast.error("Student not found");
+        // On ne redirige que si on est SÛR que l'étudiant n'existe pas
+        return; 
+      }
+
+      setStudent(data);
+    } catch (err: any) {
+      console.error("Erreur lors de la récupération de l'étudiant:", err.message);
+     
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchStudentData();
+}, [id]); 
+  
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center h-64 gap-4">
+      <Loader2 className="animate-spin text-[#39FF14]" size={40} />
+      <p className="text-gray-500">Loading student profile...</p>
+    </div>
+  );
+
+  const handleSubmitEvaluation = async () => {
+  if (!note.trim()) return toast.error("Please add a note");
+  setSubmitting(true);
+
+  try {
+    const { error } = await supabase
+      .from('coach_feedbacks')
+      .insert([{
+        student_id: id, // L'ID de l'élève récupéré par useParams
+        coach_id: user?.id,
+        content: note,
+        rating: rating,
+        // On envoie les valeurs des sliders
+        speed: skills.speed,
+        power: skills.power,
+        technique: skills.technique,
+        stamina: skills.stamina,
+        mental: skills.mental
+      }]);
+
+    if (error) throw error;
+    toast.success("Feedback and Skills updated!");
+    setNote(""); // On vide le champ texte
+  } catch (err) {
+    toast.error("Error saving data");
+  } finally {
+    setSubmitting(false);
+  }
+};
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Profil Header (Toujours utile pour savoir quel élève on regarde) */}
-      <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
-        <div className="flex gap-4 items-center">
-          <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-white/5 border-2 border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center text-3xl font-bold text-gray-400">
-            ?
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold dark:text-white font-['Playfair_Display']">Select a Student</h1>
-            <p className="text-gray-500 font-medium text-sm">Individual performance metrics will appear here.</p>
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      {/* Header avec retour */}
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#39FF14]/10 transition-colors"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold dark:text-white">{student?.full_name}</h1>
+          <p className="text-gray-500 italic">Student Performance Management</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Graphique Vide */}
-        <div className="lg:col-span-2 bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-[24px] p-12 shadow-sm flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-4">
-            <BarChart2 className="text-blue-500" size={32} />
-          </div>
-          <h3 className="text-xl font-bold dark:text-white">No Progression Data</h3>
-          <p className="text-gray-500 max-w-xs mt-2">
-            Once the student completes matches and training sessions, their skill progression will be visualized here.
-          </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* COLONNE GAUCHE : FORMULAIRE FEEDBACK */}
+        <div className="lg:col-span-2 space-y-6">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-8">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Star className="text-[#39FF14]" size={22} />
+              Technical Evaluation
+            </h3>
+            
+            <div className="space-y-4">
+              <label className="text-sm font-bold opacity-60 uppercase tracking-widest">Training Notes</label>
+              <textarea 
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Analyze the student's progress, strengths, and weaknesses..."
+                className="w-full h-40 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#39FF14] outline-none transition-all resize-none text-sm"
+              />
+              
+              <div className="flex items-center justify-between pt-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium mr-2">Session Rating:</span>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button key={s} onClick={() => setRating(s)}>
+                      <Star size={24} fill={s <= rating ? "#FFD700" : "none"} className={s <= rating ? "text-[#FFD700]" : "text-gray-300"} />
+                    </button>
+                  ))}
+                </div>
+                
+                <button 
+                  onClick={handleSubmitEvaluation}
+                  disabled={submitting}
+                  className="bg-[#39FF14] text-black px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
+                >
+                  {submitting ? "Saving..." : "Save Evaluation"}
+                  <Send size={18} />
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
 
-        {/* Zones de Focus Vides */}
-        <div className="bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-[24px] p-6 shadow-sm">
-          <h3 className="font-bold dark:text-white mb-6 flex items-center gap-2">
-            <Target size={20} className="text-[#39FF14]" /> Focus Areas
-          </h3>
-          <div className="space-y-6 py-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="space-y-2 opacity-20">
-                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4"></div>
-                <div className="h-1.5 w-full bg-gray-100 dark:bg-white/10 rounded-full"></div>
-              </div>
-            ))}
-            <p className="text-xs text-center text-gray-500 italic">Awaiting coach evaluation...</p>
-          </div>
+        {/* COLONNE DROITE : MISE À JOUR DES SCORES (SKILLS) */}
+        <div className="space-y-6">
+          <section className="bg-[#0A0E1A] text-white rounded-[32px] p-8 border border-white/10">
+            <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
+              <Activity className="text-[#39FF14]" size={20} />
+              Update Skills
+            </h3>
+            
+            <div className="space-y-8">
+              {Object.entries(skills).map(([skill, value]) => (
+                <div key={skill} className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold uppercase tracking-tighter opacity-70">{skill}</span>
+                    <span className="text-[#39FF14] font-mono font-bold">{value}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" max="100" 
+                    value={value}
+                    onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value)})}
+                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#39FF14]"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 p-4 bg-[#39FF14]/10 rounded-2xl border border-[#39FF14]/20">
+              <p className="text-[11px] text-[#39FF14] font-medium leading-relaxed">
+                Updating these values will immediately refresh the histogram on the student's analytics dashboard.
+              </p>
+            </div>
+          </section>
         </div>
+
       </div>
     </div>
   );

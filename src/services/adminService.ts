@@ -1,8 +1,39 @@
 import { supabase } from "../config/supabase";
 
 export const adminService = {
-  /**
-   * COURTS MANAGEMENT
+
+  // Récupérer les joueurs qui n'ont pas de coach_id
+  async getUnassignedPlayers() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('account_type', 'Player')
+      .is('coach_id', null); // Vérifie que la colonne s'appelle coach_id
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer tous les profils de type Coach
+  async getAllCoaches() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('account_type', 'Coach');
+    if (error) throw error;
+    return data;
+  },
+
+  // Mettre à jour le coach d'un joueur
+  async assignCoachToPlayer(playerId: string, coachId: string) {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ coach_id: coachId })
+      .eq('id', playerId);
+    if (error) throw error;
+  },
+
+  /*
+     COURT MANAGEMENT
    */
   // Récupérer tous les terrains
   async getAllCourts() {
@@ -57,29 +88,6 @@ export const adminService = {
       .from('matches')
       .update({ current_score: score })
       .eq('id', matchId);
-    if (error) throw error;
-  },
-
-  /**
-   * USER & COACH ASSIGNMENT
-   */
-  // Récupérer les joueurs qui n'ont pas encore de coach
-  async getUnassignedPlayers() {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('account_type', 'player')
-      .is('coach_id', null);
-    if (error) throw error;
-    return data;
-  },
-
-  // Assigner un coach à un élève
-  async assignCoachToStudent(studentId: string, coachId: string) {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ coach_id: coachId })
-      .eq('id', studentId);
     if (error) throw error;
   },
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { PlayerSchedule } from "./PlayerSchedule";
 import { 
   Calendar, 
   Trophy, 
@@ -18,6 +19,27 @@ export function PlayerDashboard() {
   const { user } = useAuth();
   const [hasData, setHasData] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [assignedCoach, setAssignedCoach] = useState<any>(null);
+if (!user) return;
+useEffect(() => {
+  async function getMyCoach() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('coach_id')
+      .eq('id', user?.id)
+      .single();
+
+    if (data?.coach_id) {
+      const { data: coach } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', data.coach_id)
+        .single();
+      setAssignedCoach(coach);
+    }
+  }
+  getMyCoach();
+}, [user]);
 
   useEffect(() => {
     async function checkActivity() {
@@ -33,7 +55,7 @@ export function PlayerDashboard() {
     }
     checkActivity();
   }, [user]);
-
+  
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Welcome Header */}
@@ -59,7 +81,7 @@ export function PlayerDashboard() {
         
         {/* Left Column: Stats Cards & Progress */}
         <div className="lg:col-span-2 space-y-8">
-          
+         
           {/* Stats Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard icon={Trophy} label="Wins" value={hasData ? "0" : "--"} color="#39FF14" />
@@ -87,10 +109,20 @@ export function PlayerDashboard() {
             )}
           </section>
         </div>
-
+         <PlayerSchedule />
         {/* Right Column: Quick Access & Shared Pages */}
         <div className="space-y-6">
-          
+          {assignedCoach && (
+  <div className="bg-gradient-to-br from-[#39FF14]/20 to-transparent p-6 rounded-[32px] border border-[#39FF14]/30 mb-6">
+    <p className="text-[10px] uppercase tracking-widest font-bold text-[#39FF14] mb-2">Your Assigned Coach</p>
+    <div className="flex items-center gap-3">
+       <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-bold text-white">
+         {assignedCoach.full_name[0]}
+       </div>
+       <h4 className="text-lg font-bold text-white">Coach {assignedCoach.full_name}</h4>
+    </div>
+  </div>
+)}
           {/* Next Booking Card (Adaptive State) */}
          <div className="bg-white dark:bg-[#0A0E1A] text-[#0A0E1A] dark:text-white p-8 rounded-[32px] border border-gray-100 dark:border-white/5 overflow-hidden relative group transition-colors duration-300">
           <div className="relative z-10">

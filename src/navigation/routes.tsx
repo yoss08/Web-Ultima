@@ -26,6 +26,7 @@ import { StudentList } from "../screens/coach/StudentList";
 import { SessionScheduler } from "../screens/coach/SessionScheduler";
 import { StudentDetails } from "../screens/coach/StudentDetails";
 import { AdminCourtConfig } from "../screens/admin/AdminConfig";
+import { AdminManagement } from "../screens/admin/AdminManagement";
 
 
 const DashboardIndex = () => {
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
       {
         path: "admin/overview",
         Component: OverviewPage,
+      },
+      {
+       path: "admin/management",
+       Component: AdminManagement,
       },
       // --- ROUTES COACH ---
       {

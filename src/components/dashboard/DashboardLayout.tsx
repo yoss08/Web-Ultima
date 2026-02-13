@@ -64,6 +64,11 @@ export function DashboardLayout() {
       { icon: Zap, label: "Live Matches", path: "/dashboard/live-matches" },
       { icon: Grid3X3, label: "Court Management", path: "/dashboard/courts" },
       { icon: BarChart3, label: "System Analytics", path: "/dashboard/analytics" },
+      { 
+      icon: ClipboardList, 
+      label: "Management", 
+      path: "/dashboard/admin/management" 
+    }
     ] : []),
 
     { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
