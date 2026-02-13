@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { Moon, Sun, ArrowRight, Check, Activity, Zap, LayoutDashboard, Smartphone, Shield, Play, RefreshCw, MonitorPlay, Monitor, Globe, Users, AlertCircle, Sliders, Award } from "lucide-react";
+import { Moon, Sun, ArrowRight, Check, Activity, Zap, LayoutDashboard, Smartphone, Shield, Play, RefreshCw, MonitorPlay, Monitor, Globe, Users, AlertCircle, Sliders, Award, Dribbble, Trophy, Dumbbell } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
+import { tennisBall } from '@lucide/lab';
+
 
 // Images
 const padelCourtImage = "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
-const scoringSystemImage = "https://images.unsplash.com/photo-1741478551723-4b7ce95cf395?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const scoringSystemImage = "https://media.discordapp.net/attachments/1466386538660364517/1471874891191160973/scoreboard.jpg?ex=699085d0&is=698f3450&hm=109906dc67a2efe87eb11621e7796e85b9a3472162f2661a7802b40d32accf94&=&format=webp&width=1045&height=779";
 const athleteImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const padelClubImage = "https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFkZWx8ZW58MHx8MHx8fDA%3D";
 const fitnessCenterImage = "https://images.pexels.com/photos/34761566/pexels-photo-34761566/free-photo-of-salle-de-sport-interieure-moderne-avec-equipements-cardio.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
@@ -128,6 +130,12 @@ export function SummaPage() {
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkYXNoYm9hcmQlMjBhbmFseXRpY3MlMjBpbnRlcmZhY2V8ZW58MXx8fHwxNzcwMTM5MjY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
     },
   ];
+  const environments = [
+  { title: "Padel clubs", icon: Dribbble },
+  { title: "Sports and fitness centers", icon: Dumbbell },
+  { title: "Training academies", icon: Award },
+  { title: "Competition venues", icon: Trophy },
+];
 
   const benefits = [
     {
@@ -155,13 +163,6 @@ export function SummaPage() {
       title: "Built for intensive daily use",
       description: "Reliable hardware and software engineered for high-traffic operations",
     },
-  ];
-
-  const environments = [
-    { title: "Padel clubs", image: padelClubImage },
-    { title: "Sports and fitness centers", image: fitnessCenterImage },
-    { title: "Training academies", image: trainingAcademyImage },
-    { title: "Competition venues", image: competitionVenueImage },
   ];
  const { user } = useAuth();
   return (
@@ -526,75 +527,62 @@ export function SummaPage() {
           </div>
         </div>
       </section>
+       {/* Interfaces & Platforms Section */}
+<section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+  <div className="max-w-7xl mx-auto relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="text-center mb-16"
+    >
+      <h2
+        className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] leading-[1.1] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
+      >
+        Interfaces & platforms
+      </h2>
+      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
+        SUMMA is a complete ecosystem accessible from every touchpoint
+      </p>
+    </motion.div>
 
-      {/* Interfaces & Platforms Section */}
-      <section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
-        <div className="max-w-7xl mx-auto relative z-10">
+    <div className="grid lg:grid-cols-3 gap-8">
+      {platforms.map((platform, index) => {
+        const Icon = platform.icon;
+        return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            key={platform.title}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center text-center"
           >
-            <h2
-              className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] leading-[1.1] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
-              style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
-            >
-              Interfaces & platforms
-            </h2>
-            <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
-              SUMMA is a complete ecosystem accessible from every touchpoint
+            <div className="mb-8">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
+                <Icon className="w-10 h-10 text-emerald-600 dark:text-[#39FF14]" />
+              </div>
+            </div>
+
+            <h3 className="font-['Poppins',sans-serif] font-bold text-[24px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+              {platform.title}
+            </h3>
+
+            <p className="font-['Poppins',sans-serif] text-[15px] font-semibold text-emerald-600 dark:text-[#39FF14] mb-4 uppercase tracking-wider transition-colors duration-300">
+              {platform.description}
+            </p>
+
+            <p className="font-['Poppins',sans-serif] text-[16px] leading-[1.6] text-gray-600 dark:text-white/60 transition-colors duration-300">
+              {platform.details}
             </p>
           </motion.div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            {platforms.map((platform, index) => {
-              const Icon = platform.icon;
-              return (
-                <motion.div
-                  key={platform.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white dark:bg-black border border-gray-200 dark:border-white/10 rounded-[20px] overflow-hidden hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={platform.image}
-                      alt={platform.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 dark:from-[#39FF14]/10 to-transparent pointer-events-none"></div>
-                  </div>
-
-                  <div className="p-8">
-                    <div className="mb-6">
-                      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                        <Icon className="w-7 h-7 text-emerald-600 dark:text-[#39FF14]" />
-                      </div>
-                    </div>
-
-                    <h3 className="font-['Poppins',sans-serif] font-bold text-[22px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
-                      {platform.title}
-                    </h3>
-
-                    <p className="font-['Poppins',sans-serif] text-[14px] text-emerald-600 dark:text-[#39FF14] mb-3 transition-colors duration-300">
-                      {platform.description}
-                    </p>
-
-                    <p className="font-['Poppins',sans-serif] text-[14px] leading-[1.6] text-gray-600 dark:text-white/60 transition-colors duration-300">
-                      {platform.details}
-                    </p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
+        );
+      })}
+    </div>
+  </div>
+</section>
+     
       {/* Why Choose Summa Section */}
       <section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
         <div className="max-w-7xl mx-auto relative z-10">
@@ -675,61 +663,52 @@ export function SummaPage() {
           </motion.div>
         </div>
       </section>
-
       {/* Where Summa Fits Section */}
-      <section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
-        <div className="max-w-7xl mx-auto relative z-10">
+<section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+  <div className="max-w-7xl mx-auto relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="text-center mb-16"
+    >
+      <h2
+        className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] leading-[1.1] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
+      >
+        Where SUMMA fits
+      </h2>
+      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
+        Built for professional sports environments that demand precision and reliability
+      </p>
+    </motion.div>
+
+    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {environments.map((env, index) => {
+        const Icon = env.icon || Check; // Fallback icon
+        return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            key={env.title}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            className="group"
           >
-            <h2
-              className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] leading-[1.1] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
-              style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
-            >
-              Where SUMMA fits
-            </h2>
-            <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
-              Built for professional sports environments that demand precision and reliability
-            </p>
+            <div className="h-full p-8 rounded-[24px] bg-gray-50 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center justify-center text-center">
+              <div className="w-14 h-14 rounded-full bg-white dark:bg-white/5 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                <Icon className="w-6 h-6 text-emerald-600 dark:text-[#39FF14]" />
+              </div>
+              <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white leading-[1.3]">
+                {env.title}
+              </h3>
+            </div>
           </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {environments.map((env, index) => (
-              <motion.div
-                key={env.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group relative"
-              >
-                <div className="relative rounded-[20px] overflow-hidden bg-white dark:bg-black border border-gray-200 dark:border-white/10 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300">
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={env.image}
-                      alt={env.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 group-hover:from-emerald-500/10 dark:from-[#39FF14]/0 dark:group-hover:from-[#39FF14]/10 to-transparent transition-all duration-300"></div>
-                  </div>
-
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-white leading-[1.3]">
-                      {env.title}
-                    </h3>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+        );
+      })}
+    </div>
+  </div>
+</section>
       {/* Ultima Ecosystem Section */}
       <section className="relative py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
         <div className="max-w-5xl mx-auto relative z-10">

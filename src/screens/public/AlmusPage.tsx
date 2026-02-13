@@ -1,20 +1,54 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { Moon, Sun, ArrowRight, LayoutDashboard } from "lucide-react";
+import { Moon, Sun, ArrowRight, LayoutDashboard, Dumbbell,Trophy, Citrus, Droplets, Leaf, Zap, Flower2 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 
 const imgImageAlmusSmartHydrationStation = "https://images.unsplash.com/photo-1517093911940-08cb5b3952e7?q=80&w=744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dpg";
 const imgImageAlmusInstalledInProfessionalTrainingFacility = "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const imgImageLemonFlavor = "https://images.unsplash.com/photo-1718196917011-801cddb84334?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const imgImageBerryFlavor = "https://images.unsplash.com/photo-1600718374662-0483d2b9da44?q=80&w=685&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const imgImageCitrusFlavor = "https://images.unsplash.com/photo-1671920090611-9a40303b52cb?q=80&w=765&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const imgImageTropicalFlavor = "https://plus.unsplash.com/premium_photo-1661454443043-36b5c6b66e62?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 const imgImageGymsFitnessCenters = "https://www.bezons-coeurdeville.com/-/media/bezonscoeurdeville/images/enseignes/photos/one_fitness_club/one_fitness_club.jpg?as=0&w=650&hash=98AFCE93C3812107AEE8D899A608250E";
 const imgImageTrainingFacilities = "https://static1.gensler.com/uploads/image/93317/AustinFC_StDavids_Performance_Center_N16_1722635367.jpg";
 const imgImageSportsClubs = "https://static.actu.fr/uploads/2025/09/padel-patinoire-boulogne-sport-13-960x640.jpg";
 const imgImageWellnessSpaces = "https://www.cinqmondes.com/media/contentmanager/content/helvetia_hammam_render.png";
+
+
+const environment = [
+  { name: "Gyms", description: "Fitness Centers", icon: Dumbbell },
+  { name: "Training Facilities", description: "Professional sports", icon: Droplets },
+  { name: "Sports Clubs", description: "Competitive environments", icon: Trophy },
+  { name: "Wellness Spaces", description: "Sports venues", icon: Flower2 },
+];
+
+const flavors = [
+  { 
+    name: "Lemon & Lime", 
+    desc: "Refreshing citrus burst", 
+    color: "bg-yellow-400",
+    icon: Citrus 
+  },
+  { 
+    name: "Red Fruits", 
+    desc: "Sweet berry blend", 
+    color: "bg-red-600",
+    icon: Droplets 
+  },
+  { 
+    name: "Tropical Mix", 
+    desc: "Exotic fruit fusion", 
+    color: "bg-orange-500",
+    icon: Zap 
+  },
+  { 
+    name: "Mint ", 
+    desc: "Cooling hydration", 
+    color: "bg-emerald-400",
+    icon: Leaf 
+  },
+];
+
+
+
 
 export function AlmusPage() {
   
@@ -58,33 +92,6 @@ export function AlmusPage() {
     });
   };
 
-  const flavors = [
-    {
-      name: "Lemon",
-      image: imgImageLemonFlavor,
-      color: "#FFD700",
-      gradient: "rgba(255,215,0,0.25)",
-    },
-    {
-      name: "Berry",
-      image: imgImageBerryFlavor,
-      color: "#DC143C",
-      gradient: "rgba(220,20,60,0.25)",
-    },
-    {
-      name: "Citrus",
-      image: imgImageCitrusFlavor,
-      color: "#FF8C00",
-      gradient: "rgba(255,140,0,0.25)",
-    },
-    {
-      name: "Tropical",
-      image: imgImageTropicalFlavor,
-      color: "#FF1493",
-      gradient: "rgba(255,20,147,0.25)",
-    },
-  ];
-
   const benefits = [
     {
       title: "Encourages consistent hydration during training",
@@ -100,29 +107,6 @@ export function AlmusPage() {
       title: "Low maintenance, high reliability",
       description:
         "Designed for high-traffic facilities with minimal operational overhead",
-    },
-  ];
-
-  const environments = [
-    {
-      name: "Gyms & Fitness Centers",
-      image: imgImageGymsFitnessCenters,
-      description: "High-traffic facilities",
-    },
-    {
-      name: "Training Facilities",
-      image: imgImageTrainingFacilities,
-      description: "Professional sports",
-    },
-    {
-      name: "Sports Clubs",
-      image: imgImageSportsClubs,
-      description: "Competitive environments",
-    },
-    {
-      name: "Wellness Spaces",
-      image: imgImageWellnessSpaces,
-      description: "Recovery-focused",
     },
   ];
 
@@ -435,67 +419,56 @@ export function AlmusPage() {
         </div>
       </section>
 
-      {/* Flavored Hydration Options Section */}
-      <section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        {/* Background Blurs matching the new aesthetic */}
-        <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
+      {/* Flavored Hydration Options  */}
+<section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+<div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center mb-16">
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-gray-900 dark:text-white mb-6"
+      >
+        Flavored hydration options
+      </motion.h2>
+      <p className="font-['Poppins',sans-serif] text-[18px] text-gray-600 dark:text-white/60 max-w-2xl mx-auto">
+        Personalize your recovery with our range of zero-sugar, electrolyte-rich flavors.
+      </p>
+    </div>
 
-        <div className="max-w-[936px] mx-auto px-6 relative text-center">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {flavors.map((flavor, index) => {
+        const FlavorIcon = flavor.icon;
+        return (
           <motion.div
+            key={flavor.name}
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-16"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
+            className="group relative p-8 rounded-[32px] bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-emerald-500 transition-all duration-300 text-center"
           >
-            <h2
-              className="font-['Playfair_Display',serif] font-bold text-[62px] leading-[61.6px] text-gray-900 dark:text-white mb-6 transition-colors duration-300"
-              style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
-            >
-              Flavored hydration options
-            </h2>
-            <p className="font-['Poppins',sans-serif] text-[24px] leading-[34px] text-gray-600 dark:text-white/70 max-w-[761px] mx-auto transition-colors duration-300">
-              ALMUS offers a range of light, refreshing flavors formulated for
-              regular consumption in active environments.
-            </p>
-          </motion.div>
+            {/* Icône avec cercle de couleur en fond */}
+            <div className={`w-16 h-16 rounded-2xl ${flavor.color} bg-opacity-10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
+              <FlavorIcon className={`w-8 h-8 ${flavor.color.replace('bg-', 'text-')}`} />
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {flavors.map((flavor, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1 * index }}
-                className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[24px] overflow-hidden shadow-lg dark:shadow-[0px_8px_32px_0px_rgba(0,0,0,0.4)] hover:scale-105 transition-all duration-300"
-              >
-                <div className="relative h-[256px]">
-                  <img
-                    src={flavor.image}
-                    alt={`${flavor.name} flavor`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent dark:from-[rgba(0,0,0,0.8)] dark:via-[rgba(0,0,0,0.4)] dark:to-[rgba(0,0,0,0)]" />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t to-transparent opacity-20"
-                    style={{
-                      backgroundImage: `linear-gradient(to top, ${flavor.gradient}, rgba(0,0,0,0))`,
-                    }}
-                  />
-                  <div className="absolute bottom-6 left-6">
-                    <h3 className="font-['Poppins',sans-serif] font-semibold text-[24px] leading-[36px] text-white mb-1">
-                      {flavor.name}
-                    </h3>
-                    <div
-                      className="h-[4px] w-[64px] rounded-full shadow-lg"
-                      style={{ backgroundColor: flavor.color }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <h3 className="font-['Poppins',sans-serif] font-bold text-[22px] text-gray-900 dark:text-white mb-2">
+              {flavor.name}
+            </h3>
+            <p className="font-['Poppins',sans-serif] text-gray-600 dark:text-white/60">
+              {flavor.desc}
+            </p>
+
+            {/* Petit indicateur de couleur en bas */}
+            <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full ${flavor.color} opacity-40`} />
+          </motion.div>
+        );
+      })}
+    </div>
+  </div>
+</section>
 
       {/* How It Works Section */}
 <section className="relative min-h-[70vh] pt-32 pb-16 bg-white dark:bg-[#060910] transition-colors duration-300">
@@ -563,56 +536,60 @@ export function AlmusPage() {
   </div>
 </section>
 
-      {/* Built for Active Environments Section */}
-      <section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        {/* Background Blurs matching the new aesthetic */}
-        <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
+        {/* Built for Active Environments Section */}
+<section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+  {/* Background Blurs - On garde vos fonds identiques */}
+  <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
 
-        <div className="max-w-[936px] mx-auto px-6 relative text-center">
-          <motion.h2
+  <div className="max-w-[936px] mx-auto px-6 relative text-center">
+    <motion.h2
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="font-['Playfair_Display',serif] font-bold text-[62px] leading-[61.6px] text-gray-900 dark:text-white mb-6 transition-colors duration-300"
+      style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
+    >
+      Built for active environments
+    </motion.h2>
+    <p className="font-['Poppins',sans-serif] text-[24px] leading-[34px] text-gray-600 dark:text-white/70 mb-16 max-w-[761px] mx-auto transition-colors duration-300">
+      ALMUS is designed for facilities where hydration is critical to
+      performance and member experience.
+    </p>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {environment.map((env, index) => {
+        const Icon = env.icon;
+        return (
+          <motion.div
+            key={index}
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="font-['Playfair_Display',serif] font-bold text-[62px] leading-[61.6px] text-gray-900 dark:text-white mb-6 transition-colors duration-300"
-            style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 * index }}
+            className="group relative bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[24px] p-8 shadow-lg dark:shadow-[0px_8px_32px_0px_rgba(0,0,0,0.4)] hover:scale-105 hover:border-blue-400 transition-all duration-300 flex flex-col items-center justify-center min-h-[220px]"
           >
-            Built for active environments
-          </motion.h2>
-          <p className="font-['Poppins',sans-serif] text-[24px] leading-[34px] text-gray-600 dark:text-white/70 mb-16 max-w-[761px] mx-auto transition-colors duration-300">
-            ALMUS is designed for facilities where hydration is critical to
-            performance and member experience.
-          </p>
+            {/* Conteneur de l'icône */}
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-400/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Icon className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {environments.map((env, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1 * index }}
-                className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[24px] overflow-hidden shadow-lg dark:shadow-[0px_8px_32px_0px_rgba(0,0,0,0.4)] hover:scale-105 transition-all duration-300"
-              >
-                <div className="relative h-[200px]">
-                  <img
-                    src={env.image}
-                    alt={env.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent dark:from-black dark:via-[rgba(0,0,0,0.6)] dark:to-[rgba(0,0,0,0)]" />
-                  <div className="absolute bottom-4 left-4 text-left">
-                    <h3 className="font-['Poppins',sans-serif] font-semibold text-[16px] text-white mb-1">
-                      {env.name}
-                    </h3>
-                    <p className="font-['Poppins',sans-serif] text-[12px] text-white/70">
-                      {env.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="text-center">
+              <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white mb-2">
+                {env.name}
+              </h3>
+              <p className="font-['Poppins',sans-serif] text-[13px] text-gray-500 dark:text-white/50">
+                {env.description}
+              </p>
+            </div>
+            
+            {/* Effet de brillance subtil au survol */}
+            <div className="absolute inset-0 rounded-[24px] bg-gradient-to-br from-blue-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </motion.div>
+        );
+      })}
+    </div>
+  </div>
+</section>
 
       {/* Bring ALMUS to Your Facility Section */}
       <section id="almus-cta" className="relative min-h-[70vh] pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
