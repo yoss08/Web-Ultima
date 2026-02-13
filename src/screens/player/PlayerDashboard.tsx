@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { PlayerSchedule } from "./PlayerSchedule";
+import { PlayerSchedule } from "./playerSchedule";
 import { 
   Calendar, 
   Trophy, 
