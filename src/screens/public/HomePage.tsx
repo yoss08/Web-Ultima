@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { Moon, Sun, ArrowRight, Eye, Brain, Menu, X} from "lucide-react";
+import { Moon, Sun, ArrowRight, Eye, Brain, Menu, X } from "lucide-react";
 import { useTheme } from "../../styles/useTheme";
-import { toast, Toaster } from 'sonner'; // Importez Sonner
+import { toast, Toaster } from 'sonner';
 import { Mail, Phone } from 'lucide-react';
 
 const imgImageSummaPadelSportsDashboard = "https://images.unsplash.com/photo-1657704358775-ed705c7388d2?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -37,34 +37,34 @@ export function HomePage() {
 
 
   const handleContactClick = () => {
-  toast.custom((t) => (
-    <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
-        <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
-      </div>
-      
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
-          </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 96 094 772</span>
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
+          <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
+            </div>
+            <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 96 094 772</span>
           </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+          </div>
         </div>
       </div>
-    </div>
-  ), {
-    duration: 5000,
-    position: 'bottom-right',
-  });
-};
+    ), {
+      duration: 5000,
+      position: 'bottom-right',
+    });
+  };
 
 
   return (
@@ -92,7 +92,7 @@ export function HomePage() {
               <Link to="/solutions" className="text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
               <Link to="/summa" className="text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
               <Link to="/almus" className="text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
-              
+
               <button onClick={() => setIsDark(!isDark)} className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                 {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-600" />}
               </button>
@@ -102,15 +102,15 @@ export function HomePage() {
               {/* Nouveau Bouton Live Matches */}
               <button
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300 group"
-               >
-               <span className="relative flex h-2 w-2">
+              >
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-               </span>
-               <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                Live Matches
-               </span>
-             </button>
+                </span>
+                <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
+                  Live Matches
+                </span>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -138,7 +138,7 @@ export function HomePage() {
                 <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
                 <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
                 <Link to="/almus" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
-                
+
                 <div className="pt-4 space-y-3 border-t border-gray-200 dark:border-white/10">
                   <button onClick={() => setIsDark(!isDark)} className="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                     {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-600" />}
@@ -162,7 +162,7 @@ export function HomePage() {
           )}
         </AnimatePresence>
       </motion.nav>
-      
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 sm:pt-32 sm:pb-20 md:pt-48 md:pb-32 px-4 sm:px-6 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
         <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[10%] rounded-full w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] top-[10%]" />
@@ -190,7 +190,7 @@ export function HomePage() {
             transition={{ delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Toaster/>
+            <Toaster />
             <button onClick={handleContactClick} className="w-full sm:w-auto h-[60px] px-12 rounded-full bg-blue-600 dark:bg-[#00E5FF] text-white dark:text-black font-bold hover:scale-105 transition-transform">
               Contact Sales
             </button>
@@ -282,75 +282,75 @@ export function HomePage() {
           </div>
         </div>
       </section>
-{/* PersonaVision AI Section - Integrated Design */}
-<section className="relative py-12 sm:py-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-  <div className="max-w-[1096px] mx-auto px-4 sm:px-6 lg:px-12">
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="relative group bg-white dark:bg-[#0D121F] border border-gray-200 dark:border-white/10 rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden"
-    >
-      {/* Background Decorative Glow (Matching your existing style) */}
-      <div className="absolute bg-purple-500/5 dark:bg-[rgba(192,192,192,0.03)] blur-[80px] -right-20 -top-20 rounded-full w-[300px] h-[300px]" />
+      {/* PersonaVision AI Section - Integrated Design */}
+      <section className="relative py-12 sm:py-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="max-w-[1096px] mx-auto px-4 sm:px-6 lg:px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative group bg-white dark:bg-[#0D121F] border border-gray-200 dark:border-white/10 rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 md:p-12 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden"
+          >
+            {/* Background Decorative Glow (Matching your existing style) */}
+            <div className="absolute bg-purple-500/5 dark:bg-[rgba(192,192,192,0.03)] blur-[80px] -right-20 -top-20 rounded-full w-[300px] h-[300px]" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center relative z-10">
-        {/* Left: Content */}
-        <div className="space-y-4 sm:space-y-6">
-          <div className="flex items-center gap-3 text-blue-500 dark:text-[#00e5ff]">
-            <Eye size={24} className="sm:w-7 sm:h-7 drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]" />
-            <span className="font-['Poppins',sans-serif] text-[10px] sm:text-[12px] uppercase tracking-[0.2rem] font-bold">
-              Featured Platform
-            </span>
-          </div>
-          
-          <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] leading-[1.1] text-gray-900 dark:text-white">
-            PersonaVision AI
-          </h3>
-          
-          <p className="font-['Poppins',sans-serif] text-gray-700 dark:text-white/80 text-[16px] sm:text-[18px] leading-relaxed">
-            Revolutionary computer vision platform powered by advanced neural networks. 
-            Real-time movement analysis, biomechanical intelligence, and performance 
-            optimization at the intersection of AI and human capability.
-          </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center relative z-10">
+              {/* Left: Content */}
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex items-center gap-3 text-blue-500 dark:text-[#00e5ff]">
+                  <Eye size={24} className="sm:w-7 sm:h-7 drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]" />
+                  <span className="font-['Poppins',sans-serif] text-[10px] sm:text-[12px] uppercase tracking-[0.2rem] font-bold">
+                    Featured Platform
+                  </span>
+                </div>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
-            <button
-          
-              className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg hover:scale-105"
-            >
-              Explore Platform
-            </button>
-            <button className="bg-transparent border border-gray-300 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-gray-700 dark:text-white flex items-center justify-center">
-              Learn More
-            </button>
-          </div>
-        </div>
+                <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] leading-[1.1] text-gray-900 dark:text-white">
+                  PersonaVision AI
+                </h3>
 
-        {/* Right: Visual Element */}
-        <div className="relative h-64 sm:h-80 rounded-[24px] overflow-hidden border border-gray-200 dark:border-[#00e5ff]/20 bg-gray-100 dark:bg-black/50 shadow-inner">
-          <img 
-            src="https://images.unsplash.com/photo-1673255745677-e36f618550d1?q=80&w=1080&auto=format&fit=crop"
-            alt="PersonaVision AI Visualization"
-            className="w-full h-full object-cover opacity-80 dark:opacity-60 group-hover:scale-110 transition-transform duration-700"
-          />
-          {/* Overlay gradient matching your SUMMA/ALMUS cards */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent dark:from-black/80" />
-          
-          <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 flex items-center gap-3">
-            <div className="bg-blue-500 dark:bg-[#00e5ff] p-2 rounded-lg">
-              <Brain size={20} className="text-white dark:text-black" />
+                <p className="font-['Poppins',sans-serif] text-gray-700 dark:text-white/80 text-[16px] sm:text-[18px] leading-relaxed">
+                  Revolutionary computer vision platform powered by advanced neural networks.
+                  Real-time movement analysis, biomechanical intelligence, and performance
+                  optimization at the intersection of AI and human capability.
+                </p>
+
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
+                  <button
+
+                    className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg hover:scale-105"
+                  >
+                    Explore Platform
+                  </button>
+                  <button className="bg-transparent border border-gray-300 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 h-[48px] px-8 rounded-full transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-gray-700 dark:text-white flex items-center justify-center">
+                    Learn More
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: Visual Element */}
+              <div className="relative h-64 sm:h-80 rounded-[24px] overflow-hidden border border-gray-200 dark:border-[#00e5ff]/20 bg-gray-100 dark:bg-black/50 shadow-inner">
+                <img
+                  src="https://images.unsplash.com/photo-1673255745677-e36f618550d1?q=80&w=1080&auto=format&fit=crop"
+                  alt="PersonaVision AI Visualization"
+                  className="w-full h-full object-cover opacity-80 dark:opacity-60 group-hover:scale-110 transition-transform duration-700"
+                />
+                {/* Overlay gradient matching your SUMMA/ALMUS cards */}
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent dark:from-black/80" />
+
+                <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 flex items-center gap-3">
+                  <div className="bg-blue-500 dark:bg-[#00e5ff] p-2 rounded-lg">
+                    <Brain size={20} className="text-white dark:text-black" />
+                  </div>
+                  <span className="font-['Poppins',sans-serif] text-white text-[12px] sm:text-[14px] font-semibold uppercase tracking-wider">
+                    AI Powered Analysis
+                  </span>
+                </div>
+              </div>
             </div>
-            <span className="font-['Poppins',sans-serif] text-white text-[12px] sm:text-[14px] font-semibold uppercase tracking-wider">
-              AI Powered Analysis
-            </span>
-          </div>
+          </motion.div>
         </div>
-      </div>
-    </motion.div>
-  </div>
-</section>
+      </section>
       {/* About Section */}
       <section id="about" className="relative bg-white dark:bg-[#060910] py-16 sm:py-20 md:py-24 overflow-hidden transition-colors duration-300 border-gray-100 dark:border-white/5">
         <div className="absolute bg-blue-400/5 dark:bg-[rgba(0,229,255,0.02)] blur-[100px] h-[400px] left-1/2 -translate-x-1/2 rounded-full top-0 w-[800px]" />
@@ -440,13 +440,13 @@ export function HomePage() {
               >
                 {/* Neon Checkmark Icon */}
                 <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-green-500 dark:border-[#39ff14] flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.3)]">
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    className="w-4 h-4 text-green-600 dark:text-[#39ff14]" 
-                    stroke="currentColor" 
-                    strokeWidth="4" 
-                    strokeLinecap="round" 
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="w-4 h-4 text-green-600 dark:text-[#39ff14]"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   >
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -615,7 +615,7 @@ export function HomePage() {
                 Support
               </h4>
               <ul className="space-y-2">
-                
+
                 <li>
                   <button
                     className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
@@ -631,31 +631,31 @@ export function HomePage() {
                 Contact
               </h4>
               <ul className="space-y-2">
-               <ul className="space-y-4"> 
-               
-                <li>
-                 <a
-                    href="tel:+21696094772"
-                    className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
-                   <span>96 094 772</span>
-                 </a>
-               </li>
+                <ul className="space-y-4">
 
-               
-               <li>
-                 <a
-                   href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
-                   target="_blank"
-                    rel="noopener noreferrer"
-                   className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                  <li>
+                    <a
+                      href="tel:+21696094772"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
-                   <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span>Ultima.contacus@gmail.com</span>
-                 </a>
-               </li>
-               </ul>
+                      <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                      <span>96 094 772</span>
+                    </a>
+                  </li>
+
+
+                  <li>
+                    <a
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                    >
+                      <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                      <span>Ultima.contacus@gmail.com</span>
+                    </a>
+                  </li>
+                </ul>
               </ul>
             </div>
           </div>

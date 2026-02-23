@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, ArrowRight, Check, Mail, Phone, Menu, X} from "lucide-react";
+import { Moon, Sun, ArrowRight, Check, Mail, Phone, Menu, X } from "lucide-react";
 import { ImageWithFallback } from "../../components/Design/ImageWithFallback";
 import { useTheme } from "../../styles/useTheme";
-import { toast, Toaster } from 'sonner'; 
+import { toast, Toaster } from 'sonner';
 
+import waterImage from "../../images/water.jpg";
 
 export function Solutions() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,8 +24,8 @@ export function Solutions() {
       title: "Padel Sports Dashboard",
       description:
         "Comprehensive court management and analytics platform for padel facilities. Monitor live matches, track player performance, and optimize facility operations.",
-      color: "#10B981", 
-      darkColor: "#39FF14", 
+      color: "#10B981",
+      darkColor: "#39FF14",
       image: "https://images.unsplash.com/photo-1646651105454-6c167ea6f83b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       features: [
         "Live match monitoring",
@@ -41,9 +42,9 @@ export function Solutions() {
       title: "Smart Hydration Station",
       description:
         "On-site hydration solution delivering flavored, low-calorie beverages designed for active environments. Enhance user experience while maintaining facility standards.",
-      color: "#3B82F6", 
-      darkColor: "#00E5FF", 
-      image: "https://images.unsplash.com/flagged/photo-1553353799-a992825b0d07?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      color: "#3B82F6",
+      darkColor: "#00E5FF",
+      image: waterImage,
       features: [
         "Multiple flavor options",
         "Low-calorie formulas",
@@ -71,34 +72,34 @@ export function Solutions() {
 
 
   const handleContactClick = () => {
-  toast.custom((t) => (
-    <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
-        <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
-      </div>
-      
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
-          </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 96 094 772</span>
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
+          <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
+            </div>
+            <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 96 094 772</span>
           </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+          </div>
         </div>
       </div>
-    </div>
-  ), {
-    duration: 5000,
-    position: 'bottom-right',
-  });
-};
+    ), {
+      duration: 5000,
+      position: 'bottom-right',
+    });
+  };
 
 
   return (
@@ -135,15 +136,15 @@ export function Solutions() {
               {/* Nouveau Bouton Live Matches */}
               <button
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300 group"
-               >
-               <span className="relative flex h-2 w-2">
+              >
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-               </span>
-               <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                Live Matches
-               </span>
-             </button>
+                </span>
+                <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
+                  Live Matches
+                </span>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -171,7 +172,7 @@ export function Solutions() {
                 <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
                 <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
                 <Link to="/almus" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
-                
+
                 <div className="pt-4 space-y-3 border-t border-gray-200 dark:border-white/10">
                   <button onClick={() => setIsDark(!isDark)} className="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                     {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-600" />}
@@ -224,16 +225,15 @@ export function Solutions() {
           <div className="space-y-12 sm:space-y-16 mt-12 sm:mt-20">
             {solutions.map((solution, index) => {
               const solutionColor = getSolutionColor(solution);
-              
+
               return (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 * index }}
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center ${
-                    index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                  }`}
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                    }`}
                 >
                   {/* Content */}
                   <div
@@ -363,7 +363,7 @@ export function Solutions() {
 
         <div className="max-w-[800px] mx-auto px-4 sm:px-6 relative text-center">
           <motion.div
-            id= "contact"
+            id="contact"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -432,7 +432,7 @@ export function Solutions() {
                 Support
               </h4>
               <ul className="space-y-2">
-                
+
                 <li>
                   <button
                     className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
@@ -448,31 +448,31 @@ export function Solutions() {
                 Contact
               </h4>
               <ul className="space-y-2">
-               <ul className="space-y-4"> 
-               
-                <li>
-                 <a
-                    href="tel:+21696094772"
-                    className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
-                   <span>96 094 772</span>
-                 </a>
-               </li>
+                <ul className="space-y-4">
 
-               
-               <li>
-                 <a
-                   href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
-                   target="_blank"
-                    rel="noopener noreferrer"
-                   className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                  <li>
+                    <a
+                      href="tel:+21696094772"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
-                   <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span>Ultima.contacus@gmail.com</span>
-                 </a>
-               </li>
-               </ul>
+                      <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                      <span>96 094 772</span>
+                    </a>
+                  </li>
+
+
+                  <li>
+                    <a
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                    >
+                      <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                      <span>Ultima.contacus@gmail.com</span>
+                    </a>
+                  </li>
+                </ul>
               </ul>
             </div>
           </div>
