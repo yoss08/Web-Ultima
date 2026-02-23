@@ -7,8 +7,6 @@ import { toast, Toaster } from 'sonner';
 import { Mail, Phone } from 'lucide-react';
 
 
-// Images
-const padelCourtImage = "https://images.unsplash.com/photo-1693517235862-a1b8c3323efb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYWRlbCUyMGNvdXJ0JTIwc3BvcnQlMjBmYWNpbGl0eSUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzAxMzkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 const scoringSystemImage = "https://www.vrpadel.co.za/wp-content/uploads/2025/03/WS_2.png";
 const athleteImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
@@ -286,15 +284,8 @@ export function SummaPage() {
       
 {/* Hero Section */}
       <section className="relative min-h-[70vh] pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          <img
-            src={padelCourtImage}
-            alt="SUMMA Smart Scoring System"
-            className="w-full h-full object-cover opacity-20 dark:opacity-10"
-          />
-        </div>
-
+       <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+       <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-[1200px] mx-auto w-full px-4 sm:px-6 md:px-8 lg:px-12 pb-12 sm:pb-16 relative z-10">
           <div className="text-center space-y-6 sm:space-y-8">
             {/* Title */}
@@ -357,7 +348,9 @@ export function SummaPage() {
       </section>
 
       {/* Key Metrics Section */}
-      <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-4 sm:px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-4 sm:px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {metrics.map((metric, index) => (
@@ -386,7 +379,9 @@ export function SummaPage() {
 
 
       {/* What Is Summa Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -449,7 +444,9 @@ export function SummaPage() {
       </section>
 
       {/* Core Features Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -498,7 +495,9 @@ export function SummaPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -549,7 +548,9 @@ export function SummaPage() {
         </div>
       </section>
        {/* Interfaces & Platforms Section */}
-<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -605,8 +606,11 @@ export function SummaPage() {
 </section>
      
       {/* Why Choose Summa Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -685,7 +689,9 @@ export function SummaPage() {
         </div>
       </section>
       {/* Where Summa Fits Section */}
-<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -731,7 +737,9 @@ export function SummaPage() {
   </div>
 </section>
       {/* Ultima Ecosystem Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-5xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -816,8 +824,10 @@ export function SummaPage() {
       {/* Final CTA Section */}
       <section
         id="summa-cta"
-        className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden transition-colors duration-300"
+        className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300"
       >
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
