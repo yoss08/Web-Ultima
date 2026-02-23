@@ -190,6 +190,7 @@ export function SummaPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
+      <Toaster />
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
@@ -336,7 +337,7 @@ export function SummaPage() {
               >
                 Request a demo
               </button>
-              <Toaster />
+              
               <button onClick={handleContactClick}
                 className="w-full sm:w-auto bg-transparent hover:bg-gray-100 dark:hover:bg-white/10 h-[52px] sm:h-[60px] px-8 sm:px-12 rounded-full border-2 border-gray-300 dark:border-white/40 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[16px] text-gray-800 dark:text-white"
               >
