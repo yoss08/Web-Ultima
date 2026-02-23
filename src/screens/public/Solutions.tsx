@@ -122,6 +122,7 @@ export function Solutions() {
 
             {/* Center Links */}
             <div className="hidden md:flex items-center gap-8">
+              <a href="#contact" className="text-sm font-medium hover:text-blue-500 transition-colors">Contact</a>
               <Link to="/solutions" className="text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
               <Link to="/summa" className="text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
               <Link to="/almus" className="text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
@@ -166,6 +167,7 @@ export function Solutions() {
               className="md:hidden border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0A0E1A] overflow-hidden"
             >
               <div className="px-6 py-6 space-y-4">
+                <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Contact</a>
                 <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
                 <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
                 <Link to="/almus" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
@@ -361,6 +363,7 @@ export function Solutions() {
 
         <div className="max-w-[800px] mx-auto px-4 sm:px-6 relative text-center">
           <motion.div
+            id= "contact"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}

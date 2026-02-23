@@ -170,6 +170,7 @@ export function AlmusPage() {
 
             {/* Center Links */}
             <div className="hidden md:flex items-center gap-8">
+              <a href="#contact" className="text-sm font-medium hover:text-blue-500 transition-colors">Contact</a>
               <Link to="/solutions" className="text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
               <Link to="/summa" className="text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
               <Link to="/almus" className="text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
@@ -214,6 +215,7 @@ export function AlmusPage() {
               className="md:hidden border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0A0E1A] overflow-hidden"
             >
               <div className="px-6 py-6 space-y-4">
+                <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Contact</a>
                 <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
                 <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
                 <Link to="/almus" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">ALMUS</Link>
@@ -408,7 +410,7 @@ export function AlmusPage() {
               transition={{ duration: 0.8 }}
             >
               <h2
-                className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-gray-900 dark:text-white mb-6"
+                className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[48px] lg:text-[64px] leading-[1.2] text-gray-900 dark:text-white transition-colors duration-300"
                 style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
               >
                 Why choose ALMUS
@@ -593,6 +595,7 @@ export function AlmusPage() {
 
           {/* Contact Form */}
           <motion.form
+            id= "contact"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
