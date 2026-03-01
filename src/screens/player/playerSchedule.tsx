@@ -1,0 +1,184 @@
+import { useEffect, useState } from "react";
+import { Clock, User, ChevronRight, Loader2, MapPin, CalendarDays } from "lucide-react";
+import { supabase } from "../../config/supabase";
+import { useAuth } from "../../services/AuthContext";
+
+// --- TYPES TO FIX LINTING ERRORS ---
+interface TrainingSession {
+  id: string;
+  start_time: string;
+  session_type: string;
+  profiles: { full_name: string } | null;
+}
+
+interface BookingMatch {
+  id: string;
+  booking_date: string;
+  time_slot: string;
+  courts: { name: string } | null;
+}
+
+interface CombinedEvent {
+  id: string;
+  date: string;
+  title: string;
+  time: string;
+  subtitle: string;
+  type: 'coach' | 'match';
+}
+
+export function PlayerSchedule() {
+  const { user } = useAuth();
+  const [schedule, setSchedule] = useState<CombinedEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFullSchedule() {
+      if (!user?.id) return;
+      
+      try {
+        setLoading(true);
+
+        // 1. Fetch Training Sessions (Coaching) - Joining with profiles for Coach Name
+        const { data: trainingsData } = await supabase
+          .from('training_sessions')
+          .select(`
+            id, 
+            start_time, 
+            session_type, 
+            profiles:coach_id(full_name)
+          `)
+          .eq('student_id', user.id)
+          .eq('status', 'scheduled')
+          .gte('start_time', new Date().toISOString());
+
+        // 2. Fetch Court Bookings (Matches) - Joining with courts for Court Name
+        const { data: matchesData } = await supabase
+          .from('bookings')
+          .select(`
+            id, 
+            booking_date, 
+            time_slot, 
+            courts(name)
+          `)
+          .eq('user_id', user.id)
+          .eq('status', 'confirmed')
+          .gte('booking_date', new Date().toISOString().split('T')[0]);
+
+        // Cast the data to our interfaces to resolve the "red error"
+        const trainings = (trainingsData as unknown as TrainingSession[]) || [];
+        const matches = (matchesData as unknown as BookingMatch[]) || [];
+
+        // 3. Merge and Normalize for the UI
+        const combined: CombinedEvent[] = [
+          ...trainings.map(t => ({
+            id: t.id,
+            date: t.start_time,
+            title: `Pro Training: ${t.session_type}`,
+            time: new Date(t.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            subtitle: t.profiles?.full_name ? `Coach ${t.profiles.full_name}` : "Assigned Coach",
+            type: 'coach' as const
+          })),
+          ...matches.map(m => ({
+            id: m.id,
+            date: m.booking_date,
+            title: `Match @ ${m.courts?.name || 'Main Court'}`,
+            time: m.time_slot,
+            subtitle: "Court Reservation",
+            type: 'match' as const
+          }))
+        ];
+
+        // Sort by date (Soonest first)
+        combined.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        setSchedule(combined.slice(0, 3)); // Only show top 3
+      } catch (err) {
+        console.error("Schedule fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFullSchedule();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-white/5 rounded-[32px] p-12 flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
+        <Loader2 className="animate-spin text-[#39FF14] mb-4" size={32} />
+        <p className="text-xs font-black opacity-40 uppercase tracking-widest">Loading Schedule...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 shadow-xl shadow-black/5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 px-2">
+        <div>
+          <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">Your Schedule</h3>
+          <p className="text-[10px] font-bold text-[#39FF14] uppercase tracking-widest mt-1">Next 3 Events</p>
+        </div>
+        <div className="w-10 h-10 bg-[#39FF14]/10 rounded-xl flex items-center justify-center">
+          <CalendarDays className="text-[#39FF14]" size={20} />
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="space-y-4">
+        {schedule.map((item) => (
+          <div 
+            key={item.id} 
+            className="group flex items-center gap-5 p-5 rounded-[24px] bg-gray-50 dark:bg-black/20 border border-transparent hover:border-[#39FF14]/30 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 cursor-pointer"
+          >
+            {/* Date Identity Block */}
+            <div className="flex flex-col items-center justify-center min-w-[64px] h-[64px] bg-[#0A0E1A] dark:bg-white rounded-[18px] shadow-lg group-hover:scale-105 transition-transform">
+              <span className="text-[10px] font-black text-white/40 dark:text-black/40 uppercase tracking-tighter">
+                {new Date(item.date).toLocaleDateString('en-US', { month: 'short' })}
+              </span>
+              <span className="text-2xl font-black text-white dark:text-black leading-none">
+                {new Date(item.date).getDate()}
+              </span>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-[#39FF14]' : 'bg-blue-400'}`} />
+                <h4 className="font-black text-[15px] dark:text-white truncate uppercase tracking-tight group-hover:text-[#39FF14] transition-colors">
+                  {item.title}
+                </h4>
+              </div>
+              
+              <div className="flex items-center gap-4 opacity-50">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold">
+                  <Clock size={13} className="text-[#39FF14]" />
+                  <span>{item.time}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-bold">
+                  {item.type === 'coach' ? <User size={13} className="text-[#39FF14]" /> : <MapPin size={13} className="text-[#39FF14]" />}
+                  <span className="truncate max-w-[100px]">{item.subtitle}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
+              <ChevronRight size={16} className="text-[#39FF14]" />
+            </div>
+          </div>
+        ))}
+
+        {schedule.length === 0 && (
+          <div className="text-center py-10 px-4 border-2 border-dashed border-gray-100 dark:border-white/5 rounded-[32px]">
+            <p className="text-sm font-bold opacity-30 italic">No training or matches scheduled yet.</p>
+          </div>
+        )}
+      </div>
+
+      <button className="w-full mt-6 py-4 rounded-2xl bg-gray-100 dark:bg-white/5 text-[11px] font-black uppercase tracking-[2px] dark:text-white/60 hover:text-[#39FF14] transition-colors">
+        View Full Calendar
+      </button>
+    </div>
+  );
+}
