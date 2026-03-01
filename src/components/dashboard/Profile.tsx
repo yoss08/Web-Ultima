@@ -42,6 +42,11 @@ export function Profile() {
 
   // SAUVEGARDE RÉELLE DANS SUPABASE
   const handleUpdateProfile = async () => {
+    if (!user) {
+      toast.error("You must be logged in to update your profile");
+      return;
+    }
+
     setLoading(true);
     const toastId = toast.loading("Updating profile...");
 
@@ -57,7 +62,18 @@ export function Profile() {
 
       if (error) throw error;
 
-      // 2. IMPORTANT: Rafraîchir la session locale pour que l'icône de profil change partout
+      // 2. Sync to profiles table (telephone column)
+      await supabase
+        .from('profiles')
+        .update({ 
+          full_name: userData.fullName,
+          phone_number: userData.phone,
+          telephone: userData.phone,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      // 3. IMPORTANT: Rafraîchir la session locale pour que l'icône de profil change partout
       await supabase.auth.getUser();
 
       toast.success("Profile updated successfully!", { id: toastId });

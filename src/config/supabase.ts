@@ -22,7 +22,9 @@ export interface UserProfile {
   email: string;
   full_name: string;
   phone_number?: string;
-  account_type: 'Player' | 'Coach' | 'Facility';
+  telephone?: string;
+  account_type: 'Player' | 'Coach' | 'Facility' | 'Admin';
+  role?: string;
   created_at: string;
   updated_at: string;
 }
@@ -58,7 +60,9 @@ export const authHelpers = {
         email: email,
         full_name: userData.fullName,
         phone_number: userData.phoneNumber,
+        telephone: userData.phoneNumber, // Sync to telephone column
         account_type: userData.accountType,
+        role: userData.accountType, // Sync to role column
         updated_at: new Date().toISOString(),
       });
 
