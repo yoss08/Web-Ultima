@@ -21,12 +21,10 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
-  phone_number?: string;
-  telephone?: string;
-  account_type: 'Player' | 'Coach' | 'Facility' | 'Admin';
-  role?: string;
+  phone?: string;              // matches `phone` column in profiles table
+  role?: 'Player' | 'Coach' | 'Admin';
+  avatar_url?: string;
   created_at: string;
-  updated_at: string;
 }
 
 // Helper functions
@@ -57,13 +55,9 @@ export const authHelpers = {
       .from('profiles')
       .upsert({
         id: authData.user.id,
-        email: email,
         full_name: userData.fullName,
-        phone_number: userData.phoneNumber,
-        telephone: userData.phoneNumber, // Sync to telephone column
-        account_type: userData.accountType,
-        role: userData.accountType, // Sync to role column
-        updated_at: new Date().toISOString(),
+        phone: userData.phoneNumber,   // correct column name
+        role: userData.accountType,    // correct column name
       });
 
     if (profileError) {

@@ -38,7 +38,7 @@ export function DashboardLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/login");
+    navigate("/");
   };
   const navItems = [
     { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
