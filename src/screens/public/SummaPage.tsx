@@ -330,7 +330,7 @@ export function SummaPage() {
               transition={{ duration: 0.8 }}
             >
               <h1
-                className="font-['Playfair_Display',serif] font-bold text-[56px] sm:text-[80px] md:text-[100px] lg:text-[120px] leading-[0.9] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
+                className="font-['Playfair_Display',serif] font-bold text-[56px] sm:text-[80px] md:text-[90px] lg:text-[120px] leading-[0.9] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
                 style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
               >
                 SUMMA

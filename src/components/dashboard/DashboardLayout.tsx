@@ -72,7 +72,6 @@ export function DashboardLayout() {
     ] : []),
 
     { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
-    { icon: User, label: "Profile", path: "/dashboard/profile" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 
@@ -112,14 +111,14 @@ export function DashboardLayout() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="hidden lg:flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
+              className="hidden md:flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
             >
               <Menu className={`w-5 h-5 ${isDark ? "text-white" : "text-[#0A0E1A]"}`} />
             </button>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
@@ -230,8 +229,8 @@ export function DashboardLayout() {
 
       {/* Desktop Sidebar */}
       <aside
-        className={` fixed left-0 top-16 bottom-0 ${isDark ? "bg-[#0A0E1A] border-white/10" : "bg-white border-gray-200"} border-r z-40 transition-all hidden duration-300 lg:block ${
-          sidebarOpen ? "w-64" : "w-20"
+        className={` fixed left-0 top-16 bottom-0 ${isDark ? "bg-[#0A0E1A] border-white/10" : "bg-white border-gray-200"} border-r z-40 transition-all duration-300 hidden md:block ${
+          sidebarOpen ? "lg:w-64 w-20" : "w-20"
         }`}
       >
         <nav className="p-4 space-y-2">
@@ -258,18 +257,15 @@ export function DashboardLayout() {
 
                   }`}
                 />
-                {sidebarOpen && (
-                  <span
-                    className={`font-['Poppins',sans-serif] text-[14px] font-medium ${
-                      active
-                        ? "text-[#39FF14]" : isDark ? "text-white" 
-                        : "text-[#0A0E1A]"
-
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                )}
+                <span
+                  className={`font-['Poppins',sans-serif] text-[14px] font-medium transition-opacity duration-300 ${
+                    active
+                      ? "text-[#39FF14]" : isDark ? "text-white" 
+                      : "text-[#0A0E1A]"
+                  } ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}
+                >
+                  {item.label}
+                </span>
               </Link>
             );
           })}
@@ -281,18 +277,16 @@ export function DashboardLayout() {
             className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-8"
           >
             <LogOut className="w-5 h-5 text-red-500 flex-shrink-0" />
-            {sidebarOpen && (
-              <span className="font-['Poppins',sans-serif] text-[14px] font-medium text-red-500">
-                Logout
-              </span>
-            )}
+            <span className={`font-['Poppins',sans-serif] text-[14px] font-medium text-red-500 transition-opacity duration-300 ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}>
+              Logout
+            </span>
           </Link>
         </nav>
       </aside>
 
       {/* Mobile Sidebar (Overlay) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
+        <div className="fixed inset-0 z-[60] md:hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
           <nav className={`absolute left-0 top-0 bottom-0 w-72 ${isDark ? "bg-[#0A0E1A]" : "bg-white"} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-8">
@@ -342,7 +336,7 @@ export function DashboardLayout() {
       {/* Main Content */}
       <main
         className={`pt-16 transition-all duration-300 ${
-          sidebarOpen ? "lg:pl-64" : "lg:pl-20"
+          sidebarOpen ? "lg:pl-64 md:pl-20" : "md:pl-20"
         }`}
       >
         <div className="p-6 lg:p-8">

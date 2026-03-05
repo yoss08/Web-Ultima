@@ -169,6 +169,18 @@ export function CourtBooking() {
       }
     }
     fetchCourts();
+
+    // Real-time subscription for courts
+    const courtSub = supabase
+      .channel('courts_channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'courts' }, () => {
+         fetchCourts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(courtSub);
+    };
   }, []);
 
   // Fetch taken slots whenever court or date changes
@@ -193,6 +205,24 @@ export function CourtBooking() {
       }
     }
     fetchTaken();
+
+    // Real-time subscription for bookings on the selected date & court
+    const bookingSub = supabase
+      .channel('bookings_channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, (payload) => {
+         const newBooking = payload.new as any;
+         // Handle delete events where new is empty, check old
+         const record = newBooking && Object.keys(newBooking).length > 0 ? newBooking : payload.old as any;
+         
+         if (record && record.court_id === selectedCourt!.id && record.booking_date === selectedDate) {
+           fetchTaken();
+         }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(bookingSub);
+    };
   }, [selectedCourt, selectedDate]);
 
   // Fetch user's bookings

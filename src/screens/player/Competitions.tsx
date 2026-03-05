@@ -49,11 +49,26 @@ export function Competitions() {
 
   useEffect(() => {
     fetchData();
+
+    // Listen to real-time updates for brackets and capacities
+    const tourneySub = supabase
+      .channel('tournaments_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
+         fetchData(false); // Background refresh
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tournament_registrations' }, () => {
+         fetchData(false); // Background refresh
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(tourneySub);
+    };
   }, [user]);
 
-  async function fetchData() {
+  async function fetchData(showLoader = true) {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
       const { data: tourneys, error: tError } = await supabase
         .from('tournaments')
         .select('*')
@@ -124,7 +139,7 @@ export function Competitions() {
             <TrendingUp size={16} />
             <span>Tournament Center</span>
           </div>
-          <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">Active Competitions</h1>
+          <h1 className="font-['Playfair_Display',serif] text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black dark:text-white leading-none mb-4">Active Competitions</h1>
           <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
             Register for upcoming tournaments and prove your skills.
           </p>
@@ -162,7 +177,7 @@ export function Competitions() {
       </header>
 
       {/* COMPETITION CARDS */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <AnimatePresence mode="popLayout">
           {filteredTournaments.map((t) => {
             const isRegistered = userRegistrations.includes(t.id);

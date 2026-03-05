@@ -1,39 +1,129 @@
-import { motion } from "framer-motion"; // Correction de l'import (framer-motion est plus standard que motion/react)
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Bell,
-  Shield,
+  User,
   Save,
-  Sun,
+  Loader2,
   Moon,
+  Sun,
+  Bell,
+  Globe,
+  Shield,
+  Palette,
+  CreditCard,
+  Lock,
+  ChevronRight
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { useTheme } from "../../styles/useTheme";
-import { AnimatePresence } from "framer-motion";
+import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
 
+type TabType = 'account' | 'appearance' | 'notifications' | 'security';
+
 export function SettingsPage() {
+  const { user } = useAuth();
   const { isDark, setIsDark } = useTheme();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as TabType) || 'account';
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const [loading, setLoading] = useState(false);
+
+  // Sync tab state with URL
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
+
+  // Profile Data state
+  const [userData, setUserData] = useState({
+    fullName: "",
+    email: "",
+    role: "",
+    phone: "",
+  });
+
+  // App Settings states
   const [notifications, setNotifications] = useState({
     emailAlerts: true,
     matchUpdates: true,
     maintenanceReminders: true,
     lowWaterAlerts: true,
-    weeklyReports: false,
+    push: true,
   });
+  const [language, setLanguage] = useState("en");
+  const [privacy, setPrivacy] = useState("public");
 
+  // Security states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Load initial data
+  useEffect(() => {
+    if (user) {
+      const metadata = user.user_metadata || {};
+      setUserData({
+        fullName: metadata.full_name || "",
+        email: user.email || "",
+        role: metadata.account_type || "Player",
+        phone: metadata.phone_number || "",
+      });
+    }
+  }, [user]);
+
+  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!user) {
+      toast.error("You must be logged in to update your profile");
+      return;
+    }
+
+    setLoading(true);
+    const toastId = toast.loading("Updating profile...");
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { 
+          full_name: userData.fullName,
+          phone_number: userData.phone
+        }
+      });
+
+      if (error) throw error;
+
+      await supabase
+        .from('profiles')
+        .update({ 
+          full_name: userData.fullName,
+          phone_number: userData.phone,
+          telephone: userData.phone,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      await supabase.auth.getUser();
+      toast.success("Profile updated successfully!", { id: toastId });
+    } catch (error: any) {
+      toast.error(error.message || "Update failed", { id: toastId });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleThemeUpdate = (mode: 'light' | 'dark') => {
-  if ((mode === 'dark' && isDark) || (mode === 'light' && !isDark)) return;
-   setIsDark(mode === 'dark');
-  
-  setTimeout(() => {
-    window.location.reload();
-  }, 150);
-};
+    if ((mode === 'dark' && isDark) || (mode === 'light' && !isDark)) return;
+    setIsDark(mode === 'dark');
+    
+    // Refresh to ensure all styles and themed components update correctly
+    setTimeout(() => {
+      window.location.reload();
+    }, 150);
+  };
 
   const handleNotificationToggle = (key: string) => {
     setNotifications(prev => ({
@@ -42,15 +132,14 @@ export function SettingsPage() {
     }));
   };
 
-  const handleSave = () => {
-    toast.success("Settings saved successfully!");
-  };
-
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) return toast.error("Passwords do not match");
     if (newPassword.length < 6) return toast.error("Password too short");
 
+    setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setLoading(false);
+
     if (error) {
       toast.error(error.message);
     } else {
@@ -61,190 +150,373 @@ export function SettingsPage() {
     }
   };
 
+  const tabs = [
+    { id: 'account', label: 'Account', icon: User, color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF]/10' },
+    { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-[#39FF14]', bg: 'bg-[#39FF14]/10' },
+    { id: 'notifications', label: 'Alerts', icon: Bell, color: 'text-[#FFD700]', bg: 'bg-[#FFD700]/10' },
+    { id: 'security', label: 'Security', icon: Shield, color: 'text-[#FF4D4D]', bg: 'bg-[#FF4D4D]/10' },
+  ];
+
+  const inputClassName = "w-full bg-gray-50 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#39FF14] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white font-['Poppins',sans-serif]";
+
   return (
-    <div className="space-y-8 max-w-4xl pb-10 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500">
       {/* Header */}
       <div>
         <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">
           Settings
         </h1>
         <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
-          Manage your dashboard preferences and account security.
+          Manage your account profile, appearance, and security preferences.
         </p>
       </div>
 
-      {/* Appearance Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[24px] p-6 lg:p-8 shadow-sm"
-      >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-[12px] bg-[#39FF14]/10 border border-[#39FF14]/20 flex items-center justify-center">
-            {isDark ? <Moon className="w-6 h-6 text-[#39FF14]" /> : <Sun className="w-6 h-6 text-[#39FF14]" />}
-          </div>
-          <div>
-            <h2 className="font-['Poppins'] font-semibold text-[20px] text-[#0A0E1A] dark:text-white">Appearance</h2>
-            <p className="text-xs opacity-50 text-[#0A0E1A] dark:text-white">Customize how the dashboard looks on your device</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            onClick={() => handleThemeUpdate('light')}
-            className={`relative p-6 rounded-[20px] border-2 flex flex-col items-center gap-4 transition-all ${
-              !isDark 
-                ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_20px_rgba(57,255,20,0.1)]" 
-                : "border-gray-100 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/20"
-            }`}
-          >
-            <div className={`p-3 rounded-full ${!isDark ? "bg-[#39FF14] text-black" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
-              <Sun size={24} />
-            </div>
-            <div className="text-center">
-              <p className={`font-bold text-sm ${!isDark ? "text-black" : "text-gray-400"}`}>Light Mode</p>
-              {!isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Active</span>}
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleThemeUpdate('dark')}
-            className={`relative p-6 rounded-[20px] border-2 flex flex-col items-center gap-4 transition-all ${
-              isDark 
-                ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_20px_rgba(57,255,20,0.1)]" 
-                : "border-gray-100 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/20"
-            }`}
-          >
-            <div className={`p-3 rounded-full ${isDark ? "bg-[#39FF14] text-black" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
-              <Moon size={24} />
-            </div>
-            <div className="text-center">
-              <p className={`font-bold text-sm ${isDark ? "text-white" : "text-gray-400"}`}>Dark Mode</p>
-              {isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Active</span>}
-            </div>
-          </button>
-        </div>
-      </motion.div>
-
-      {/* Notifications Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[24px] p-6 lg:p-8 shadow-sm"
-      >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-[12px] bg-[#39FF14]/10 border border-[#39FF14]/20 flex items-center justify-center">
-            <Bell className="w-6 h-6 text-[#39FF14]" />
-          </div>
-          <h2 className="font-['Poppins',sans-serif] font-semibold text-[22px] text-[#0A0E1A] dark:text-white">
-            Notifications
-          </h2>
-        </div>
-
-        <div className="space-y-1">
-          {Object.entries(notifications).map(([key, value]) => (
-            <div
-              key={key}
-              className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-white/5 last:border-0"
-            >
-              <span className="font-['Poppins',sans-serif] text-[15px] font-medium text-[#0A0E1A] dark:text-white">
-                {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-              </span>
+      <div className="grid lg:grid-cols-[280px_1fr] gap-8">
+        {/* Navigation Sidebar */}
+        <div className="space-y-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
               <button
-                onClick={() => handleNotificationToggle(key)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                  value ? "bg-[#39FF14]" : "bg-gray-200 dark:bg-white/10"
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id as TabType)}
+                className={`w-full flex items-center justify-between p-4 rounded-[16px] transition-all group ${
+                  isActive 
+                    ? "bg-[#39FF14]/10 border border-[#39FF14]/20 shadow-sm" 
+                    : "hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <span
-                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${
-                    value ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-[12px] ${tab.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                    <Icon className={`w-5 h-5 ${tab.color}`} />
+                  </div>
+                  <span className={`font-['Poppins',sans-serif] font-bold text-[15px] ${
+                    isActive ? "text-[#0A0E1A] dark:text-white" : "text-[#0A0E1A]/60 dark:text-white/40"
+                  }`}>
+                    {tab.label}
+                  </span>
+                </div>
+                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "text-[#39FF14] translate-x-1" : "text-gray-300 opacity-0 group-hover:opacity-100"}`} />
               </button>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Security Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[24px] p-6 lg:p-8 shadow-sm"
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-[12px] bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-            <Shield className="w-6 h-6 text-red-500" />
-          </div>
-          <div>
-             <h2 className="font-['Poppins',sans-serif] font-semibold text-[22px] text-[#0A0E1A] dark:text-white">
-               Security
-             </h2>
-             <p className="text-xs opacity-50 text-[#0A0E1A] dark:text-white">Manage your account security and authentication</p>
-          </div>
+            );
+          })}
         </div>
 
-        <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-2xl mb-6">
-           <h3 className="text-sm font-bold text-red-500 mb-1">Privacy & Credentials</h3>
-           <p className="text-xs opacity-60">Update your password regularly to keep your account secure.</p>
-        </div>
+        {/* Content Area */}
+        <div className="min-h-[600px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[28px] p-6 lg:p-10 shadow-sm"
+            >
+              {/* ACCOUNT TAB */}
+              {activeTab === 'account' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-2xl font-bold dark:text-white mb-2">Account Profile</h2>
+                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Manage your public information and contact details.</p>
+                  </div>
 
-        <button 
-          onClick={() => setShowPasswordModal(true)}
-          className="flex items-center gap-2 px-8 h-12 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 border border-gray-200 dark:border-white/20 rounded-[12px] transition-all font-bold text-sm text-[#0A0E1A] dark:text-white shadow-sm"
-        >
-          Change Account Password
-        </button>
-      </motion.div>
+                  <div className="space-y-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Full Name</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={userData.fullName}
+                        onChange={handleUserChange}
+                        className={inputClassName}
+                        placeholder="Your full name"
+                      />
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Email Address</label>
+                        <input
+                          type="email"
+                          value={userData.email}
+                          disabled
+                          className={`${inputClassName} opacity-50 cursor-not-allowed`}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Phone Number</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={userData.phone}
+                          onChange={handleUserChange}
+                          className={inputClassName}
+                          placeholder="+1 (555) 000-0000"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Account Role</label>
+                      <div className="w-full bg-gray-100 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 flex items-center cursor-not-allowed">
+                        <span className="font-['Poppins',sans-serif] text-[15px] text-[#0A0E1A]/40 dark:text-white/40">
+                          {userData.role}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 flex justify-end">
+                    <button
+                      onClick={handleUpdateProfile}
+                      disabled={loading}
+                      className="flex items-center gap-2 px-10 h-14 bg-[#39FF14] hover:bg-[#32E012] disabled:opacity-50 rounded-[18px] shadow-lg shadow-[#39FF14]/20 transition-all font-bold text-black"
+                    >
+                      {loading ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* APPEARANCE TAB */}
+              {activeTab === 'appearance' && (
+                <div className="space-y-10">
+                  <div>
+                    <h2 className="text-2xl font-bold dark:text-white mb-2">Display & Appearance</h2>
+                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Customize how the application looks on your device.</p>
+                  </div>
+
+                  {/* Theme Selection */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <button
+                      onClick={() => handleThemeUpdate('light')}
+                      className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
+                        !isDark 
+                          ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_30px_rgba(57,255,20,0.15)]" 
+                          : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
+                      }`}
+                    >
+                      <div className={`p-5 rounded-full ${!isDark ? "bg-[#39FF14] text-black shadow-lg shadow-[#39FF14]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                        <Sun size={32} />
+                      </div>
+                      <div className="text-center">
+                        <p className={`font-black text-lg ${!isDark ? "text-black" : "text-gray-400"}`}>Light</p>
+                        {!isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Selected</span>}
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleThemeUpdate('dark')}
+                      className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
+                        isDark 
+                          ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_30px_rgba(57,255,20,0.15)]" 
+                          : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
+                      }`}
+                    >
+                      <div className={`p-5 rounded-full ${isDark ? "bg-[#39FF14] text-black shadow-lg shadow-[#39FF14]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                        <Moon size={32} />
+                      </div>
+                      <div className="text-center">
+                        <p className={`font-black text-lg ${isDark ? "text-white" : "text-gray-400"}`}>Dark</p>
+                        {isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Selected</span>}
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="space-y-6 pt-6 border-t border-gray-100 dark:border-white/5">
+                    {/* Language */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-[#00E5FF]/10 rounded-xl">
+                          <Globe className="text-[#00E5FF]" size={20} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold dark:text-white">Global Language</h4>
+                          <p className="text-xs opacity-60">System-wide display language</p>
+                        </div>
+                      </div>
+                      <select 
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="h-11 px-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 outline-none text-sm font-bold dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                      >
+                        <option value="en">English (US)</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                      </select>
+                    </div>
+
+                    {/* Privacy */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-[#FF4D4D]/10 rounded-xl">
+                          <Lock className="text-[#FF4D4D]" size={20} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold dark:text-white">Profile Visibility</h4>
+                          <p className="text-xs opacity-60">Control who can see your stats</p>
+                        </div>
+                      </div>
+                      <select 
+                        value={privacy}
+                        onChange={(e) => setPrivacy(e.target.value)}
+                        className="h-11 px-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 outline-none text-sm font-bold dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                      >
+                        <option value="public">Public</option>
+                        <option value="friends">Friends</option>
+                        <option value="private">Private</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* NOTIFICATIONS TAB */}
+              {activeTab === 'notifications' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-2xl font-bold dark:text-white mb-2">Notification Preferences</h2>
+                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Choose which updates you want to receive and how.</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {Object.entries(notifications).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-5 rounded-[18px] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+                      >
+                        <div>
+                          <span className="font-bold text-[16px] text-[#0A0E1A] dark:text-white">
+                            {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
+                          </span>
+                          <p className="text-[12px] opacity-40">Get notified about {key.toLowerCase().replace('alerts', '')} instantly</p>
+                        </div>
+                        <button
+                          onClick={() => handleNotificationToggle(key)}
+                          className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
+                            value ? "bg-[#39FF14]" : "bg-gray-200 dark:bg-white/10"
+                          }`}
+                        >
+                          <motion.span
+                            layout
+                            className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md ${
+                              value ? "translate-x-6" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'security' && (
+                <div className="space-y-10">
+                  <div>
+                    <h2 className="text-2xl font-bold dark:text-white mb-2">Security & Privacy</h2>
+                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Keep your account safe and manage authentication.</p>
+                  </div>
+
+                  <div className="p-8 bg-[#FF4D4D]/5 border border-[#FF4D4D]/20 rounded-[24px]">
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-full bg-[#FF4D4D] flex items-center justify-center flex-shrink-0">
+                        <Shield className="text-white w-6 h-6" />
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-[#FF4D4D]">Password Protection</h3>
+                          <p className="text-sm opacity-70">We recommend using a strong password that you don't use elsewhere.</p>
+                        </div>
+                        <button 
+                          onClick={() => setShowPasswordModal(true)}
+                          className="px-8 h-12 bg-white dark:bg-white/10 font-black text-sm rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/20 transition-all shadow-sm"
+                        >
+                          Change Password
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
+                      <Lock size={18} className="text-[#39FF14]" />
+                      Two-Factor Authentication
+                    </h3>
+                    <p className="text-sm opacity-50 px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
 
       {/* Password Modal */}
       <AnimatePresence>
         {showPasswordModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
-               initial={{ opacity: 0, scale: 0.9 }} 
-               animate={{ opacity: 1, scale: 1 }}
-               className="bg-white dark:bg-[#0A0E1A] p-8 rounded-[32px] max-w-md w-full relative border border-white/10"
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPasswordModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-[#0A0E1A] p-10 rounded-[36px] max-w-md w-full relative border border-gray-200 dark:border-white/10 shadow-2xl"
             >
-              <h2 className="text-2xl font-black mb-6">Update Password</h2>
-              <div className="space-y-4 mb-8">
-                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest">New Password</label>
-                    <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full h-12 px-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:ring-1 ring-[#39FF14]" />
-                 </div>
-                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest">Confirm Password</label>
-                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full h-12 px-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:ring-1 ring-[#39FF14]" />
-                 </div>
+              <h2 className="text-3xl font-black mb-2 dark:text-white">Security Update</h2>
+              <p className="text-sm opacity-50 mb-8 font-['Poppins']">Enter your new password below to secure your account.</p>
+              
+              <div className="space-y-5 mb-10">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest text-[#0A0E1A] dark:text-white">New Password</label>
+                  <input 
+                    type="password" 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    className={inputClassName} 
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest text-[#0A0E1A] dark:text-white">Confirm New Password</label>
+                  <input 
+                    type="password" 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    className={inputClassName} 
+                    placeholder="••••••••"
+                  />
+                </div>
               </div>
-              <div className="flex gap-3">
-                 <button onClick={() => setShowPasswordModal(false)} className="flex-1 h-12 bg-gray-100 dark:bg-white/5 font-bold rounded-xl">Cancel</button>
-                 <button onClick={handlePasswordChange} className="flex-1 h-12 bg-[#39FF14] text-black font-black rounded-xl">Update</button>
+              
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setShowPasswordModal(false)} 
+                  className="flex-1 h-14 bg-gray-100 dark:bg-white/5 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors dark:text-white"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handlePasswordChange} 
+                  disabled={loading}
+                  className="flex-1 h-14 bg-[#39FF14] text-black font-black rounded-2xl hover:bg-[#32E012] transition-colors shadow-lg shadow-[#39FF14]/20 flex items-center justify-center gap-2"
+                >
+                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Update
+                </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
-      {/* Save Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="flex justify-end"
-      >
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-2 px-10 h-14 bg-[#39FF14] hover:bg-[#32E012] rounded-[16px] shadow-[0_8px_24px_rgba(57,255,20,0.3)] transition-all font-bold text-black"
-        >
-          <Save className="w-5 h-5" />
-          Save Settings
-        </button>
-      </motion.div>
     </div>
   );
 }

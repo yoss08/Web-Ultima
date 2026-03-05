@@ -89,8 +89,8 @@ export function AdminBookingsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display']">Bookings Management</h1>
-          <p className="text-gray-500">Overview of all court reservations and schedules.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">Bookings Management</h1>
+          <p className="text-gray-500 text-sm">Overview of all court reservations and schedules.</p>
         </div>
         
         <div className="flex gap-2">
@@ -142,44 +142,44 @@ export function AdminBookingsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10">
-                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Player</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Court</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Schedule</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                  <th className="px-4 sm:px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Player</th>
+                  <th className="px-4 sm:px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Court</th>
+                  <th className="px-4 sm:px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Schedule</th>
+                  <th className="px-4 sm:px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                  <th className="px-4 sm:px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                 {filteredBookings.map((booking) => (
                   <tr key={booking.id} className="group hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold">
                           {booking.profiles?.full_name?.[0] || <User size={18} />}
                         </div>
-                        <span className="font-bold dark:text-white">{booking.profiles?.full_name || "Unknown"}</span>
+                        <span className="font-bold dark:text-white truncate max-w-[100px] sm:max-w-none">{booking.profiles?.full_name || "Unknown"}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6">
                       <div className="flex items-center gap-2 dark:text-gray-300">
                         <MapPin size={16} className="text-[#39FF14]" />
                         <span className="font-medium">{booking.courts?.name || "Unassigned"}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm dark:text-white font-semibold">
+                        <div className="flex items-center gap-2 text-sm dark:text-white font-semibold whitespace-nowrap">
                           <CalendarIcon size={14} className="text-gray-400" />
                           {new Date(booking.start_time).toLocaleDateString()}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 whitespace-nowrap">
                           <Clock size={14} />
                           {new Date(booking.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
                           {new Date(booking.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
                         booking.status === 'confirmed' ? 'bg-[#39FF14]/10 text-[#39FF14]' :
                         booking.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
@@ -188,7 +188,7 @@ export function AdminBookingsPage() {
                         {booking.status}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-4 sm:px-8 py-6 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {booking.status !== 'confirmed' && (
                           <button 

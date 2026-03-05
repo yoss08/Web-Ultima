@@ -85,8 +85,8 @@ export function CourtsManagementPage() {
       {/* Header avec bouton d'ajout */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display']">Courts Management</h1>
-          <p className="text-gray-500">Real-time status and advanced facility control.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">Courts Management</h1>
+          <p className="text-gray-500 text-sm">Real-time status and advanced facility control.</p>
         </div>
         
         <div className="flex gap-2">
@@ -117,7 +117,7 @@ export function CourtsManagementPage() {
           <p className="text-gray-500 mt-2">Click "Add Court" to initialize your tennis club facilities.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {courts.map((court: any) => {
             const config = getStatusConfig(court.status);
             const Icon = config.icon;

@@ -40,7 +40,7 @@ export function CoachDashboard() {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Welcome Message Dynamique - Identique aux specs du PDF */}
       <div>
-        <h1 className="font-['Playfair_Display'] font-bold text-4xl dark:text-white mb-2">
+        <h1 className="font-['Playfair_Display'] font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl dark:text-white mb-2 leading-tight">
           Welcome, Coach {coachName}!
         </h1>
         <p className="text-gray-500 font-['Poppins'] text-sm">
@@ -49,7 +49,7 @@ export function CoachDashboard() {
       </div>
 
       {/* Quick Overview Cards - Données réelles (vides pour l'instant) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-12 h-12 bg-[#39FF14]/10 rounded-2xl flex items-center justify-center mb-4">
             <Users className="text-[#39FF14]" size={24} />
@@ -78,7 +78,7 @@ export function CoachDashboard() {
       {/* Quick Actions */}
       <div className="space-y-4">
         <h2 className="text-lg font-bold dark:text-white px-1">Quick Actions</h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link 
             to="/dashboard/coach/schedule" 
             className="flex items-center gap-3 px-6 h-14 bg-[#39FF14] text-black rounded-[18px] font-bold shadow-lg shadow-[#39FF14]/20 hover:scale-105 active:scale-95 transition-all"
@@ -110,7 +110,7 @@ export function CoachDashboard() {
       </div>
 
       {/* Placeholder for Recent Activity */}
-      <div className="bg-gray-50 dark:bg-black/20 border border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-12 text-center">
+      <div className="bg-gray-50 dark:bg-black/20 border border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-12 text-center">
         <p className="text-gray-500 font-medium">
           Your recent activities and pending student requests will appear here.
         </p>
@@ -120,7 +120,7 @@ export function CoachDashboard() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-12 text-center"
+          className="bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-12 text-center"
         >
           <div className="w-16 h-16 bg-[#39FF14]/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Plus className="text-[#39FF14]" size={32} />

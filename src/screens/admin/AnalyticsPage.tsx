@@ -65,8 +65,8 @@ export function AnalyticsPage() {
       {/* Header avec Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display']">Analytics & Reports</h1>
-          <p className="text-gray-500">Deep dive into club performance and usage patterns.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">Analytics & Reports</h1>
+          <p className="text-gray-500 text-sm">Deep dive into club performance and usage patterns.</p>
         </div>
         
         <div className="flex gap-3">
@@ -83,7 +83,7 @@ export function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Graphique 1: Revenus ou Activité Mensuelle */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8">
           <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
             <TrendingUp size={20} className="text-[#39FF14]" /> Monthly Activity
           </h3>
@@ -107,7 +107,7 @@ export function AnalyticsPage() {
         </div>
 
         {/* Graphique 2: Utilisation des Courts */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8">
           <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
             <BarChart3 size={20} className="text-[#00E5FF]" /> Court Usage %
           </h3>
@@ -131,7 +131,7 @@ export function AnalyticsPage() {
         </div>
 
         {/* Graphique 3: Distribution par type de match */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8 lg:col-span-2">
+        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8 lg:col-span-2">
           <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
             <PieChartIcon size={20} className="text-purple-400" /> Member Segment Distribution
           </h3>

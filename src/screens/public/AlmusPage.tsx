@@ -295,7 +295,7 @@ export function AlmusPage() {
         <div>
           <h1
             className="font-['Playfair_Display',serif] font-bold 
-                       text-[42px] sm:text-[64px] md:text-[90px] lg:text-[120px]
+                       text-[42px] sm:text-[64px] md:text-[72px] lg:text-[120px]
                        text-gray-900 dark:text-white mb-2 transition-colors duration-300"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >

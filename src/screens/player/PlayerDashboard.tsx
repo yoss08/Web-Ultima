@@ -91,7 +91,7 @@ export function PlayerDashboard() {
     <div className="space-y-8 animate-in fade-in duration-700 pb-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">
+          <h1 className="font-['Playfair_Display',serif] text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black dark:text-white leading-none mb-4">
             Hello, {user?.user_metadata?.full_name?.split(' ')[0] || "Player"}! 👋
           </h1>
           <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
@@ -193,7 +193,7 @@ export function PlayerDashboard() {
 
 function StatCard({ icon: Icon, label, value, color }: any) {
   return (
-    <div className="bg-white dark:bg-white/5 p-5 rounded-[24px] border border-gray-200 dark:border-white/10">
+    <div className="bg-white dark:bg-white/5 p-4 sm:p-5 rounded-[24px] border border-gray-200 dark:border-white/10">
       <div className="flex items-center gap-3 mb-2">
         <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}15` }}><Icon size={16} style={{ color }} /></div>
         <span className="text-xs opacity-50 font-medium uppercase tracking-wider">{label}</span>

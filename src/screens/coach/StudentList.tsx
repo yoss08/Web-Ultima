@@ -39,7 +39,7 @@ export function StudentList() {
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold dark:text-white font-['Playfair_Display']">My Students</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">My Students</h1>
           <p className="text-gray-500 text-sm">Manage and track your players performance.</p>
         </div>
 
@@ -84,7 +84,7 @@ export function StudentList() {
         </div>
       ) : (
         /* Grille des étudiants réels */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredStudents.length > 0 ? (
             filteredStudents.map(student => (
               <div 

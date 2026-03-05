@@ -203,7 +203,7 @@ export function HomePage() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[36px] md:text-[64px] lg:text-[82px] font-bold leading-[1.1] text-gray-900 dark:text-white mb-8"
+            className="text-[36px] sm:text-[54px] md:text-[72px] lg:text-[82px] font-bold leading-[1.1] text-gray-900 dark:text-white mb-8"
           >
             Experience the  <br className="hidden md:block" />
             <span className="text-blue-600 dark:text-[#00E5FF]">Ultimate Evolution</span>
@@ -251,7 +251,7 @@ export function HomePage() {
           </motion.div>
 
           {/* Product Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {/* SUMMA Card */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
