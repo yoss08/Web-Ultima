@@ -289,11 +289,7 @@ export function DashboardLayout() {
         <div className="fixed inset-0 z-[60] md:hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
           <nav className={`absolute left-0 top-0 bottom-0 w-72 ${isDark ? "bg-[#0A0E1A]" : "bg-white"} p-6 shadow-2xl`}>
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-[#39FF14] rounded-lg flex items-center justify-center font-bold text-black">A</div>
-                <span className={`font-['Playfair_Display'] font-bold text-xl ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>ALMUS</span>
-              </div>
+            <div className="flex justify-end mb-8">
               <button onClick={() => setMobileMenuOpen(false)} className={isDark ? "text-white" : "text-black"}>
                 <X size={24} />
               </button>
