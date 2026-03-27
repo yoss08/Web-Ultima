@@ -16,6 +16,7 @@ import {
   Area
 } from "recharts";
 import { coachService } from "../../services/CoachService";
+import { useSocket } from "../../hooks/useSocket";
 
 export function StudentDetails() {
   const { id } = useParams();
@@ -27,10 +28,15 @@ export function StudentDetails() {
   const [trend, setTrend] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const { socket } = useSocket();
 
   // État pour le nouveau feedback
   const [note, setNote] = useState("");
   const [rating, setRating] = useState(5);
+
+  // Private coach notes (persistent, separate from evaluation)
+  const [privateNotes, setPrivateNotes] = useState("");
+  const [savingNotes, setSavingNotes] = useState(false);
 
   // État pour les scores techniques (Skills)
   const [skills, setSkills] = useState({
@@ -61,6 +67,17 @@ export function StudentDetails() {
             stamina: latest.stamina || 50,
             mental: latest.mental || 50
           });
+        }
+
+        // Load private notes
+        if (user?.id) {
+          const { data: notesData } = await supabase
+            .from('coach_notes')
+            .select('content')
+            .eq('student_id', id)
+            .eq('coach_id', user.id)
+            .single();
+          if (notesData) setPrivateNotes(notesData.content || '');
         }
       } catch (err) {
         console.error("Error loading student data:", err);
@@ -100,6 +117,13 @@ export function StudentDetails() {
       }]);
 
     if (error) throw error;
+    
+    // Send real-time notification via Socket.io
+    socket.emit('send-feedback-notification', { 
+      studentId: id, 
+      coachName: user?.user_metadata?.full_name || 'your coach' 
+    });
+
     toast.success("Feedback and Skills updated!");
     setNote(""); // On vide le champ texte
   } catch (err) {
@@ -226,6 +250,37 @@ export function StudentDetails() {
 
         {/* COLONNE DROITE : MISE À JOUR DES SCORES (SKILLS) */}
         <div className="space-y-6">
+          {/* PRIVATE NOTES SECTION */}
+          <section className="bg-white dark:bg-white/5 text-slate-900 dark:text-white rounded-[32px] p-8 border border-gray-100 dark:border-white/10 shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              📝 Private Notes
+            </h3>
+            <p className="text-[11px] opacity-40 mb-3">Only visible to you. Not shared with the student.</p>
+            <textarea
+              value={privateNotes}
+              onChange={(e) => setPrivateNotes(e.target.value)}
+              placeholder="Write private observations about this student..."
+              className="w-full h-32 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#FFD700] outline-none transition-all resize-none text-sm"
+            />
+            <button
+              onClick={async () => {
+                if (!user?.id || !id) return;
+                setSavingNotes(true);
+                try {
+                  const { error } = await supabase
+                    .from('coach_notes')
+                    .upsert({ student_id: id, coach_id: user.id, content: privateNotes, updated_at: new Date().toISOString() }, { onConflict: 'student_id,coach_id' });
+                  if (error) throw error;
+                  toast.success('Notes saved');
+                } catch { toast.error('Failed to save notes'); }
+                finally { setSavingNotes(false); }
+              }}
+              disabled={savingNotes}
+              className="mt-3 w-full py-2.5 bg-[#FFD700]/10 text-[#FFD700] font-bold rounded-xl text-sm hover:bg-[#FFD700]/20 transition-colors disabled:opacity-50"
+            >
+              {savingNotes ? 'Saving...' : 'Save Notes'}
+            </button>
+          </section>
           <section className="bg-white dark:bg-white/5 text-slate-900 dark:text-white rounded-[32px] p-8 border border-gray-100 dark:border-white/10 shadow-sm transition-colors duration-300">
             <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
               <Activity className="text-[#39FF14]" size={20} />

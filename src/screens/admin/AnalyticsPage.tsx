@@ -9,7 +9,8 @@ import {
   BarChart3,
   Loader2,
   Filter,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  FileSpreadsheet
 } from "lucide-react";
 import {
   LineChart,
@@ -29,9 +30,30 @@ import {
 import { useTheme } from "../../styles/useTheme";
 import { supabase } from "../../config/supabase";
 
+// CSV export utility
+function downloadCSV(data: Record<string, any>[], filename: string) {
+  if (!data.length) return;
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(","),
+    ...data.map(row => headers.map(h => {
+      const val = row[h];
+      return typeof val === "string" && val.includes(",") ? `"${val}"` : val ?? "";
+    }).join(","))
+  ].join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${filename}_${new Date().toISOString().split("T")[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 export function AnalyticsPage() {
   const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [data, setData] = useState({
     monthlyRevenue: [],
     courtUsage: [],
@@ -40,13 +62,9 @@ export function AnalyticsPage() {
   });
 
   useEffect(() => {
-    // Simulation du chargement des données réelles
     const fetchAnalytics = async () => {
       setLoading(true);
       try {
-        // Ici, vous ferez vos appels Supabase :
-        // const { data: revenue } = await supabase.rpc('get_monthly_revenue');
-        
         await new Promise(resolve => setTimeout(resolve, 1000));
         setLoading(false);
       } catch (error) {
@@ -56,6 +74,26 @@ export function AnalyticsPage() {
     };
     fetchAnalytics();
   }, []);
+
+  const handleExportCSV = async (type: string) => {
+    setExporting(true);
+    try {
+      if (type === "bookings") {
+        const { data } = await supabase.from("bookings").select("id, user_id, court_id, booking_date, start_time, end_time, status, result, score, created_at");
+        if (data) downloadCSV(data, "bookings_report");
+      } else if (type === "players") {
+        const { data } = await supabase.from("profiles").select("id, full_name, email, phone, role, created_at");
+        if (data) downloadCSV(data, "players_report");
+      } else if (type === "courts") {
+        const { data } = await supabase.from("courts").select("id, name, type, status, surface, capacity, pricing_peak, pricing_offpeak");
+        if (data) downloadCSV(data, "courts_report");
+      }
+    } catch (err) {
+      console.error("Export failed:", err);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const chartStroke = isDark ? "#ffffff10" : "#0A0E1A10";
   const textStroke = isDark ? "#ffffff60" : "#0A0E1A60";
@@ -69,13 +107,26 @@ export function AnalyticsPage() {
           <p className="text-gray-500 text-sm">Deep dive into club performance and usage patterns.</p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white text-sm font-semibold">
             <Filter size={18} /> Filter Period
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#39FF14] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
-            <Download size={18} /> Export CSV
-          </button>
+          <div className="relative group">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#39FF14] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
+              {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={18} />} Export
+            </button>
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1a1e2e] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+              <button onClick={() => handleExportCSV("bookings")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
+                <FileSpreadsheet size={14} /> Bookings CSV
+              </button>
+              <button onClick={() => handleExportCSV("players")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
+                <FileSpreadsheet size={14} /> Players CSV
+              </button>
+              <button onClick={() => handleExportCSV("courts")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
+                <FileSpreadsheet size={14} /> Courts CSV
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

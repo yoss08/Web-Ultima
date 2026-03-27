@@ -7,6 +7,9 @@ import { AlmusPage } from "../screens/public/AlmusPage";
 import { LoginPage } from "../screens/public/LoginPage";
 import { SignUpPage } from "../screens/public/SignUpPage";
 import { ForgotPasswordPage } from "../screens/public/ForgotPasswordPage";
+import { AboutPage } from "../screens/public/AboutPage";
+import { TimelinePage } from "../screens/public/TimelinePage";
+import { PricingPage } from "../screens/public/PricingPage";
 import { OverviewPage } from "../screens/admin/OverviewPage";
 import { AdminBookingsPage } from "../screens/admin/AdminBookingsPage";
 import { AdminPlayersPage } from "../screens/admin/AdminPlayersPage";
@@ -31,6 +34,9 @@ import { SessionScheduler } from "../screens/coach/SessionScheduler";
 import { StudentDetails } from "../screens/coach/StudentDetails";
 import { AdminCourtConfig } from "../screens/admin/AdminConfig";
 import { AdminManagement } from "../screens/admin/AdminManagement";
+import { PlayerStats } from "../screens/player/PlayerStats";
+import { MatchDetails } from "../screens/player/MatchDetails";
+import { StudentComparison } from "../screens/coach/StudentComparison";
 
 
 const DashboardIndex = () => {
@@ -77,6 +83,18 @@ export const router = createBrowserRouter([
     Component: ForgotPasswordPage,
   },
   {
+    path: "/about",
+    Component: AboutPage,
+  },
+  {
+    path: "/timeline",
+    Component: TimelinePage,
+  },
+  {
+    path: "/pricing",
+    Component: PricingPage,
+  },
+  {
     path: "/dashboard",
     Component: ProtectedDashboard,
     children: [
@@ -114,7 +132,15 @@ export const router = createBrowserRouter([
       {
         path: "player/home",
         Component: PlayerDashboard,
-      },  
+      },
+      {
+        path: "player/stats",
+        Component: PlayerStats,
+      },
+      {
+        path: "player/matches/:id",
+        Component: MatchDetails,
+      },
       {
         path: "matches",
         Component: Matches,
@@ -138,6 +164,7 @@ export const router = createBrowserRouter([
       },
       { path: "coach/students", Component: StudentList },
       { path: "coach/students/:id", Component: StudentDetails },
+      { path: "coach/compare", Component: StudentComparison },
       { path: "coach/schedule", Component: SessionScheduler },
       { path: "coach/video-review", Component: VideoReviewPage },
       { path: "coach/ai-analysis", Component: AIRecommendations },

@@ -1,4 +1,6 @@
 import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
@@ -13,43 +15,91 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const httpServer = createServer(app);
+
+// Flexible CORS Configuration
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) 
+  : ["http://localhost:5173", "http://127.0.0.1:5173"];
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: function(origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      
+      const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+      const isVercelPreview = origin.endsWith('.vercel.app');
+      const isAllowedDomain = allowedOrigins.includes(origin);
+
+      if (isLocalhost || isVercelPreview || isAllowedDomain || process.env.NODE_ENV === 'development') {
+        callback(null, true);
+      } else {
+        console.warn(`CORS blocked for origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  }
+});
+
+
+io.on('connection', (socket) => {
+  const userId = socket.handshake.query.userId;
+  
+  if (userId) {
+    socket.join(`user_${userId}`);
+    console.log(`Client ${socket.id} joined room user_${userId}`);
+  }
+
+  socket.on('send-feedback-notification', ({ studentId, coachName }) => {
+    // Broadcast to the specific student
+    io.to(`user_${studentId}`).emit('receive-feedback-notification', {
+      message: `Coach ${coachName || 'your coach'} has left a new evaluation!`,
+      coachName
+    });
+    console.log(`Notification sent to student ${studentId} from coach ${coachName}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected from socket.io:', socket.id);
+  });
+});
+
+
 app.use(cors());
 app.use(express.json());
 
-// Init Supabase Client with Service Key (for backend operations)
-// If you don't have the service key yet, this acts as a placeholder
+// Init Supabase Client with Service Role Key (for backend operations)
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || ''; // Ideally use SERVICE_ROLE_KEY here
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Basic health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'ULTIMA API is running' });
-});
+// Import middleware
+import { requireAuth, requireRole } from './middleware/authMiddleware.js';
 
+// Import routes
+import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-
-// Admin Routes
-app.use('/api/admin', adminRoutes);
-
-// Other placeholders for completeness until created
-app.use('/api/admin/bookings', (req, res) => res.json([]));
-app.use('/api/admin/players', (req, res) => res.json([]));
-app.use('/api/admin/competitions', (req, res) => res.json([]));
-
 import coachRoutes from './routes/coachRoutes.js';
 import playerRoutes from './routes/playerRoutes.js';
 import competitionRoutes from './routes/competitionRoutes.js';
 
-// Coach Routes
-app.use('/api/coach', coachRoutes);
+// Basic health check (public)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'ULTIMA API is running' });
+});
 
-// Player Routes
-app.use('/api/player', playerRoutes);
+// Auth Routes (public — no middleware)
+app.use('/api/auth', authRoutes);
 
-// Competition Routes
-app.use('/api/competitions', competitionRoutes);
+// Protected Routes — require authentication + role
+app.use('/api/admin', requireAuth, requireRole('admin'), adminRoutes);
+app.use('/api/coach', requireAuth, requireRole('coach', 'admin'), coachRoutes);
+app.use('/api/player', requireAuth, playerRoutes);
+app.use('/api/competitions', requireAuth, competitionRoutes);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

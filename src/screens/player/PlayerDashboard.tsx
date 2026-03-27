@@ -9,6 +9,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Link } from "react-router";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
+import { useSocket } from "../../hooks/useSocket";
+import { toast } from "react-hot-toast";
 
 const CACHE_KEY = "ultima_player_dashboard_cache";
 
@@ -84,6 +86,24 @@ export function PlayerDashboard() {
     }
     fetchDashboardData();
   }, [user]);
+
+  // Real-time notifications listener
+  const { socket } = useSocket();
+  useEffect(() => {
+    socket.on('receive-feedback-notification', (data) => {
+      toast.success(data.message, {
+        duration: 5000,
+        position: 'top-right',
+        icon: '🎾'
+      });
+      // Optionally refresh data
+      // fetchDashboardData(); 
+    });
+
+    return () => {
+      socket.off('receive-feedback-notification');
+    };
+  }, [socket]);
 
   if (loading && matches.length === 0) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-[#39FF14]" /></div>;
 
