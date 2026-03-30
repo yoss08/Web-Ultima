@@ -207,7 +207,7 @@ export function AlmusPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                </span>
                <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                Live Matches
+                Live 
                </span>
              </Link>
             </div>
@@ -268,7 +268,7 @@ export function AlmusPage() {
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                     </span>
                     <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                      Live Matches
+                      Live 
                     </span>
                   </Link>
                 </div>

@@ -62,6 +62,7 @@ export function LiveMatchesPage() {
 
             {/* Center Links */}
             <div className="hidden md:flex items-center gap-8">
+              <Link to="/about" className="text-sm font-medium hover:text-blue-500 transition-colors">About</Link>
               <Link to="/#contact" className="text-sm font-medium hover:text-blue-500 transition-colors">Contact</Link>
               <Link to="/solutions" className="text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
               <Link to="/summa" className="text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
@@ -98,7 +99,7 @@ export function LiveMatchesPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                 </span>
                 <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                  Live Matches
+                  Live 
                 </span>
               </Link>
             </div>
@@ -124,6 +125,7 @@ export function LiveMatchesPage() {
               className="md:hidden border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0A0E1A] overflow-hidden"
             >
               <div className="px-6 py-6 space-y-4">
+                <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">About</Link>
                 <Link to="/#contact" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Contact</Link>
                 <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">Solutions</Link>
                 <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium hover:text-blue-500 transition-colors">SUMMA</Link>
@@ -158,7 +160,7 @@ export function LiveMatchesPage() {
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                     </span>
                     <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
-                      Live Matches
+                      Live 
                     </span>
                   </Link>
                 </div>
