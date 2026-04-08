@@ -171,7 +171,7 @@ export function SummaPage() {
           <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
             <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
           </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 96 094 772</span>
+          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
         </div>
         
         <div className="flex items-center gap-3">
@@ -302,6 +302,7 @@ export function SummaPage() {
               </Link>
               </>
               )}
+              {/*   
                   <Link to="/live-matches" className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -311,6 +312,7 @@ export function SummaPage() {
                       Live 
                     </span>
                   </Link>
+                  */}
                 </div>
               </div>
             </motion.div>
@@ -1056,11 +1058,11 @@ export function SummaPage() {
                
                 <li>
                  <a
-                    href="tel:+21696094772"
+                    href="tel:+21699799368"
                     className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
                    <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
-                   <span>96 094 772</span>
+                   <span>+216 99 799 368</span>
                  </a>
                </li>
 

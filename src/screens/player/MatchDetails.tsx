@@ -20,11 +20,28 @@ export function MatchDetails() {
 
   async function fetchMatch() {
     try {
-      const { data } = await supabase
-        .from("bookings")
-        .select("*, courts(name, type, surface)")
+      const { data: matchData, error: matchError } = await supabase
+        .from("matches")
+        .select(`
+          *,
+          player1:profiles!player1_id(full_name),
+          player2:profiles!player2_id(full_name),
+          booking:bookings(booking_date, duration, courts(name, type, surface))
+        `)
         .eq("id", id)
         .single();
+
+      if (matchError || !matchData) return;
+
+      // Transform for the UI
+      const data = {
+        ...matchData,
+        booking_date: matchData.booking?.booking_date,
+        duration_hours: matchData.booking?.duration,
+        courts: matchData.booking?.courts,
+        opponent_name: matchData.player1_id === user?.id ? matchData.player2?.full_name : matchData.player1?.full_name,
+        result: matchData.winner_id === user?.id ? "Win" : matchData.winner_id ? "Loss" : "TBD"
+      };
 
       setMatch(data);
     } finally {

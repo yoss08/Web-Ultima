@@ -32,13 +32,23 @@ export function PlayerStats() {
 
   async function fetchStats() {
     try {
-      const { data } = await supabase
-        .from("bookings")
-        .select("*, courts(name)")
-        .eq("user_id", user!.id)
-        .order("booking_date", { ascending: true });
+      const { data: matchData, error } = await supabase
+        .from("matches")
+        .select("*, booking:bookings(booking_date, duration, courts(name))")
+        .or(`player1_id.eq.${user!.id},player2_id.eq.${user!.id}`)
+        .order('created_at', { ascending: true });
 
-      if (!data) return;
+      if (error || !matchData) return;
+
+      // Transform and flatten for easier processing
+      const data = matchData.map(m => ({
+        ...m,
+        booking_date: m.booking?.booking_date,
+        duration_hours: m.booking?.duration || 1,
+        court_name: m.booking?.courts?.name || "Unknown",
+        result: m.winner_id === user!.id ? "Win" : m.winner_id ? "Loss" : "TBD"
+      }));
+
       setMatches(data);
 
       // Career stats
@@ -46,8 +56,7 @@ export function PlayerStats() {
       const losses = data.filter((m) => m.result === "Loss").length;
       const courtCounts: Record<string, number> = {};
       data.forEach((m) => {
-        const name = m.courts?.name || "Unknown";
-        courtCounts[name] = (courtCounts[name] || 0) + 1;
+        courtCounts[m.court_name] = (courtCounts[m.court_name] || 0) + 1;
       });
       const fav = Object.entries(courtCounts).sort((a, b) => b[1] - a[1])[0];
 
@@ -56,7 +65,7 @@ export function PlayerStats() {
         wins,
         losses,
         winRate: data.length > 0 ? Math.round((wins / data.length) * 100) : 0,
-        totalPoints: data.reduce((acc, m) => acc + (m.points_scored || 0), 0),
+        totalPoints: data.reduce((acc, m) => acc + (m.score_player1 || 0), 0), // Assuming score format or just count points
         totalHours: data.reduce((acc, m) => acc + (m.duration_hours || 1), 0),
         favoriteCourt: fav ? fav[0] : "—",
       });
@@ -64,6 +73,7 @@ export function PlayerStats() {
       // Win rate over time (by month)
       const monthlyWins: Record<string, { wins: number; total: number }> = {};
       data.forEach((m) => {
+        if (!m.booking_date) return;
         const month = new Date(m.booking_date).toLocaleDateString("en", { month: "short", year: "2-digit" });
         if (!monthlyWins[month]) monthlyWins[month] = { wins: 0, total: 0 };
         monthlyWins[month].total++;
@@ -79,6 +89,7 @@ export function PlayerStats() {
       // Matches per month
       const monthly: Record<string, number> = {};
       data.forEach((m) => {
+        if (!m.booking_date) return;
         const month = new Date(m.booking_date).toLocaleDateString("en", { month: "short" });
         monthly[month] = (monthly[month] || 0) + 1;
       });

@@ -67,7 +67,7 @@ export function AboutPage() {
               </Link>
               </>
               )}
-              {/* Nouveau Bouton Live Matches */}
+              {/* Nouveau Bouton Live Matches 
               <Link
                 to="/live-matches"
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300 group"
@@ -80,6 +80,7 @@ export function AboutPage() {
                   Live 
                 </span>
               </Link>
+              */}
             </div>
 
             {/* Mobile Menu Button */}
@@ -133,6 +134,7 @@ export function AboutPage() {
               </Link>
               </>
               )}
+              {/* 
                   <Link to="/live-matches" className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -142,6 +144,7 @@ export function AboutPage() {
                       Live 
                     </span>
                   </Link>
+                  */}
                 </div>
               </div>
             </motion.div>

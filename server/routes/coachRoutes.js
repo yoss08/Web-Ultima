@@ -11,38 +11,15 @@ const router = express.Router();
 router.get('/stats', async (req, res) => {
   try {
     const { coachId } = req.query;
-    if (!coachId) return res.status(400).json({ error: "coachId is required" });
-
-    // 1. Student Count
-    const { count: studentCount } = await supabase
-      .from('coach_students')
-      .select('*', { count: 'exact', head: true })
-      .eq('coach_id', coachId);
-
-    // 2. Upcoming Sessions (Today)
-    const today = new Date().toISOString().split('T')[0];
-    const { count: sessionCount } = await supabase
-      .from('training_sessions')
-      .select('*', { count: 'exact', head: true })
-      .eq('coach_id', coachId)
-      .gte('start_time', `${today}T00:00:00Z`)
-      .lte('start_time', `${today}T23:59:59Z`);
-
-    // 3. Performance Avg (Mocked for now or calculated from coach_feedbacks)
-    const { data: feedbacks } = await supabase
-      .from('coach_feedbacks')
-      .select('rating')
-      .eq('coach_id', coachId);
+    const finalCoachId = coachId || req.user.id;
     
-    const avg = feedbacks?.length 
-      ? (feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / feedbacks.length).toFixed(1) 
-      : "0.0";
+    if (!finalCoachId) return res.status(400).json({ error: "coachId is required" });
 
-    res.json({
-      studentCount: studentCount || 0,
-      upcomingSessions: sessionCount || 0,
-      performanceAvg: avg
-    });
+    const { data, error } = await supabase.rpc('rpc_coach_stats', { p_coach_id: finalCoachId });
+    
+    if (error) throw error;
+
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -87,20 +64,25 @@ router.get('/students/:id/stats', async (req, res) => {
       .order('created_at', { ascending: false })
       .limit(5);
 
-    // 3. Performance Trend (Mocked for now or from coach_feedbacks)
+    // 3. Performance Trend (from coach_feedbacks)
     const { data: trend } = await supabase
       .from('coach_feedbacks')
       .select('created_at, rating, technique, power, speed, stamina, mental')
       .eq('student_id', id)
       .order('created_at', { ascending: true });
 
+    // 4. Calculate stats from matches
+    const totalMatches = matches?.length || 0;
+    const wins = matches?.filter(m => m.winner_id === id).length || 0;
+    const winRate = totalMatches > 0 ? `${Math.round((wins / totalMatches) * 100)}%` : "0%";
+
     res.json({
       profile,
       matches: matches || [],
       performanceTrend: trend || [],
       stats: {
-        winRate: "65%", // Placeholder
-        totalMatches: matches?.length || 0,
+        winRate,
+        totalMatches,
         skillLevel: profile?.skill_level || "Intermediate"
       }
     });

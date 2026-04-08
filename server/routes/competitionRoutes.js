@@ -4,31 +4,36 @@ import { supabase } from '../index.js';
 const router = express.Router();
 
 /**
- * SHARED COMPETITION ENDPOINTS
+ * SHARED TOURNAMENT ENDPOINTS
  */
 
-// GET /api/competitions - list competitions
+// GET /api/competitions - list tournaments
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('competitions')
-      .select('*')
-      .order('start_date', { ascending: true });
+    const { data, error } = await supabase.rpc('rpc_list_tournaments');
       
     if (error) throw error;
-    res.json(data);
+    
+    // Status mapping for frontend compatibility
+    const mappedData = data.map(t => ({
+      ...t,
+      status: t.status === 'Finished' ? 'Completed' : 
+              t.status === 'Invite Only' ? 'Closed' : t.status
+    }));
+
+    res.json(mappedData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET /api/competitions/:id - competition details
+// GET /api/competitions/:id - tournament details
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
     const { data, error } = await supabase
-      .from('competitions')
+      .from('tournaments')
       .select('*')
       .eq('id', id)
       .single();
@@ -40,7 +45,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/competitions/:id/register - register for competition
+// POST /api/competitions/:id/register - register for tournament
 router.post('/:id/register', async (req, res) => {
   try {
     const { id } = req.params;
@@ -48,9 +53,10 @@ router.post('/:id/register', async (req, res) => {
     
     if (!player_id) return res.status(400).json({ error: "player_id is required" });
 
+    // Using the verified registration table 'tournament_registrations'
     const { data, error } = await supabase
-      .from('competition_participants')
-      .insert([{ competition_id: id, player_id, status: 'registered' }])
+      .from('tournament_registrations')
+      .insert([{ tournament_id: id, player_id }])
       .select();
       
     if (error) throw error;

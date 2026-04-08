@@ -84,9 +84,26 @@ router.get('/bookings', async (req, res) => {
   try {
     const { data, error } = await supabase.from('bookings').select('*, profiles(full_name), courts(name)');
     if (error) throw error;
-    res.json(data);
-  } catch (error) { res.status(500).json({ error: error.message }); }
+
+    // Transform data to include start_time and end_time for the Admin UI
+    const transformedData = data.map(booking => {
+      if (booking.booking_date && booking.time_slot) {
+        const [start, end] = booking.time_slot.split(' - ');
+        return {
+          ...booking,
+          start_time: `${booking.booking_date}T${start}:00`,
+          end_time: `${booking.booking_date}T${end}:00`
+        };
+      }
+      return booking;
+    });
+
+    res.json(transformedData);
+  } catch (error) { 
+    res.status(500).json({ error: error.message }); 
+  }
 });
+
 
 router.post('/bookings', async (req, res) => {
   try {
@@ -110,6 +127,22 @@ router.delete('/bookings/:id', async (req, res) => {
     if (error) throw error;
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+/**
+ * ADMIN MATCHES ENDPOINTS
+ */
+router.get('/matches', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(booking_date, time_slot, courts(name))');
+    
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /**
@@ -140,11 +173,11 @@ router.put('/players/:id', async (req, res) => {
 });
 
 /**
- * ADMIN COMPETITIONS ENDPOINTS
+ * ADMIN TOURNAMENTS ENDPOINTS
  */
 router.get('/competitions', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('competitions').select('*');
+    const { data, error } = await supabase.from('tournaments').select('*');
     if (error) throw error;
     res.json(data);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -152,7 +185,7 @@ router.get('/competitions', async (req, res) => {
 
 router.post('/competitions', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('competitions').insert([req.body]).select();
+    const { data, error } = await supabase.from('tournaments').insert([req.body]).select();
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -160,7 +193,7 @@ router.post('/competitions', async (req, res) => {
 
 router.put('/competitions/:id', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('competitions').update(req.body).eq('id', req.params.id).select();
+    const { data, error } = await supabase.from('tournaments').update(req.body).eq('id', req.params.id).select();
     if (error) throw error;
     res.json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -174,20 +207,18 @@ router.get('/reports/:type', async (req, res) => {
     const { type } = req.params;
     
     if (type === 'overview') {
-      // Real counts from Supabase
-      const { count: liveMatches } = await supabase.from('matches').select('*', { count: 'exact', head: true }).eq('status', 'live');
-      const { count: totalPlayers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('account_type', 'Player');
-      const { data: courts } = await supabase.from('courts').select('status');
+      const { data, error } = await supabase.rpc('rpc_admin_overview');
       
-      const available = courts ? courts.filter(c => c.status === 'available').length : 0;
-      const totalCourts = courts ? courts.length : 0;
-
+      if (error) throw error;
+      
+      // Ensure the response matches the frontend expectation
       return res.json({
-        activeMatches: liveMatches || 0,
-        totalPlayers: totalPlayers || 0,
-        availableCourts: `${available}/${totalCourts}`,
-        totalMatchesToday: 12, // Placeholder or real query if 'matches' has timestamps
-        hydrationTotal: "42L" // Placeholder
+        activeMatches: data.activeMatches || 0,
+        totalPlayers: data.totalPlayers || 0,
+        availableCourts: data.availableCourts || "0/0",
+        maintenanceCount: data.maintenanceCount || 0,
+        totalMatchesToday: data.totalMatchesToday || 0,
+        hydrationTotal: data.hydrationTotal || "24.5L"
       });
     }
 

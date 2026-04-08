@@ -42,11 +42,12 @@ export function PlayerDashboard() {
       if (!user?.id) return;
 
       try {
+        // Fetch matches from the dedicated matches table
         const { data: matchData } = await supabase
-          .from('bookings')
-          .select('*, courts(name)')
-          .eq('user_id', user.id)
-          .order('booking_date', { ascending: false });
+          .from('matches')
+          .select('*, booking:bookings(booking_date, time_slot, courts(name))')
+          .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+          .order('created_at', { ascending: false });
 
         const { data: fbData } = await supabase
           .from('coach_feedbacks')
@@ -55,13 +56,22 @@ export function PlayerDashboard() {
           .order('created_at', { ascending: false });
 
         if (matchData) {
-          const wins = matchData.filter(m => m.result === 'Win').length;
+          const wins = matchData.filter(m => m.winner_id === user.id).length;
           const newStats = {
             totalMatches: matchData.length,
             wins: wins,
             winRate: matchData.length > 0 ? Math.round((wins / matchData.length) * 100) : 0
           };
-          setMatches(matchData.slice(0, 3));
+          
+          // Flatten data for the UI
+          const transformedMatches = matchData.map(m => ({
+            ...m,
+            courts: m.booking?.courts,
+            booking_date: m.booking?.booking_date,
+            time_slot: m.booking?.time_slot
+          }));
+
+          setMatches(transformedMatches.slice(0, 3));
           setStats(newStats);
         }
 
@@ -176,10 +186,20 @@ export function PlayerDashboard() {
                 <tbody className="divide-y divide-white/5">
                   {matches.map((m) => (
                     <tr key={m.id}>
-                      <td className="py-4"><span className={`font-bold ${m.result === 'Win' ? 'text-[#39FF14]' : 'text-red-500'}`}>{m.result || 'TBD'}</span></td>
-                      <td className="py-4 text-sm opacity-80">{m.courts?.name}</td>
+                      <td className="py-4">
+                        <span className={`font-bold ${
+                          m.winner_id === user?.id ? 'text-[#39FF14]' : 
+                          m.winner_id && m.winner_id !== '00000000-0000-0000-0000-000000000000' ? 'text-red-500' : 
+                          'text-gray-400'
+                        }`}>
+                          {m.winner_id === user?.id ? 'Win' : m.winner_id ? 'Loss' : 'TBD'}
+                        </span>
+                      </td>
+                      <td className="py-4 text-sm opacity-80">{m.booking?.courts?.name || '—'}</td>
                       <td className="py-4 font-mono text-sm">{m.score || '-- : --'}</td>
-                      <td className="py-4 text-right opacity-40 text-xs">{new Date(m.booking_date).toLocaleDateString()}</td>
+                      <td className="py-4 text-right opacity-40 text-xs">
+                        {m.booking?.booking_date ? new Date(m.booking.booking_date).toLocaleDateString() : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

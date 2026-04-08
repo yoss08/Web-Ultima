@@ -10,6 +10,7 @@ import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
+import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -130,11 +131,14 @@ export function CourtBooking() {
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [playersLoading, setPlayersLoading] = useState(false);
 
   // ── Booking form ──
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
+  const [selectedOpponentId, setSelectedOpponentId] = useState<string | null>(null);
   const [duration, setDuration] = useState(1.5);
   const [playerCount, setPlayerCount] = useState(2);
   const [notes, setNotes] = useState("");
@@ -169,6 +173,21 @@ export function CourtBooking() {
       }
     }
     fetchCourts();
+
+    // Fetch players for opponent selection
+    async function fetchPlayers() {
+      setPlayersLoading(true);
+      try {
+        const data = await getPlayers();
+        // Remove current user from list
+        setPlayers(data.filter((p: any) => p.id !== user?.id));
+      } catch {
+        console.error("Failed to load players");
+      } finally {
+        setPlayersLoading(false);
+      }
+    }
+    if (user) fetchPlayers();
 
     // Real-time subscription for courts
     const courtSub = supabase
@@ -269,7 +288,7 @@ export function CourtBooking() {
 
     setBookingLoading(true);
     try {
-      const { error } = await supabase.from("bookings").insert([
+      const { data: bookingData, error: bookingError } = await supabase.from("bookings").insert([
         {
           court_id: selectedCourt.id,
           user_id: user.id,
@@ -281,12 +300,22 @@ export function CourtBooking() {
           notes,
           total_price: totalPrice,
         },
-      ]);
+      ]).select();
 
-      if (error) {
-        if (error.code === "23505")
+      if (bookingError) {
+        if (bookingError.code === "23505")
           throw new Error("This slot was just taken. Please choose another.");
-        throw error;
+        throw bookingError;
+      }
+
+      // Create the match record if an opponent was selected
+      if (selectedOpponentId && bookingData?.[0]) {
+        await createMatch({
+          booking_id: bookingData[0].id,
+          player1_id: user.id,
+          player2_id: selectedOpponentId,
+          match_type: 'friendly'
+        });
       }
 
       toast.success("Spot secured! See you on the court. 🎾");
@@ -581,7 +610,7 @@ export function CourtBooking() {
                   </div>
                 </section>
 
-                {/* ── 3. Notes & Discount ── */}
+                {/* ── 3. Details & Extras ── */}
                 <section>
                   <SectionHeading step={3} title="Details & Extras" />
                   <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 space-y-6">
@@ -630,6 +659,46 @@ export function CourtBooking() {
                           ✓ {appliedDiscount * 100}% discount applied
                         </p>
                       )}
+                    </div>
+
+                    {/* ── Opponent Selection (Match Logic) ── */}
+                    <div className="pt-6 border-t border-gray-100 dark:border-white/5">
+                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">
+                        <Users size={14} /> Who are you playing against? (Optional)
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                        {playersLoading ? (
+                          <div className="col-span-2 py-8 flex items-center justify-center">
+                            <Loader2 className="animate-spin text-[#39FF14]" size={24} />
+                          </div>
+                        ) : (
+                          players.map(player => (
+                            <button
+                              key={player.id}
+                              onClick={() => setSelectedOpponentId(selectedOpponentId === player.id ? null : player.id)}
+                              className={`flex items-center gap-3 p-4 rounded-[20px] border transition-all duration-300 text-left ${
+                                selectedOpponentId === player.id
+                                  ? "bg-[#39FF14] border-[#39FF14] text-black shadow-lg shadow-[#39FF14]/20 scale-[0.98]"
+                                  : "bg-gray-100 dark:bg-white/5 border-transparent dark:text-white hover:border-[#39FF14]/40 hover:bg-white dark:hover:bg-white/10"
+                              }`}
+                            >
+                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden shrink-0 border-2 border-white/10">
+                                <img 
+                                  src={player.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.full_name}`} 
+                                  alt="" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-xs font-black truncate leading-none mb-1">{player.full_name}</span>
+                                <span className={`text-[9px] font-bold uppercase tracking-widest ${selectedOpponentId === player.id ? 'text-black/60' : 'opacity-40'}`}>
+                                  Player Profile
+                                </span>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
                     </div>
                   </div>
                 </section>

@@ -6,11 +6,24 @@ import { supabase } from "../config/supabase";
 
 // Get player stats (career overview)
 export async function getPlayerStats(userId: string) {
+  // Query matches where user is either player1 or player2
   const { data, error } = await supabase
-    .from("bookings")
-    .select("*, courts(name)")
-    .eq("user_id", userId)
-    .order("booking_date", { ascending: false });
+    .from("matches")
+    .select("*, booking:bookings(*, courts(name))")
+    .or(`player1_id.eq.${userId},player2_id.eq.${userId}`)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+// Get all players for opponent selection
+export async function getPlayers() {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .eq("role", "player")
+    .order("full_name", { ascending: true });
 
   if (error) throw error;
   return data || [];
@@ -22,19 +35,17 @@ export async function getMatchHistory(
   filters?: { result?: string; dateFrom?: string; dateTo?: string }
 ) {
   let query = supabase
-    .from("bookings")
-    .select("*, courts(name)")
-    .eq("user_id", userId)
-    .order("booking_date", { ascending: false });
+    .from("matches")
+    .select("*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(*, courts(name))")
+    .or(`player1_id.eq.${userId},player2_id.eq.${userId}`)
+    .order("created_at", { ascending: false });
 
   if (filters?.result && filters.result !== "all") {
-    query = query.eq("result", filters.result === "win" ? "Win" : "Loss");
-  }
-  if (filters?.dateFrom) {
-    query = query.gte("booking_date", filters.dateFrom);
-  }
-  if (filters?.dateTo) {
-    query = query.lte("booking_date", filters.dateTo);
+    if (filters.result === "win") {
+      query = query.eq("winner_id", userId);
+    } else {
+      query = query.neq("winner_id", userId).not("winner_id", "is", null);
+    }
   }
 
   const { data, error } = await query;
@@ -45,13 +56,29 @@ export async function getMatchHistory(
 // Get single match details
 export async function getMatchDetails(matchId: string) {
   const { data, error } = await supabase
-    .from("bookings")
-    .select("*, courts(name, type, surface)")
+    .from("matches")
+    .select("*, player1:profiles!player1_id(*), player2:profiles!player2_id(*), booking:bookings(*, courts(name, type, surface))")
     .eq("id", matchId)
     .single();
 
   if (error) throw error;
   return data;
+}
+
+// Create a match record
+export async function createMatch(matchData: {
+  booking_id: string;
+  player1_id: string;
+  player2_id: string;
+  match_type?: string;
+}) {
+  const { data, error } = await supabase
+    .from("matches")
+    .insert([matchData])
+    .select();
+
+  if (error) throw error;
+  return data?.[0];
 }
 
 // Update a booking (modify reservation)

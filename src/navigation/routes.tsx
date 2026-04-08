@@ -9,13 +9,13 @@ import { SignUpPage } from "../screens/public/SignUpPage";
 import { ForgotPasswordPage } from "../screens/public/ForgotPasswordPage";
 import { AboutPage } from "../screens/public/AboutPage";
 import { TimelinePage } from "../screens/public/TimelinePage";
-import { PricingPage } from "../screens/public/PricingPage";
 import { OverviewPage } from "../screens/admin/OverviewPage";
 import { AdminBookingsPage } from "../screens/admin/AdminBookingsPage";
 import { AdminPlayersPage } from "../screens/admin/AdminPlayersPage";
 import { AdminCompetitionsPage } from "../screens/admin/AdminCompetitionsPage";
 import { VideoReviewPage } from "../screens/coach/VideoReviewPage";
 import { AIRecommendations } from "../screens/coach/AIRecommendations";
+import { BookingPage } from "../screens/public/BookingPage";
 import { LiveMatchesPage } from "../screens/public/LiveMatchesPage";
 import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
@@ -89,10 +89,6 @@ export const router = createBrowserRouter([
   {
     path: "/timeline",
     Component: TimelinePage,
-  },
-  {
-    path: "/pricing",
-    Component: PricingPage,
   },
   {
     path: "/dashboard",
@@ -185,5 +181,9 @@ export const router = createBrowserRouter([
   {
     path: "/live-matches",
     Component: LiveMatchesPage,
+  },
+  {
+    path: "/booking",
+    Component: BookingPage,
   },
 ]);

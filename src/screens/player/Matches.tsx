@@ -17,13 +17,30 @@ export function Matches() {
     async function fetchMatches() {
       if (!user?.id) return;
       setLoading(true);
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*, courts(name, surface)')
-        .eq('user_id', user.id)
-        .order('booking_date', { ascending: sortOrder === 'asc' });
       
-      if (!error) setMatches(data || []);
+      const { data, error } = await supabase
+        .from('matches')
+        .select(`
+          *,
+          player1:profiles!player1_id(full_name),
+          player2:profiles!player2_id(full_name),
+          booking:bookings(booking_date, time_slot, courts(name, surface))
+        `)
+        .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+        .order('created_at', { ascending: sortOrder === 'asc' });
+      
+      if (!error && data) {
+        // Flatten for the UI
+        const flattened = data.map(m => ({
+          ...m,
+          booking_date: m.booking?.booking_date,
+          time_slot: m.booking?.time_slot,
+          courts: m.booking?.courts,
+          opponent_name: m.player1_id === user.id ? m.player2?.full_name : m.player1?.full_name,
+          result: m.winner_id === user.id ? 'Win' : m.winner_id ? 'Loss' : 'TBD'
+        }));
+        setMatches(flattened);
+      }
       setLoading(false);
     }
     fetchMatches();
