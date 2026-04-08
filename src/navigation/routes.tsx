@@ -8,15 +8,12 @@ import { LoginPage } from "../screens/public/LoginPage";
 import { SignUpPage } from "../screens/public/SignUpPage";
 import { ForgotPasswordPage } from "../screens/public/ForgotPasswordPage";
 import { AboutPage } from "../screens/public/AboutPage";
-import { TimelinePage } from "../screens/public/TimelinePage";
 import { OverviewPage } from "../screens/admin/OverviewPage";
 import { AdminBookingsPage } from "../screens/admin/AdminBookingsPage";
 import { AdminPlayersPage } from "../screens/admin/AdminPlayersPage";
 import { AdminCompetitionsPage } from "../screens/admin/AdminCompetitionsPage";
 import { VideoReviewPage } from "../screens/coach/VideoReviewPage";
 import { AIRecommendations } from "../screens/coach/AIRecommendations";
-import { BookingPage } from "../screens/public/BookingPage";
-import { LiveMatchesPage } from "../screens/public/LiveMatchesPage";
 import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
 import { HydrationPage } from "../components/dashboard/HydrationPage";
@@ -37,7 +34,9 @@ import { AdminManagement } from "../screens/admin/AdminManagement";
 import { PlayerStats } from "../screens/player/PlayerStats";
 import { MatchDetails } from "../screens/player/MatchDetails";
 import { StudentComparison } from "../screens/coach/StudentComparison";
-
+import { LiveMatchesPage } from "../screens/public/LiveMatchesPage";
+import BookingPage from "../screens/public/BookingPage";
+import ClubDetailsPage from "../screens/public/ClubDetailsPage";
 
 const DashboardIndex = () => {
   const { user } = useAuth();
@@ -85,10 +84,6 @@ export const router = createBrowserRouter([
   {
     path: "/about",
     Component: AboutPage,
-  },
-  {
-    path: "/timeline",
-    Component: TimelinePage,
   },
   {
     path: "/dashboard",
@@ -185,5 +180,9 @@ export const router = createBrowserRouter([
   {
     path: "/booking",
     Component: BookingPage,
+  },
+  {
+    path: "/club/:id",
+    Component: ClubDetailsPage,
   },
 ]);

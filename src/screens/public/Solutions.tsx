@@ -83,8 +83,8 @@ export function Solutions() {
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
-              <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[#00E5FF]/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
             </div>
             <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
           </div>
@@ -137,7 +137,7 @@ export function Solutions() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="bg-[#00E5FF] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -203,7 +203,7 @@ export function Solutions() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="w-full bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="w-full bg-[#00E5FF] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -493,7 +493,7 @@ export function Solutions() {
                       href="tel:+21699799368"
                       className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
-                      <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                      <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
                       <span>+216 99 799 368</span>
                     </a>
                   </li>

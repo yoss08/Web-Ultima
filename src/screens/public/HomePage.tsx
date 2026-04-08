@@ -47,8 +47,8 @@ export function HomePage() {
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
-              <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[#00E5FF]/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
             </div>
             <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
           </div>
@@ -103,7 +103,7 @@ export function HomePage() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -170,7 +170,7 @@ export function HomePage() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="w-full bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="w-full bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -230,10 +230,10 @@ export function HomePage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Toaster />
-            <button onClick={handleContactClick} className="w-full sm:w-auto h-[60px] px-12 rounded-full bg-blue-600 dark:bg-[#00E5FF] text-white dark:text-black font-bold hover:scale-105 transition-transform">
+            <button onClick={handleContactClick} className="w-full sm:w-auto h-[60px] px-12 rounded-full border border-gray-300 dark:border-white/20 flex items-center justify-center gap-2 dark:text-white">
               Contact Sales
             </button>
-            <Link to="/booking" className="w-full sm:w-auto h-[60px] px-12 rounded-full border border-gray-300 dark:border-white/20 flex items-center justify-center gap-2 dark:text-white">
+            <Link to="/booking" className="w-full sm:w-auto h-[60px] px-12 rounded-full bg-blue-600 dark:bg-[#00E5FF] text-white dark:text-black font-bold flex items-center justify-center gap-2 hover:scale-105 transition-transform">
               Book a Court <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
@@ -283,7 +283,7 @@ export function HomePage() {
                     <p className="font-['Poppins',sans-serif] text-[16px] sm:text-[18px] md:text-[20px] text-white/90">
                       Padel Sports Dashboard
                     </p>
-                    <div className="bg-emerald-500 dark:bg-[#39ff14] h-[4px] w-[96px] rounded-full shadow-lg dark:shadow-[0px_0px_12px_0px_rgba(57,255,20,0.8)]" />
+                    <div className="bg-emerald-400 dark:bg-[#39FF14] h-[4px] w-[96px] rounded-full shadow-lg dark:shadow-[0px_0px_12px_0px_rgba(57,255,20,0.8)]" />
                   </div>
                 </div>
               </Link>
@@ -478,11 +478,11 @@ export function HomePage() {
                 className="group relative bg-white dark:bg-[#0D121F] border border-gray-200 dark:border-[#00e5ff]/20 rounded-[24px] p-6 flex items-center gap-5 shadow-sm hover:shadow-md dark:shadow-[0_0_20px_rgba(0,229,255,0.05)] transition-all duration-300"
               >
                 {/* Neon Checkmark Icon */}
-                <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-green-500 dark:border-[#39ff14] flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.3)]">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-green-500 dark:border-[#00E5FF] flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.3)]">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
-                    className="w-4 h-4 text-green-600 dark:text-[#39ff14]"
+                    className="w-4 h-4 text-green-600 dark:text-[#00E5FF]"
                     stroke="currentColor"
                     strokeWidth="4"
                     strokeLinecap="round"
@@ -677,7 +677,7 @@ export function HomePage() {
                       href="tel:+21699799368"
                       className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
-                      <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                      <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
                       <span>+216 99 799 368</span>
                     </a>
                   </li>

@@ -1,6 +1,7 @@
 import {
   Mail, Phone, MapPin, Instagram, Linkedin,
-  Users, Target, Eye, Heart, Award, Globe, ChevronRight
+  Users, Target, Eye, Heart, Award, Globe, ChevronRight,
+  Facebook
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Moon, Sun, ArrowRight, Brain, Menu, X, LayoutDashboard} from "lucide-react";
@@ -178,7 +179,7 @@ export function AboutPage() {
       </section>
 
       {/* Mission / Vision / Values */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-gray-50 dark:bg-white/[0.02]">
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
           {[
             { icon: Target, title: "Our Mission", desc: "Empower every athlete with smart technology that reveals their true potential, making professional-grade analytics accessible to everyone.", color: "#39FF14" },
@@ -244,7 +245,7 @@ export function AboutPage() {
       {/* Contact */}
       <section className="py-20 px-6 bg-gray-50 dark:bg-white/[0.02]">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-['Playfair_Display',serif] text-4xl font-black mb-10 text-center">
+          <h2 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black mb-8 text-center">
             Get In <span className="text-[#39FF14]">Touch</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -256,7 +257,7 @@ export function AboutPage() {
                 </div>
                 <div>
                   <p className="font-bold">Call Us</p>
-                  <p className="text-sm opacity-50">+216 96 094 772</p>
+                  <p className="text-sm opacity-50">+216 99799368</p>
                 </div>
                 <ChevronRight size={16} className="ml-auto opacity-30" />
               </a>
@@ -283,53 +284,115 @@ export function AboutPage() {
               </div>
 
               {/* Social Links */}
-              <div className="flex gap-3 pt-4">
-                {[
-                  { icon: Instagram, href: "", color: "#E1306C" },
-                  { icon: Linkedin, href: "", color: "#0A66C2" },
-                ].map(({ icon: Icon, href, color }) => (
-                  <a key={href} href={href} target="_blank" rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-xl border border-gray-200 dark:border-white/10 flex items-center justify-center hover:scale-110 transition-transform"
-                  >
-                    <Icon size={20} style={{ color }} />
-                  </a>
-                ))}
-                <a href="" target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-xl border border-gray-200 dark:border-white/10 flex items-center justify-center hover:scale-110 transition-transform"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="opacity-70">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78c.27 0 .54.04.8.1V8.94a6.34 6.34 0 0 0-.8-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.88a8.26 8.26 0 0 0 3.76.91V6.69z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            {/* Map Embed */}
-            <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 h-[400px]">
-              <iframe
-                src="https://www.google.com/maps/place/Arena+Gym+Premium/@36.8706722,10.2397764,15z/data=!4m6!3m5!1s0x12e2cb94862d47bf:0x494dcecf1c908ab8!8m2!3d36.8706722!4d10.2588308!16s%2Fg%2F11s3dftxvv?entry=ttu&g_ep=EgoyMDI2MDMyMi4wIKXMDSoASAFQAw%3D%3D"
-                width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade" title="ULTIMA Location"
-              />
+<div className="flex gap-3 pt-4">
+  {[
+    { icon: Facebook, href: "", color: "#305fe1ff" },
+    { icon: Linkedin, href: "", color: "#0A66C2" },
+  ].map(({ icon: Icon, href, color }) => (
+    <a
+      key={href}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-12 h-12 rounded-xl border border-gray-200 dark:border-white/10 flex items-center justify-center hover:scale-110 transition-transform"
+    >
+      <Icon size={20} style={{ color }} />
+    </a>
+  ))}
+</div>
             </div>
           </div>
         </div>
       </section>
+      
+      {/* Footer */}
+      <footer className="bg-gray-900 dark:bg-black border-t border-gray-700 dark:border-white/10 py-12 transition-colors duration-300">
+        <div className="max-w-[1096px] mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            {/* Logo Column */}
+            <div>
+              <h3 className="font-['Arial',sans-serif] font-bold text-[20px] text-white mb-4">
+                ULTIMA
+              </h3>
+            </div>
 
-      {/* CTA */}
-      <section className="py-20 px-6 text-center">
-        <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl font-black mb-6">
-          Ready to <span className="text-[#39FF14]">elevate</span> your game?
-        </h2>
-        <div className="flex gap-4 justify-center">
-          <Link to="/signup" className="px-8 py-4 bg-[#39FF14] text-black font-black rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-[#39FF14]/20">
-            Sign Up Free
-          </Link>
-          <Link to="/solutions" className="px-8 py-4 border border-gray-300 dark:border-white/20 font-bold rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
-            Explore Solutions
-          </Link>
+            {/* ULTIMA Column */}
+            <div>
+              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
+                ULTIMA
+              </h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    to="/about"
+                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
+                  >
+                    About us
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support Column */}
+            <div>
+              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
+                Support
+              </h4>
+              <ul className="space-y-2">
+
+                <li>
+                  <button
+                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
+                  >
+                    FAQ
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
+                Contact
+              </h4>
+              <ul className="space-y-2">
+                <ul className="space-y-4">
+
+                  <li>
+                    <a
+                      href="tel:+21699799368"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                    >
+                      <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                      <span>+216 99 799 368</span>
+                    </a>
+                  </li>
+
+
+                  <li>
+                    <a
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
+                    >
+                      <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                      <span>Ultima.contacus@gmail.com</span>
+                    </a>
+                  </li>
+                </ul>
+              </ul>
+            </div>
+          </div>
+
+
+          {/* Copyright */}
+          <div className="pt-8 border-t border-gray-700 dark:border-white/10 text-center">
+            <p className="font-['Poppins',sans-serif] text-[14px] text-gray-400">
+              © {new Date().getFullYear()} ULTIMA. All rights reserved.
+            </p>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }

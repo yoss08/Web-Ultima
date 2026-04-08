@@ -168,8 +168,8 @@ export function SummaPage() {
       
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-emerald-600 dark:text-[#39FF14]" />
+          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[#00E5FF]/10 flex items-center justify-center shrink-0">
+            <Phone className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
           </div>
           <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
         </div>
@@ -223,7 +223,7 @@ export function SummaPage() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="w-full bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="w-full bg-[#00E5FF] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -237,7 +237,7 @@ export function SummaPage() {
               </Link>
               </>
               )}
-              {/* Nouveau Bouton Live Matches */}
+              {/* Nouveau Bouton Live Matches 
               <Link
                 to="/live-matches"
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300 group"
@@ -250,6 +250,7 @@ export function SummaPage() {
                 Live 
                </span>
              </Link>
+             */}
             </div>
 
             {/* Mobile Menu Button */}
@@ -288,7 +289,7 @@ export function SummaPage() {
           // SI CONNECTÉ
           <Link
             to="/dashboard"
-            className="w-full bg-[#39FF14] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#39FF14]/20"
+            className="w-full bg-[#00E5FF] hover:bg-[#32e612] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
@@ -339,7 +340,7 @@ export function SummaPage() {
               >
                 SUMMA
               </h1>
-              <div className="w-32 sm:w-40 h-[6px] bg-emerald-500 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_20px_rgba(57,255,20,0.8)] mx-auto mb-6 sm:mb-8 transition-colors duration-300"></div>
+              <div className="w-32 sm:w-40 h-[6px] bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_20px_rgba(57,255,20,0.8)] mx-auto mb-6 sm:mb-8 transition-colors duration-300"></div>
             </motion.div>
 
             {/* Subtitle */}
@@ -402,7 +403,7 @@ export function SummaPage() {
                 className="relative bg-gray-100 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-6 sm:p-8 text-center transition-colors duration-300"
               >
                 <h3
-                  className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] text-emerald-600 dark:text-[#39FF14] mb-2 transition-colors duration-300"
+                  className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] text-emerald-500 dark:text-[#39FF14] mb-2 transition-colors duration-300"
                   style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
                 >
                   {metric.number}
@@ -453,7 +454,7 @@ export function SummaPage() {
                   alt="SUMMA scoring system in action"
                   className="w-full h-auto"
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 dark:from-[#39FF14]/10 to-transparent pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 dark:from-[#39FF14]/10 to-transparent pointer-events-none"></div>
               </div>
             </motion.div>
 
@@ -476,7 +477,7 @@ export function SummaPage() {
                 over court operations and player data.
               </p>
 
-              <div className="w-24 h-1 bg-emerald-500 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
+              <div className="w-24 h-1 bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
             </motion.div>
           </div>
         </div>
@@ -512,11 +513,11 @@ export function SummaPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white dark:bg-black border border-gray-200 dark:border-white/10 p-10 rounded-[20px] hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300"
+                  className="bg-white dark:bg-black border border-gray-200 dark:border-white/10 p-10 rounded-[20px] hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300"
                 >
                   <div className="mb-6">
                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                      <Icon className="w-7 h-7 text-emerald-600 dark:text-[#39FF14]" />
+                      <Icon className="w-7 h-7 text-emerald-500 dark:text-[#39FF14]" />
                     </div>
                   </div>
 
@@ -573,7 +574,7 @@ export function SummaPage() {
 
                   <div className="mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                      <Icon className="w-8 h-8 text-emerald-600 dark:text-[#39FF14]" />
+                      <Icon className="w-8 h-8 text-emerald-500 dark:text-[#39FF14]" />
                     </div>
                   </div>
 
@@ -588,7 +589,7 @@ export function SummaPage() {
       </section>
        {/* Interfaces & Platforms Section */}
 <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
   <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
     <motion.div
@@ -618,11 +619,11 @@ export function SummaPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center text-center"
+            className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center text-center"
           >
             <div className="mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                <Icon className="w-10 h-10 text-emerald-600 dark:text-[#39FF14]" />
+                <Icon className="w-10 h-10 text-emerald-500 dark:text-[#39FF14]" />
               </div>
             </div>
 
@@ -630,7 +631,7 @@ export function SummaPage() {
               {platform.title}
             </h3>
 
-            <p className="font-['Poppins',sans-serif] text-[15px] font-semibold text-emerald-600 dark:text-[#39FF14] mb-4 uppercase tracking-wider transition-colors duration-300">
+            <p className="font-['Poppins',sans-serif] text-[15px] font-semibold text-emerald-500 dark:text-[#39FF14] mb-4 uppercase tracking-wider transition-colors duration-300">
               {platform.description}
             </p>
 
@@ -646,8 +647,8 @@ export function SummaPage() {
      
       {/* Why Choose Summa Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
 
           <motion.div
@@ -690,7 +691,7 @@ export function SummaPage() {
                         className="flex gap-4"
                       >
                         <div className="flex-shrink-0">
-                          <div className="w-12 h-12 rounded-full bg-emerald-500 dark:bg-[#39FF14] flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-emerald-400 dark:bg-[#39FF14] flex items-center justify-center">
                             <Icon className="w-6 h-6 text-white dark:text-black" />
                           </div>
                         </div>
@@ -761,9 +762,9 @@ export function SummaPage() {
             transition={{ duration: 0.6, delay: index * 0.1 }}
             className="group"
           >
-            <div className="h-full p-8 rounded-[24px] bg-gray-50 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="h-full p-8 rounded-[24px] bg-gray-50 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center justify-center text-center">
               <div className="w-14 h-14 rounded-full bg-white dark:bg-white/5 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                <Icon className="w-6 h-6 text-emerald-600 dark:text-[#39FF14]" />
+                <Icon className="w-6 h-6 text-emerald-500 dark:text-[#39FF14]" />
               </div>
               <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white leading-[1.3]">
                 {env.title}
@@ -777,8 +778,8 @@ export function SummaPage() {
 </section>
       {/* Ultima Ecosystem Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-5xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -800,7 +801,7 @@ export function SummaPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative bg-gray-100 dark:bg-[#0F1425] border-2 border-emerald-500 dark:border-[#39FF14] rounded-[20px] p-10 transition-colors duration-300"
+                className="relative bg-gray-100 dark:bg-[#0F1425] border-2 border-emerald-400 dark:border-[#39FF14] rounded-[20px] p-10 transition-colors duration-300"
               >
                 <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                   SUMMA
@@ -808,7 +809,7 @@ export function SummaPage() {
                 <p className="font-['Poppins',sans-serif] text-[16px] text-gray-600 dark:text-white/60 mb-4 transition-colors duration-300">
                   Smart Scoring & Facility System
                 </p>
-                <div className="w-20 h-1 bg-emerald-500 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
+                <div className="w-20 h-1 bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
               </motion.div>
 
               <motion.div
@@ -844,7 +845,7 @@ export function SummaPage() {
             >
               <div className="max-w-2xl mx-auto space-y-4">
                 <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-white/80 transition-colors duration-300">
-                  <span className="text-emerald-600 dark:text-[#39FF14] font-semibold">SUMMA</span>{" "}
+                  <span className="text-emerald-500 dark:text-[#39FF14] font-semibold">SUMMA</span>{" "}
                   manages scoring and performance.
                 </p>
                 <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-white/80 transition-colors duration-300">
@@ -865,8 +866,8 @@ export function SummaPage() {
         id="summa-cta"
         className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300"
       >
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -910,7 +911,7 @@ export function SummaPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
                   placeholder="Your name"
                 />
               </div>
@@ -929,7 +930,7 @@ export function SummaPage() {
                   required
                   value={formData.company}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
                   placeholder="Facility or company name"
                 />
               </div>
@@ -950,7 +951,7 @@ export function SummaPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -968,7 +969,7 @@ export function SummaPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
                   placeholder="+216 00 000 000"
                 />
               </div>
@@ -987,7 +988,7 @@ export function SummaPage() {
                 value={formData.message}
                 onChange={handleChange}
                 rows={4}
-                className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-3 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-3 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
                 placeholder="Number of courts, expected usage, specific requirements..."
               />
             </div>
@@ -995,7 +996,7 @@ export function SummaPage() {
             <div className="flex justify-center pt-4">
               <button
                 type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 dark:bg-[#39FF14] dark:hover:bg-[#32E012] h-[60px] px-16 rounded-full shadow-lg dark:shadow-[0_0_24px_rgba(57,255,20,0.4)] hover:shadow-xl dark:hover:shadow-[0_0_36px_rgba(57,255,20,0.7)] hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[18px] text-white dark:text-black"
+                className="bg-emerald-400 hover:bg-emerald-500 dark:bg-[#39FF14] dark:hover:bg-[#32E012] h-[60px] px-16 rounded-full shadow-lg dark:shadow-[0_0_24px_rgba(57,255,20,0.4)] hover:shadow-xl dark:hover:shadow-[0_0_36px_rgba(57,255,20,0.7)] hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[18px] text-white dark:text-black"
               >
                 Request a demo
               </button>
@@ -1061,7 +1062,7 @@ export function SummaPage() {
                     href="tel:+21699799368"
                     className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
                     >
-                   <Phone className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                   <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
                    <span>+216 99 799 368</span>
                  </a>
                </li>

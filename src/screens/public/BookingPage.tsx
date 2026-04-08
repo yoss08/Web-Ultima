@@ -1,525 +1,560 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  ArrowLeft, Search, MapPin, Star, ChevronRight, 
-  Calendar, Clock, Users, CreditCard, Wallet, 
-  CheckCircle2, Info, ArrowRight
+  SlidersHorizontal, MapPin, Clock, DollarSign, 
+  TrendingUp, Home as HomeIcon, Sun, Moon, 
+  Menu, X, LayoutDashboard, Star, Info, List, Map, Calendar
 } from 'lucide-react';
+import { useTheme } from "../../styles/useTheme";
+import { useAuth } from "../../services/AuthContext";
+import PadelArena from "../../assets/images/padel_arena.png";
 
-// Reusing User Provided Mock Data
-interface Club {
-  id: string;
-  name: string;
-  image: string;
-  distance: number;
-  rating: number;
-  reviewCount: number;
-  location: string;
-  tags: string[];
-  courtsCount: number;
-  isOpen: boolean;
-}
-
-const mockClubs: Club[] = [
+const clubs = [
   {
-    id: '1',
-    name: 'Elite Padel Center',
-    image: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&h=600&fit=crop',
-    distance: 1.2,
-    rating: 4.8,
-    reviewCount: 342,
-    location: 'Downtown Sports Complex',
-    tags: ['Indoor', 'Outdoor', 'Open now'],
-    courtsCount: 6,
-    isOpen: true,
-  },
-  {
-    id: '2',
-    name: 'Padel Pro Arena',
-    image: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800&h=600&fit=crop',
+    id: 1,
+    name: 'Padel Arena',
+    image: PadelArena,
+    courts: 5,
     distance: 2.5,
-    rating: 4.9,
-    reviewCount: 198,
-    location: 'West End Sports Park',
-    tags: ['Indoor', 'Open now', 'Premium'],
-    courtsCount: 8,
-    isOpen: true,
+    available: true,
+    price: 50,
+    level: 'intermediate',
+    type: 'indoor'
   },
   {
-    id: '3',
-    name: 'City Padel Club',
-    image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&h=600&fit=crop',
-    distance: 3.1,
-    rating: 4.6,
-    reviewCount: 267,
-    location: 'Central Business District',
-    tags: ['Outdoor', 'Open now'],
-    courtsCount: 4,
-    isOpen: true,
+    id: 2,
+    name: 'Padel Marsa',
+    image: 'https://images.unsplash.com/photo-1672223550220-df93d147fa4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    courts: 3,
+    distance: 5.2,
+    available: false,
+    price: 40,
+    level: 'beginner',
+    type: 'outdoor'
   },
   {
-    id: '4',
-    name: 'Summit Padel Courts',
-    image: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&h=600&fit=crop',
-    distance: 4.3,
-    rating: 4.7,
-    reviewCount: 421,
-    location: 'North Hills Recreation',
-    tags: ['Indoor', 'Outdoor', 'Academy'],
-    courtsCount: 10,
-    isOpen: true,
+    id: 3,
+    name: 'Casa Del Padel',
+    image: 'https://images.unsplash.com/photo-1709587825393-84b6c1698f32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    courts: 2,
+    distance: 1.8,
+    available: true,
+    price: 60,
+    level: 'advanced',
+    type: 'indoor'
   },
   {
-    id: '5',
-    name: 'Riverside Padel',
-    image: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&h=600&fit=crop',
-    distance: 5.7,
-    rating: 4.5,
-    reviewCount: 156,
-    location: 'Riverside Sports Zone',
-    tags: ['Outdoor', 'Closed'],
-    courtsCount: 4,
-    isOpen: false,
+    id: 4,
+    name: 'Five Stars Padel',
+    image: 'https://images.unsplash.com/photo-1709587824751-dd30420f5cf3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    courts: 4,
+    distance: 3.7,
+    available: true,
+    price: 45,
+    level: 'intermediate',
+    type: 'outdoor'
   },
+  {
+    id: 5,
+    name: 'Club De Padel',
+    image: 'https://images.unsplash.com/photo-1709587825415-814c2d7cfce7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+    courts: 3,
+    distance: 4.1,
+    available: false,
+    price: 35,
+    level: 'beginner',
+    type: 'indoor'
+  }
 ];
 
-const timeSlots = [
-  '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 
-  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
-];
-
-type Step = 'club' | 'details' | 'form' | 'payment' | 'confirmation';
-
-export function BookingPage() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState<Step>('club');
-  const [selectedClub, setSelectedClub] = useState<Club | null>(null);
-  const [bookingData, setBookingData] = useState({
-    date: '',
-    time: '',
-    duration: '60',
-    players: '4',
-  });
-  const [userDetails, setUserDetails] = useState({
-    name: '',
-    email: '',
-    phone: '',
-  });
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
-
-  const handleClubSelect = (club: Club) => {
-    setSelectedClub(club);
-    setStep('details');
-  };
-
-  const handleBookingDetails = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep('form');
-  };
-
-  const handleUserDetails = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep('payment');
-  };
-
-  const handlePayment = () => {
-    setStep('confirmation');
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 'club':
-        return (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
-          >
-            <div className="flex flex-col gap-2">
-              <h2 className="text-3xl font-bold text-white">Choose a Club</h2>
-              <p className="text-white/60">Select your preferred padel center to start booking.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockClubs.map((club) => (
-                <div 
-                  key={club.id}
-                  onClick={() => club.isOpen && handleClubSelect(club)}
-                  className={`group relative rounded-2xl overflow-hidden bg-[#0D121F] border border-white/10 hover:border-[#39FF14]/50 transition-all cursor-pointer ${!club.isOpen ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                >
-                  <div className="h-48 overflow-hidden">
-                    <img src={club.image} alt={club.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{club.name}</h3>
-                        <div className="flex items-center gap-1 text-white/60 text-sm">
-                          <MapPin size={14} />
-                          <span>{club.location}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 bg-[#39FF14]/10 text-[#39FF14] px-2 py-1 rounded-lg text-sm font-bold">
-                        <Star size={14} fill="#39FF14" />
-                        <span>{club.rating}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                      {club.tags.map(tag => (
-                        <span key={tag} className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md bg-white/5 text-white/40 border border-white/10">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="pt-2 flex justify-between items-center text-sm border-t border-white/5">
-                      <span className="text-white/40">{club.distance} km away</span>
-                      <span className="text-[#39FF14] font-bold">{club.courtsCount} Courts Available</span>
-                    </div>
-                  </div>
-                  {!club.isOpen && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                      Currently Closed
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        );
-
-      case 'details':
-        return (
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="max-w-xl mx-auto space-y-8"
-          >
-            <button onClick={() => setStep('club')} className="flex items-center gap-2 text-white/60 hover:text-[#39FF14] transition-colors">
-              <ArrowLeft size={18} />
-              <span>Back to clubs</span>
-            </button>
-            
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-white">Booking Details</h2>
-              <p className="text-white/60">Pick your time and duration at <span className="text-[#39FF14]">{selectedClub?.name}</span></p>
-            </div>
-
-            <form onSubmit={handleBookingDetails} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Select Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
-                    <input 
-                      type="date" 
-                      required
-                      value={bookingData.date}
-                      onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-12 py-3 text-white focus:border-[#39FF14] outline-none transition-colors"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Select Time</label>
-                  <div className="relative">
-                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
-                    <select 
-                      required
-                      value={bookingData.time}
-                      onChange={(e) => setBookingData({...bookingData, time: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-12 py-3 text-white focus:border-[#39FF14] outline-none transition-colors appearance-none"
-                    >
-                      <option value="" disabled className="bg-[#0D121F]">Choose time</option>
-                      {timeSlots.map(t => <option key={t} value={t} className="bg-[#0D121F]">{t}</option>)}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Duration</label>
-                  <div className="flex gap-2">
-                    {['60', '90', '120'].map(d => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => setBookingData({...bookingData, duration: d})}
-                        className={`flex-1 py-3 rounded-xl border transition-all ${bookingData.duration === d ? 'bg-[#39FF14] border-[#39FF14] text-black font-bold' : 'bg-white/5 border-white/10 text-white hover:border-[#39FF14]/50'}`}
-                      >
-                        {d} min
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Players</label>
-                  <div className="flex gap-2">
-                    {['2', '4'].map(p => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => setBookingData({...bookingData, players: p})}
-                        className={`flex-1 py-3 rounded-xl border transition-all ${bookingData.players === p ? 'bg-[#39FF14] border-[#39FF14] text-black font-bold' : 'bg-white/5 border-white/10 text-white hover:border-[#39FF14]/50'}`}
-                      >
-                        {p} Players
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-white/10">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-white/60">Estimated Total</span>
-                  <span className="text-3xl font-bold text-[#39FF14]">${(Number(bookingData.duration) / 60) * 40}</span>
-                </div>
-                <button 
-                  type="submit"
-                  className="w-full py-4 rounded-xl bg-[#39FF14] text-black font-bold text-lg hover:scale-[1.02] transition-transform active:scale-95 flex items-center justify-center gap-2"
-                >
-                  Continue to Personal Details
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        );
-
-      case 'form':
-        return (
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="max-w-md mx-auto space-y-8"
-          >
-            <button onClick={() => setStep('details')} className="flex items-center gap-2 text-white/60 hover:text-[#39FF14] transition-colors">
-              <ArrowLeft size={18} />
-              <span>Back to booking info</span>
-            </button>
-            
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-white">Your Details</h2>
-              <p className="text-white/60">Please provide your contact information to finalize the booking.</p>
-            </div>
-
-            <form onSubmit={handleUserDetails} className="space-y-4">
-               <div className="space-y-2">
-                <label className="text-sm font-medium text-white/80">Full Name</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="John Doe"
-                  value={userDetails.name}
-                  onChange={(e) => setUserDetails({...userDetails, name: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#39FF14] outline-none transition-colors"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/80">Email Address</label>
-                <input 
-                  type="email" 
-                  required
-                  placeholder="john@example.com"
-                  value={userDetails.email}
-                  onChange={(e) => setUserDetails({...userDetails, email: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#39FF14] outline-none transition-colors"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/80">Phone Number</label>
-                <input 
-                  type="tel" 
-                  required
-                  placeholder="+216 -- --- ---"
-                  value={userDetails.phone}
-                  onChange={(e) => setUserDetails({...userDetails, phone: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#39FF14] outline-none transition-colors"
-                />
-              </div>
-
-              <div className="pt-6">
-                 <button 
-                  type="submit"
-                  className="w-full py-4 rounded-xl bg-[#39FF14] text-black font-bold text-lg hover:scale-[1.02] transition-transform active:scale-95 flex items-center justify-center gap-2"
-                >
-                  Continue to Payment
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        );
-
-      case 'payment':
-        return (
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="max-w-md mx-auto space-y-8"
-          >
-            <button onClick={() => setStep('form')} className="flex items-center gap-2 text-white/60 hover:text-[#39FF14] transition-colors">
-              <ArrowLeft size={18} />
-              <span>Back to details</span>
-            </button>
-            
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-white">Payment Method</h2>
-              <p className="text-white/60">Choose how you'd like to pay for your session.</p>
-            </div>
-
-            <div className="space-y-4">
-              <div 
-                onClick={() => setPaymentMethod('cash')}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all flex items-center gap-4 ${paymentMethod === 'cash' ? 'bg-[#39FF14]/10 border-[#39FF14]' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${paymentMethod === 'cash' ? 'bg-[#39FF14] text-black' : 'bg-white/10 text-white/40'}`}>
-                  <Wallet size={24} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-white text-lg">Cash (In Club)</h3>
-                  <p className="text-white/40 text-sm">Pay directly at the reception desk.</p>
-                </div>
-                {paymentMethod === 'cash' && <div className="w-6 h-6 rounded-full bg-[#39FF14] flex items-center justify-center"><CheckCircle2 size={16} color="black" /></div>}
-              </div>
-
-              <div 
-                onClick={() => setPaymentMethod('card')}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all flex items-center gap-4 ${paymentMethod === 'card' ? 'bg-[#39FF14]/10 border-[#39FF14]' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${paymentMethod === 'card' ? 'bg-[#39FF14] text-black' : 'bg-white/10 text-white/40'}`}>
-                  <CreditCard size={24} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-white text-lg">Online Payment</h3>
-                  <p className="text-white/40 text-sm">Pay securely with Credit / Debit Card.</p>
-                </div>
-                {paymentMethod === 'card' && <div className="w-6 h-6 rounded-full bg-[#39FF14] flex items-center justify-center"><CheckCircle2 size={16} color="black" /></div>}
-              </div>
-            </div>
-
-            <div className="pt-6">
-                 <button 
-                  onClick={handlePayment}
-                  className="w-full py-4 rounded-xl bg-[#39FF14] text-black font-bold text-lg hover:scale-[1.02] transition-transform active:scale-95 flex items-center justify-center gap-2"
-                >
-                  Confirm Booking
-                  <CheckCircle2 size={20} />
-                </button>
-            </div>
-          </motion.div>
-        );
-
-      case 'confirmation':
-        return (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md mx-auto text-center space-y-6 py-12"
-          >
-            <div className="w-24 h-24 rounded-full bg-[#39FF14] flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(57,255,20,0.3)]">
-              <CheckCircle2 size={48} color="black" />
-            </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-4xl font-bold text-white">Booking Confirmed!</h2>
-              <p className="text-white/60">Your court at <span className="text-[#39FF14]">{selectedClub?.name}</span> is ready.</p>
-            </div>
-
-            <div className="bg-[#0D121F] border border-white/10 rounded-2xl p-6 text-left space-y-4 shadow-xl">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-white/40 uppercase tracking-widest font-bold">Ref Number</span>
-                <span className="text-white font-mono">#ULT-9942</span>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="text-white/40 text-xs">DateTime</p>
-                <p className="text-white font-medium">{bookingData.date} @ {bookingData.time}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-white/40 text-xs">Duration</p>
-                  <p className="text-white font-medium">{bookingData.duration} Minutes</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-white/40 text-xs">Payment</p>
-                  <p className="text-white font-medium capitalize">{paymentMethod}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 flex flex-col gap-3">
-              <button 
-                onClick={() => navigate('/')}
-                className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-colors"
-              >
-                Back to Home
-              </button>
-              <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
-                <Info size={14} />
-                <span>A confirmation email has been sent.</span>
-              </div>
-            </div>
-          </motion.div>
-        );
-    }
-  };
-
+function ClubCard({ club }: { club: typeof clubs[0] }) {
   return (
-    <div className="min-h-screen bg-[#060910] text-white pt-32 pb-20 px-4">
-      {/* Background Glow */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#39FF14]/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="max-w-[1096px] mx-auto relative z-10">
-        {/* Progress Bar */}
-        {step !== 'confirmation' && (
-          <div className="hidden md:flex justify-between items-center mb-16 px-12 relative">
-             <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 -translate-y-1/2" />
-             <div 
-              className="absolute top-1/2 left-0 h-[2px] bg-[#39FF14] -translate-y-1/2 transition-all duration-500" 
-              style={{ width: `${(step === 'club' ? 0 : step === 'details' ? 33 : step === 'form' ? 66 : 100)}%` }}
-             />
-             
-             {[
-               { id: 'club', label: 'Select Club' },
-               { id: 'details', label: 'Book Time' },
-               { id: 'form', label: 'Details' },
-               { id: 'payment', label: 'Payment' }
-             ].map((s, idx) => (
-               <div key={s.id} className="relative z-10 flex flex-col items-center gap-3">
-                 <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                   step === s.id ? 'bg-black border-[#39FF14] text-[#39FF14] scale-125' : 
-                   (idx < ['club', 'details', 'form', 'payment'].indexOf(step) ? 'bg-[#39FF14] border-[#39FF14] text-black' : 'bg-[#060910] border-white/20 text-white/40')
-                 }`}>
-                   {idx + 1}
-                 </div>
-                 <span className={`text-[10px] uppercase tracking-widest font-bold transition-colors duration-300 ${step === s.id ? 'text-[#39FF14]' : 'text-white/40'}`}>
-                   {s.label}
-                 </span>
-               </div>
-             ))}
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className={`bg-white dark:bg-[#1A1F2C] rounded-2xl border border-gray-200 dark:border-[#2A2A2A] overflow-hidden hover:border-blue-500 dark:hover:border-[#00E5FF] transition-all duration-300 shadow-sm hover:shadow-md ${!club.available ? 'opacity-70 grayscale-[0.5]' : ''}`}
+    >
+      <div className="relative h-48 overflow-hidden group">
+        <img
+          src={club.image}
+          alt={club.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute top-3 right-3 flex gap-2">
+          <div className="bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+            {club.courts} Courts
+          </div>
+          {club.available && (
+            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              Available
+            </div>
+          )}
+        </div>
+        {!club.available && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <span className="bg-red-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Closed Now</span>
           </div>
         )}
+      </div>
 
-        {/* Step Content */}
-        <AnimatePresence mode="wait">
-          {renderStep()}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white">{club.name}</h3>
+              {club.type && (
+                <span className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-[#2A2A2A] px-2 py-0.5 rounded-full capitalize">
+                  {club.type}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2">
+              <MapPin className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+              <span>Tunisia, Tunis</span>
+              {club.distance && (
+                <span className="text-blue-500 dark:text-[#00E5FF] font-semibold">• {club.distance} km</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-sm mb-2">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                <span>Open 10:00 - 01:00</span>
+              </div>
+              {club.price && (
+                <span className="text-gray-900 dark:text-white font-semibold">{club.price} DT/hr</span>
+              )}
+            </div>
+
+            {club.level && (
+              <div className="mt-2 text-left">
+                <span className="text-xs bg-blue-500/10 dark:bg-[#00E5FF]/10 text-blue-600 dark:text-[#00E5FF] px-2 py-1 rounded-full font-medium inline-block">
+                  {club.level.charAt(0).toUpperCase() + club.level.slice(1)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col justify-center h-full pt-2">
+            {club.available ? (
+              <Link to={`/club/${club.id}`} className="px-6 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap active:scale-95 text-center bg-gradient-to-r from-blue-500 to-blue-400 dark:from-[#00E5FF] dark:to-[#00D4E6] text-white dark:text-black hover:shadow-xl hover:shadow-blue-500/20 dark:hover:shadow-[#00E5FF]/20">
+                Order Now
+              </Link>
+            ) : (
+              <button disabled className="px-6 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap bg-gray-200 dark:bg-white/5 text-gray-400 cursor-not-allowed shadow-none">
+                Order Now
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function BookingPage() {
+  const { isDark, setIsDark } = useTheme();
+  const { user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [filters, setFilters] = useState({
+    maxDistance: 10,
+    availableNow: false,
+    priceSort: 'none' as 'asc' | 'desc' | 'none',
+    level: 'all' as 'all' | 'beginner' | 'intermediate' | 'advanced',
+    type: 'all' as 'all' | 'indoor' | 'outdoor'
+  });
+
+  const filteredClubs = clubs
+    .filter(club => club.distance <= filters.maxDistance)
+    .filter(club => !filters.availableNow || club.available)
+    .filter(club => filters.level === 'all' || club.level === filters.level)
+    .filter(club => filters.type === 'all' || club.type === filters.type)
+    .sort((a, b) => {
+      if (filters.priceSort === 'asc') return a.price - b.price;
+      if (filters.priceSort === 'desc') return b.price - a.price;
+      return 0;
+    });
+
+  return (
+    <div className="min-h-screen transition-colors duration-300 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0A0E1A] dark:to-gray-900 pb-24">
+      {/* Navigation Bar */}
+      {/* Navigation */}
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[rgba(10,14,26,0.8)] backdrop-blur-xl border-b border-gray-200 dark:border-white/10 transition-colors duration-300"
+      >
+        <div className="max-w-[1096px] mx-auto px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              to="/"
+              className="font-['Arial',sans-serif] font-bold text-[20px] sm:text-[24px] text-gray-900 dark:text-white tracking-[1.2px] transition-colors duration-300"
+            >
+              ULTIMA
+            </Link>
+
+            {/* Center Links */}
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/about" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">About</Link>
+              <a href="#contact" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">Contact</a>
+              <Link to="/solutions" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">Solutions</Link>
+              <Link to="/summa" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">SUMMA</Link>
+              <Link to="/almus" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">ALMUS</Link>
+              
+
+              <button onClick={() => setIsDark(!isDark)} className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-600" />}
+              </button>
+               {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="bg-blue-500 dark:bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
+              <Link
+                to="/signup" className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg dark:shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(0,229,255,0.5)]">
+                Get Started
+              </Link>
+              </>
+              )}
+              {/* Nouveau Bouton Live Matches 
+              <Link
+                to="/live-matches"
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300 group"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                </span>
+                <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
+                  Live 
+                </span>
+              </Link>
+              */}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+            >
+              {isMenuOpen ? <X className="w-6 h-6 text-gray-900 dark:text-white" /> : <Menu className="w-6 h-6 text-gray-900 dark:text-white" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0A0E1A] overflow-hidden"
+            >
+              <div className="px-6 py-6 space-y-4">
+                <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">About</Link>
+                <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">Contact</a>
+                <Link to="/solutions" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">Solutions</Link>
+                <Link to="/summa" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">SUMMA</Link>
+                <Link to="/almus" onClick={() => setIsMenuOpen(false)} className="block text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">ALMUS</Link>
+                
+
+                <div className="pt-4 space-y-3 border-t border-gray-200 dark:border-white/10">
+                  <button onClick={() => setIsDark(!isDark)} className="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                    {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-blue-600" />}
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+                  </button>
+                  {user ? (
+          // SI CONNECTÉ
+          <Link
+            to="/dashboard"
+            className="w-full bg-blue-500 dark:bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        ) : (
+          // SI DÉCONNECTÉ
+          <>
+              <Link
+                to="/signup" className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg dark:shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(0,229,255,0.5)]">
+                Get Started
+              </Link>
+              </>
+              )}
+              {/* 
+                  <Link to="/live-matches" className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-all duration-300">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    </span>
+                    <span className="font-['Poppins',sans-serif] font-semibold text-[14px] text-red-600 dark:text-red-500">
+                      Live 
+                    </span>
+                  </Link>
+                  */}
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
+      </motion.nav>
+
+      {/* Main Content */}
+      <div className="max-w-[1096px] mx-auto pt-28 px-4">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Recommendations</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Find and reserve the best padel clubs in your area.</p>
+        </div>
+
+        {/* Filter Bar */}
+        <div className="mb-6 bg-white dark:bg-[#1A1F2C] rounded-[20px] border border-gray-200 dark:border-white/10 p-4 shadow-sm">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full flex items-center justify-between text-gray-900 dark:text-white"
+          >
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="w-5 h-5 text-blue-500 dark:text-[#00E5FF]" />
+              <span className="font-semibold">Filters</span>
+              {(filters.availableNow || filters.priceSort !== 'none' || filters.level !== 'all' || filters.type !== 'all') && (
+                <span className="bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black text-xs px-2 py-0.5 rounded-full font-bold">Active</span>
+              )}
+            </div>
+            <span className="text-gray-400 transition-transform duration-300" style={{ transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          </button>
+
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }} 
+                animate={{ opacity: 1, height: "auto" }} 
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 space-y-5 overflow-hidden border-t border-gray-100 dark:border-white/10 pt-4"
+              >
+                {/* Distance */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-white">Distance: {filters.maxDistance} km</label>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={filters.maxDistance}
+                    onChange={(e) => setFilters({ ...filters, maxDistance: parseInt(e.target.value) })}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, ${isDark ? '#00E5FF' : '#3B82F6'}  0%, ${isDark ? '#00E5FF' : '#3B82F6'}  ${(filters.maxDistance / 20) * 100}%, ${isDark ? '#2A2A2A' : '#E5E7EB'} ${(filters.maxDistance / 20) * 100}%, ${isDark ? '#2A2A2A' : '#E5E7EB'} 100%)`
+                    }}
+                  />
+                </div>
+
+                {/* Available Now */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-white">Available Now</label>
+                  </div>
+                  <button
+                    onClick={() => setFilters({ ...filters, availableNow: !filters.availableNow })}
+                    className={`w-12 h-6 rounded-full transition-colors ${
+                      filters.availableNow ? 'bg-blue-500 dark:bg-[#00E5FF]' : 'bg-gray-300 dark:bg-white/10'
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                        filters.availableNow ? 'translate-x-6' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {/* Price Sort */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                      <label className="text-sm font-medium text-gray-700 dark:text-white">Price</label>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setFilters({ ...filters, priceSort: 'asc' })}
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
+                          filters.priceSort === 'asc'
+                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                        }`}
+                      >
+                        Low High
+                      </button>
+                      <button
+                        onClick={() => setFilters({ ...filters, priceSort: 'desc' })}
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
+                          filters.priceSort === 'desc'
+                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                        }`}
+                      >
+                        High Low
+                      </button>
+                      <button
+                        onClick={() => setFilters({ ...filters, priceSort: 'none' })}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
+                          filters.priceSort === 'none'
+                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                        }`}
+                        title="Reset Price Filter"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Level */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                      <label className="text-sm font-medium text-gray-700 dark:text-white">Level</label>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {['all', 'beginner', 'intermediate', 'advanced'].map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => setFilters({ ...filters, level: level as any })}
+                          className={`flex-1 min-w-[70px] py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-transparent ${
+                            filters.level === level
+                              ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
+                              : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                          }`}
+                        >
+                          {level === 'all' ? 'All' : level.slice(0, 3)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Indoor/Outdoor */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <HomeIcon className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+                      <label className="text-sm font-medium text-gray-700 dark:text-white">Court Type</label>
+                    </div>
+                    <div className="flex gap-2">
+                      {['all', 'indoor', 'outdoor'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setFilters({ ...filters, type: type as any })}
+                          className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
+                            filters.type === type
+                              ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
+                              : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                          }`}
+                        >
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Results Count & View Toggle */}
+        <div className="mb-6 flex justify-between items-center text-sm">
+          <div className="flex items-center gap-4">
+            <p className="text-gray-500 dark:text-gray-400">
+              Showing <span className="font-bold text-blue-500 dark:text-[#00E5FF]">{filteredClubs.length}</span> of {clubs.length} clubs
+            </p>
+            {filteredClubs.length !== clubs.length && (
+               <button 
+                onClick={() => setFilters({ maxDistance: 10, availableNow: false, priceSort: 'none', level: 'all', type: 'all' })}
+                className="text-blue-500 dark:text-[#00E5FF] text-xs font-bold uppercase tracking-widest hover:underline"
+               >
+                Reset Filters
+               </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-[#1A1F2C] text-blue-500 dark:text-[#00E5FF] shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
+              <List className="w-4 h-4" />
+              <span className="text-sm font-semibold hidden sm:block">List</span>
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
+                viewMode === 'map'
+                  ? 'bg-white dark:bg-[#1A1F2C] text-blue-500 dark:text-[#00E5FF] shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
+              <Map className="w-4 h-4" />
+              <span className="text-sm font-semibold hidden sm:block">Map</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        {viewMode === 'map' ? (
+          <div className="w-full h-[600px] rounded-2xl bg-white dark:bg-[#1A1F2C] border border-gray-200 dark:border-white/10 flex items-center justify-center shadow-sm">
+            <div className="text-center">
+              <Map className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 font-medium">Map view coming soon</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredClubs.length > 0 ? (
+                filteredClubs.map((club) => (
+                  <ClubCard key={club.id} club={club} />
+                ))
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="col-span-full py-20 text-center space-y-4"
+                >
+                  <div className="w-20 h-20 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Info className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">No centers match your filters</h3>
+                    <p className="text-gray-500 mt-2">Try adjusting your radius or requirements.</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
