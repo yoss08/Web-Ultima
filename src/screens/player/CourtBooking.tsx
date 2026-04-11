@@ -13,7 +13,6 @@ import { useNavigate } from "react-router";
 import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Court {
   id: string;
@@ -43,7 +42,6 @@ interface Booking {
 
 type Tab = "book" | "upcoming" | "history";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const TIME_SLOTS = [
   "08:00 - 09:30", "09:30 - 11:00", "11:00 - 12:30",
@@ -70,7 +68,6 @@ const COURT_STATUS_CONFIG = {
   maintenance:{ label: "Maintenance", color: "text-red-400 bg-red-400/10" },
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -91,7 +88,6 @@ function getCountdown(date: string, slot: string) {
   return `${m}m`;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: Court["status"] }) {
   const cfg = COURT_STATUS_CONFIG[status ?? "available"];
@@ -115,7 +111,6 @@ function SectionHeading({ step, title }: { step?: number | string; title: string
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export function CourtBooking() {
   const { user } = useAuth();
@@ -155,9 +150,7 @@ export function CourtBooking() {
   const discount = basePrice * appliedDiscount;
   const totalPrice = basePrice - discount;
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Data fetching
-  // ──────────────────────────────────────────────────────────────────────────
+  
 
   useEffect(() => {
     async function fetchCourts() {
@@ -263,9 +256,6 @@ export function CourtBooking() {
     fetchMyBookings();
   }, [user, activeTab]);
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Actions
-  // ──────────────────────────────────────────────────────────────────────────
 
   const handleApplyDiscount = () => {
     const upper = discountCode.toUpperCase();
@@ -351,9 +341,7 @@ export function CourtBooking() {
     }
   };
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Loading state
-  // ──────────────────────────────────────────────────────────────────────────
+  
 
   if (loading) {
     return (
@@ -364,9 +352,7 @@ export function CourtBooking() {
     );
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Derived booking lists
-  // ──────────────────────────────────────────────────────────────────────────
+  
 
   const today = new Date().toISOString().split("T")[0];
   const upcomingBookings = myBookings.filter(
@@ -376,9 +362,7 @@ export function CourtBooking() {
     (b) => b.booking_date < today || b.status !== "confirmed"
   );
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Render
-  // ──────────────────────────────────────────────────────────────────────────
+
 
   return (
     <div className="max-w-[1400px] mx-auto pb-20 px-4 md:px-0">
@@ -430,9 +414,6 @@ export function CourtBooking() {
       </nav>
 
       <AnimatePresence mode="wait">
-        {/* ════════════════════════════════════════════════════════════════════
-            TAB: BOOK A COURT
-        ════════════════════════════════════════════════════════════════════ */}
         {activeTab === "book" && (
           <motion.div
             key="book"

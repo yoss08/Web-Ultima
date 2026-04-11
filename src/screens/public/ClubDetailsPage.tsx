@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router';
+import { useParams, Link, useNavigate, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Phone, Calendar, Clock, MapPin, Star, Users, CheckCircle2, ChevronLeft, Shield, Sun, Moon, Trophy
 } from 'lucide-react';
 import { useTheme } from "../../styles/useTheme";
+import { supabase } from "../../config/supabase";
 
 const MOCK_CLUB = {
   id: 1,
@@ -14,6 +15,7 @@ const MOCK_CLUB = {
   location: "Tunisia, Tunis",
   description: "Premium padel experience with state-of-the-art panoramic crystal courts and professional lighting.",
   image: "https://images.unsplash.com/photo-1709587825415-814c2d7cfce7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
+  price: 99,
   courts: [
     { id: 'c1', name: 'Court 1', type: 'Indoor - Glass walls', available: true },
     { id: 'c2', name: 'Court 2', type: 'Indoor - Premium', available: true },
@@ -55,53 +57,101 @@ const mockOpenGames = [
   },
 ];
 
-const DATES = Array.from({ length: 7 }).map((_, i) => {
-  const d = new Date();
-  d.setDate(d.getDate() + i);
-  return {
-    day: d.toLocaleDateString('en-US', { weekday: 'short' }),
-    date: d.getDate(),
-    fullDate: d.toISOString()
-  };
-});
+const getISODate = (d: Date) => {
+  const tzOffset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - tzOffset).toISOString().split('T')[0];
+};
 
 const MOCK_TIMES = [
-  { id: 't1', time: '9:00 AM', price: 99 },
-  { id: 't2', time: '10:30 AM', price: 99 },
-  { id: 't4', time: '12:00 PM', price: 99 },
-  { id: 't5', time: '1:30 PM', price: 99 },
-  { id: 't6', time: '3:00 PM', price: 99 },
-  { id: 't8', time: '4:30 PM', price: 99 },
+  { id: 't1', time: '9:00 AM' },
+  { id: 't2', time: '10:30 AM'},
+  { id: 't4', time: '12:00 PM' },
+  { id: 't5', time: '1:30 PM' },
+  { id: 't6', time: '3:00 PM' },
+  { id: 't8', time: '4:30 PM' },
 ];
 
 const DURATIONS = [
-  { id: '1.5', label: '1.5 hours', value: 1.5 },
-
+  { id: '1', label: '1 session', value: 1 },
+  { id: '2', label: '2 sessions', value: 2 },
 ];
 
 export function ClubDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isDark, setIsDark } = useTheme();
+
+  const passedClub = location.state?.club;
+  const displayClub = passedClub ? {
+    ...MOCK_CLUB,
+    id: passedClub.id,
+    name: passedClub.name,
+    image: passedClub.image,
+    price: passedClub.price,
+  } : MOCK_CLUB;
 
   const [activeTab, setActiveTab] = useState<'courts' | 'games'>('courts');
   const [selectedCourt, setSelectedCourt] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>(DATES[0].fullDate);
+  const todayDateObj = new Date();
+  const minDateStr = getISODate(todayDateObj);
+  const maxDateObj = new Date();
+  maxDateObj.setDate(todayDateObj.getDate() + 7);
+  const maxDateStr = getISODate(maxDateObj);
+
+  const [selectedDate, setSelectedDate] = useState<string>(minDateStr);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedDuration, setSelectedDuration] = useState<string>('1.5');
+  const [selectedDuration, setSelectedDuration] = useState<string>('1');
   const [selectedPlayers, setSelectedPlayers] = useState<number>(4);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedTimeObj = MOCK_TIMES.find(t => t.id === selectedTime);
   const selectedDurObj = DURATIONS.find(d => d.id === selectedDuration);
-  const basePricePerHour = selectedTimeObj?.price || 99;
-  const totalPrice = basePricePerHour * (selectedDurObj?.value || 1);
+  const basePricePerSession = displayClub.price || 99; // The price of the session
+  const totalPrice = basePricePerSession * (selectedDurObj?.value || 1);
 
-  const handleBook = () => {
-    alert("Booking Confirmed!");
-    navigate('/booking');
+  const handleBook = async () => {
+    if (!formData.name || !formData.email || !formData.phone) {
+      alert("Please fill in your contact information first.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase.from('bookings').insert([
+        {
+          full_name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          club_id: displayClub.id,
+          court_id: selectedCourt,
+          booking_date: selectedDate,
+          time_slot: selectedTimeObj?.time || '',
+          duration: selectedDurObj?.value || 1,
+          total_price: totalPrice,
+          status: 'pending'
+        }
+      ]);
+
+      if (error) {
+        console.error('Supabase error:', error);
+        alert("Failed to confirm booking. Please try again.");
+        return;
+      }
+
+      alert("Booking Confirmed!");
+      navigate('/booking');
+    } catch (err) {
+      console.error('Error creating booking:', err);
+      alert("Failed to confirm booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const selectedCourtDetails = MOCK_CLUB.courts.find(c => c.id === selectedCourt);
+  const selectedCourtDetails = displayClub.courts.find(c => c.id === selectedCourt);
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-gray-50 dark:bg-[#0A0E1A] pb-24">
@@ -130,14 +180,14 @@ export function ClubDetailsPage() {
         {/* Header Section */}
         <div className="bg-white dark:bg-[#1A1F2C] rounded-[32px] overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm mb-8">
           <div className="h-[250px] relative">
-            <img src={MOCK_CLUB.image} alt={MOCK_CLUB.name} className="w-full h-full object-cover" />
+            <img src={displayClub.image} alt={displayClub.name} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
               <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <h1 className="text-4xl font-bold text-white mb-2">{MOCK_CLUB.name}</h1>
+                  <h1 className="text-4xl font-bold text-white mb-2">{displayClub.name}</h1>
                   <div className="flex items-center gap-4 text-white/80 text-sm">
-                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {MOCK_CLUB.location}</span>
-                    <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {MOCK_CLUB.rating} ({MOCK_CLUB.reviews} reviews)</span>
+                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {displayClub.location}</span>
+                    <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {displayClub.rating} ({displayClub.reviews} reviews)</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -189,7 +239,7 @@ export function ClubDetailsPage() {
                 >
                   <h3 className="mb-4 font-bold text-gray-900 dark:text-white">Available Courts Today</h3>
                   <div className="space-y-3">
-                    {MOCK_CLUB.courts.map((court, index) => (
+                    {displayClub.courts.map((court, index) => (
                       <motion.div
                         key={court.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -305,7 +355,7 @@ export function ClubDetailsPage() {
             {/* Booking Form */}
             <div id="booking-section">
                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Book a Court</h2>
-               <p className="text-gray-500 dark:text-gray-400 mb-6">{MOCK_CLUB.name}</p>
+               <p className="text-gray-500 dark:text-gray-400 mb-6">{displayClub.name}</p>
 
                {selectedCourt ? (
                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
@@ -319,27 +369,57 @@ export function ClubDetailsPage() {
                      <button onClick={() => setSelectedCourt(null)} className="text-sm text-blue-600 dark:text-[#00E5FF] underline font-medium">Change</button>
                    </div>
 
+                   {/* Contact Information Form */}
+                   <div className="bg-white dark:bg-[#1C212E] p-6 rounded-2xl border border-gray-200 dark:border-[#2A303C]">
+                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Personal Information</h3>
+                     <div className="space-y-4">
+                       <div>
+                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                         <input 
+                           type="text" 
+                           value={formData.name}
+                           onChange={e => setFormData({...formData, name: e.target.value})}
+                           placeholder="Enter your full name" 
+                           className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF]" 
+                         />
+                       </div>
+                       <div>
+                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                         <input 
+                           type="email" 
+                           value={formData.email}
+                           onChange={e => setFormData({...formData, email: e.target.value})}
+                           placeholder="Enter your email" 
+                           className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF]" 
+                         />
+                       </div>
+                       <div>
+                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                         <input 
+                           type="tel" 
+                           value={formData.phone}
+                           onChange={e => setFormData({...formData, phone: e.target.value})}
+                           placeholder="Enter your phone number" 
+                           className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF]" 
+                         />
+                       </div>
+                     </div>
+                   </div>
+
                    {/* Date Selection */}
                    <div>
                      <div className="flex items-center gap-2 mb-4">
                        <Calendar className="w-5 h-5 text-blue-500 dark:text-[#00E5FF]" />
                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Select Date</h3>
                      </div>
-                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                       {DATES.map((d) => (
-                         <button
-                           key={d.fullDate}
-                           onClick={() => setSelectedDate(d.fullDate)}
-                            className={`flex-shrink-0 w-[100px] h-[48px] rounded-2xl flex items-center justify-center transition-all border hover:border-blue-400 dark:hover:border-[#00E5FF]/50 ${
-                              selectedDate === d.fullDate
-                                ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black border-transparent'
-                                : 'bg-gray-100 dark:bg-[#1C212E] text-gray-700 dark:text-white border-gray-200 dark:border-[#2A303C]'
-                            }`}
-                         >
-                           <span className="text-sm font-semibold">{d.day}, {d.day === 'Today' ? 'Apr 7' : 'Apr ' + d.date}</span>
-                         </button>
-                       ))}
-                     </div>
+                     <input
+                       type="date"
+                       min={minDateStr}
+                       max={maxDateStr}
+                       value={selectedDate}
+                       onChange={(e) => setSelectedDate(e.target.value)}
+                       className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#1C212E] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF] cursor-pointer"
+                     />
                    </div>
 
                    {/* Time Selection */}
@@ -360,7 +440,7 @@ export function ClubDetailsPage() {
                             }`}
                          >
                            <span>{timeObj.time}</span>
-                           <span className={selectedTime === timeObj.id ? 'text-white dark:text-black' : 'text-gray-400'}>{timeObj.price}DT</span>
+                           <span className={selectedTime === timeObj.id ? 'text-white dark:text-black' : 'text-gray-400'}></span>
                          </button>
                        ))}
                      </div>
@@ -385,29 +465,66 @@ export function ClubDetailsPage() {
                        ))}
                      </div>
                    </div>
+                  {/* Sidebar / Price Summary */}
+          <div className="w-full lg:w-[380px]">
+            <div className="sticky top-28 rounded-[24px] bg-gray-50 dark:bg-[#1A1F2C] border border-blue-200 dark:border-[#00E5FF]/30 p-6 shadow-sm dark:shadow-[0_0_20px_rgba(0,229,255,0.05)]">
+              
+              {/* Club Info in Summary */}
+              <div className="mb-6 flex items-center gap-4 border-b border-gray-200 dark:border-white/10 pb-4">
+                <img src={displayClub.image} alt={displayClub.name} className="w-16 h-16 rounded-xl object-cover" />
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{displayClub.name}</h3>
+                  <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <MapPin className="w-3.5 h-3.5" /> {displayClub.location}
+                  </div>
+                </div>
+              </div>
 
-                   {/* Number of Players */}
-                   <div>
-                     <div className="flex items-center gap-2 mb-4">
-                       <Users className="w-5 h-5 text-blue-500 dark:text-[#00E5FF]" />
-                       <h3 className="text-lg font-bold text-gray-900 dark:text-white">Number of Players</h3>
-                     </div>
-                     <div className="flex gap-4">
-                       {[2, 4].map((num) => (
-                         <button
-                           key={num}
-                           onClick={() => setSelectedPlayers(num)}
-                            className={`flex-1 py-3 rounded-2xl flex flex-col items-center gap-2 transition-all border hover:border-blue-400 dark:hover:border-[#00E5FF]/50 ${
-                              selectedPlayers === num
-                                ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black border-transparent'
-                                : 'bg-gray-100 dark:bg-[#1C212E] text-gray-700 dark:text-white border-gray-200 dark:border-[#2A303C]'
-                            }`}
-                         >
-                           <span className="font-semibold">{num} players</span>
-                         </button>
-                       ))}
-                     </div>
-                   </div>
+              <div className="flex items-center gap-2 mb-6">
+                <span className="text-blue-500 dark:text-[#00E5FF] text-xl font-bold">DT</span>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Price Summary</h3>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <span>Price per session:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{basePricePerSession}DT</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <span>Duration:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{selectedDurObj?.label}</span>
+                </div>
+                <div className="pt-6 border-t border-blue-200 dark:border-[#00E5FF]/30 flex justify-between items-center">
+                  <span className="font-bold text-gray-900 dark:text-white text-lg">Total</span>
+                  <span className="text-3xl font-bold text-blue-500 dark:text-[#00E5FF]">{totalPrice}DT</span>
+                </div>
+              </div>
+
+              <div className="mt-8 border-t border-blue-200 dark:border-[#00E5FF]/30 pt-6">
+                <button
+                  onClick={handleBook}
+                  disabled={!selectedCourt || !selectedTime || isSubmitting}
+                  className={`w-full py-4 rounded-xl font-semibold text-[17px] transition-all flex items-center justify-center gap-2 ${
+                    selectedCourt && selectedTime && !isSubmitting
+                      ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-[0_4px_14px_rgba(59,130,246,0.4)] dark:shadow-[0_4px_14px_rgba(0,229,255,0.4)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.6)] dark:hover:shadow-[0_6px_20px_rgba(0,229,255,0.6)]'
+                      : 'bg-gray-200 dark:bg-[#1C212E] text-gray-400 cursor-not-allowed border border-gray-300 dark:border-[#2A303C]'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                       <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                       Processing...
+                    </span>
+                  ) : (
+                    `Book Court - ${totalPrice}DT`
+                  )}
+                </button>
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
+                  You can cancel up to 2 hours before the booking
+                </p>
+              </div>
+            </div>
+          </div>
 
                  </motion.div>
                ) : (
@@ -419,53 +536,6 @@ export function ClubDetailsPage() {
                )}
             </div>
 
-          </div>
-
-          {/* Sidebar / Price Summary */}
-          <div className="w-full lg:w-[380px]">
-            <div className="sticky top-28 rounded-[24px] bg-gray-50 dark:bg-[#1A1F2C] border border-blue-200 dark:border-[#00E5FF]/30 p-6 shadow-sm dark:shadow-[0_0_20px_rgba(0,229,255,0.05)]">
-              
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-blue-500 dark:text-[#00E5FF] text-xl font-bold">DT</span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Price Summary</h3>
-              </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <span>Court rental:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{basePricePerHour}DT/hour</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <span>Duration:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{selectedDurObj?.label}</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <span>Players:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{selectedPlayers} players</span>
-                </div>
-                <div className="pt-6 border-t border-blue-200 dark:border-[#00E5FF]/30 flex justify-between items-center">
-                  <span className="font-bold text-gray-900 dark:text-white text-lg">Total</span>
-                  <span className="text-3xl font-bold text-blue-500 dark:text-[#00E5FF]">{totalPrice}DT</span>
-                </div>
-              </div>
-
-              <div className="mt-8 border-t border-blue-200 dark:border-[#00E5FF]/30 pt-6">
-                <button
-                  onClick={handleBook}
-                  disabled={!selectedCourt || !selectedTime}
-                  className={`w-full py-4 rounded-xl font-semibold text-[17px] transition-all ${
-                    selectedCourt && selectedTime
-                      ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-[0_4px_14px_rgba(59,130,246,0.4)] dark:shadow-[0_4px_14px_rgba(0,229,255,0.4)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.6)] dark:hover:shadow-[0_6px_20px_rgba(0,229,255,0.6)]'
-                      : 'bg-gray-200 dark:bg-[#1C212E] text-gray-400 cursor-not-allowed border border-gray-300 dark:border-[#2A303C]'
-                  }`}
-                >
-                  Book Court - {totalPrice}DT
-                </button>
-                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
-                  You can cancel up to 2 hours before the booking
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
