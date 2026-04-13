@@ -43,7 +43,7 @@ export default function Navigation() {
               // SI CONNECTÉ
               <Link
                 to="/dashboard"
-                className="bg-blue-500 dark:bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
+                className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg dark:shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(0,229,255,0.5)]"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 Dashboard
@@ -92,7 +92,7 @@ export default function Navigation() {
                   // SI CONNECTÉ
                   <Link
                     to="/dashboard"
-                    className="w-full bg-blue-500 dark:bg-[#00E5FF] hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[14px] text-black flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
+                    className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-[#00E5FF] dark:hover:bg-[#00D4E6] h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-white dark:text-black flex items-center justify-center shadow-lg dark:shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(0,229,255,0.5)]"
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard

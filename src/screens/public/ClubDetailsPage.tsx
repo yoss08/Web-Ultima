@@ -276,7 +276,7 @@ export function ClubDetailsPage() {
                 onClick={() => setActiveTab('courts')}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
                   activeTab === 'courts'
-                    ? 'bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20'
+                    ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
@@ -287,7 +287,7 @@ export function ClubDetailsPage() {
                 onClick={() => setActiveTab('games')}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
                   activeTab === 'games'
-                    ? 'bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20'
+                    ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
@@ -329,7 +329,7 @@ export function ClubDetailsPage() {
                                 setSelectedCourt(court.id);
                                 document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
                               }}
-                              className="px-5 py-2 rounded-xl font-semibold text-sm bg-[#00E5FF] text-black hover:scale-105 transition-all shadow-lg shadow-[#00E5FF]/10"
+                              className="px-5 py-2 rounded-xl font-semibold text-sm bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black hover:scale-105 transition-all shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
                             >
                               Book Now
                             </button>
@@ -455,7 +455,7 @@ export function ClubDetailsPage() {
                            value={formData.email}
                            onChange={e => setFormData({...formData, email: e.target.value})}
                            placeholder="Enter your email" 
-                           className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00E5FF]" 
+                           className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF]" 
                          />
                        </div>
                        <div>
@@ -465,7 +465,7 @@ export function ClubDetailsPage() {
                             value={formData.phone}
                             onChange={e => setFormData({...formData, phone: e.target.value})}
                             placeholder="Enter your phone number" 
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00E5FF]/50" 
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#0A0E1A] border border-gray-200 dark:border-[#2A303C] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF]" 
                           />
                        </div>
                      </div>
@@ -507,8 +507,8 @@ export function ClubDetailsPage() {
                                     onClick={() => setSelectedDuration(dur.id)}
                                     className={`flex-1 h-12 rounded-xl text-[11px] font-black transition-all border ${
                                       selectedDuration === dur.id
-                                        ? "bg-[#00E5FF] border-[#00E5FF] text-black"
-                                        : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                        ? "bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black"
+                                        : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-blue-500 dark:hover:border-[#00E5FF]"
                                     }`}
                                   >
                                     {dur.label}
@@ -535,8 +535,8 @@ export function ClubDetailsPage() {
                                     onClick={() => setSelectedTime(timeObj.id)}
                                     className={`relative h-12 rounded-xl text-[11px] font-black transition-all border ${
                                       isSelected
-                                        ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20 scale-105"
-                                        : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                        ? "bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20 scale-105"
+                                        : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-blue-500 dark:hover:border-[#00E5FF]"
                                     }`}
                                   >
                                     {timeObj.time}
@@ -547,7 +547,7 @@ export function ClubDetailsPage() {
 
                             <div className="flex items-center gap-4 mt-4 text-[10px] font-bold opacity-40 dark:text-white">
                               <span className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded bg-[#00E5FF]" /> Selected
+                                <span className="w-3 h-3 rounded bg-blue-500 dark:bg-[#00E5FF]" /> Selected
                               </span>
                               <span className="flex items-center gap-1.5">
                                   <span className="w-3 h-3 rounded bg-red-400" /> Taken
@@ -601,7 +601,7 @@ export function ClubDetailsPage() {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-500 dark:text-gray-400">Time Slot:</span>
-                            <span className="font-bold text-[#00E5FF]">{selectedTimeObj?.time || '---'}</span>
+                            <span className="font-bold text-blue-500 dark:text-[#00E5FF]">{selectedTimeObj?.time || '---'}</span>
                           </div>
 
                           <div className="h-px bg-gray-200 dark:bg-white/10 w-full" />
@@ -631,7 +631,7 @@ export function ClubDetailsPage() {
                             disabled={!selectedCourt || !selectedTime || isSubmitting}
                             className={`w-full py-4 rounded-xl font-semibold text-[17px] transition-all flex items-center justify-center gap-2 ${
                               selectedCourt && selectedTime && !isSubmitting
-                                ? 'bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20 hover:scale-[1.02] active:scale-95'
+                                ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20 hover:scale-[1.02] active:scale-95'
                                 : 'bg-gray-200 dark:bg-[#1C212E] text-gray-400 cursor-not-allowed border border-gray-300 dark:border-[#2A303C]'
                             }`}
                           >

@@ -76,7 +76,7 @@ function ClubCard({ club }: { club: typeof clubs[0] }) {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className={`bg-white dark:bg-[#1A1F2C] rounded-2xl border border-gray-200 dark:border-[#2A2A2A] overflow-hidden hover:border-blue-500 dark:hover:border-[#00E5FF] transition-all duration-300 shadow-sm hover:shadow-md ${!club.available ? 'opacity-70 grayscale-[0.5]' : ''}`}
+      className={`bg-gray-200 dark:bg-[#1A1F2C] rounded-2xl border border-gray-200 dark:border-[#2A2A2A] overflow-hidden hover:border-blue-500 dark:hover:border-[#00E5FF] transition-all duration-300 shadow-sm hover:shadow-md ${!club.available ? 'opacity-70 grayscale-[0.5]' : ''}`}
     >
       <div className="relative h-48 overflow-hidden group">
         <img
