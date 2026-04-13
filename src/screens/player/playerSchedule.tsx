@@ -118,10 +118,10 @@ export function PlayerSchedule() {
       <div className="flex items-center justify-between mb-8 px-2">
         <div>
           <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">Your Schedule</h3>
-          <p className="text-[10px] font-bold text-[#39FF14] uppercase tracking-widest mt-1">Next 3 Events</p>
+          <p className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-widest mt-1">Next 3 Events</p>
         </div>
-        <div className="w-10 h-10 bg-[#39FF14]/10 rounded-xl flex items-center justify-center">
-          <CalendarDays className="text-[#39FF14]" size={20} />
+        <div className="w-10 h-10 bg-[#00E5FF]/10 rounded-xl flex items-center justify-center">
+          <CalendarDays className="text-[#00E5FF]" size={20} />
         </div>
       </div>
 
@@ -130,7 +130,7 @@ export function PlayerSchedule() {
         {schedule.map((item) => (
           <div 
             key={item.id} 
-            className="group flex items-center gap-5 p-5 rounded-[24px] bg-gray-50 dark:bg-black/20 border border-transparent hover:border-[#39FF14]/30 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 cursor-pointer"
+            className="group flex items-center gap-5 p-5 rounded-[24px] bg-gray-50 dark:bg-black/20 border border-transparent hover:border-[#00E5FF]/30 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 cursor-pointer"
           >
             {/* Date Identity Block */}
             <div className="flex flex-col items-center justify-center min-w-[64px] h-[64px] bg-[#0A0E1A] dark:bg-white rounded-[18px] shadow-lg group-hover:scale-105 transition-transform">
@@ -145,8 +145,8 @@ export function PlayerSchedule() {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-[#39FF14]' : 'bg-blue-400'}`} />
-                <h4 className="font-black text-[15px] dark:text-white truncate uppercase tracking-tight group-hover:text-[#39FF14] transition-colors">
+                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-[#00E5FF]' : 'bg-blue-400'}`} />
+                <h4 className="font-black text-[15px] dark:text-white truncate uppercase tracking-tight group-hover:text-[#00E5FF] transition-colors">
                   {item.title}
                 </h4>
               </div>
@@ -176,7 +176,7 @@ export function PlayerSchedule() {
         )}
       </div>
 
-      <button className="w-full mt-6 py-4 rounded-2xl bg-gray-100 dark:bg-white/5 text-[11px] font-black uppercase tracking-[2px] dark:text-white/60 hover:text-[#39FF14] transition-colors">
+      <button className="w-full mt-6 py-4 rounded-2xl bg-gray-100 dark:bg-white/5 text-[11px] font-black uppercase tracking-[2px] dark:text-white/60 hover:text-[#00E5FF] transition-colors">
         View Full Calendar
       </button>
     </div>

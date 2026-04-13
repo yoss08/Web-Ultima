@@ -190,8 +190,8 @@ export default function BookingPage() {
       <div className="max-w-[1096px] mx-auto pt-28 px-4">
         {/* Page Title */}
         <div className="mb-6">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Recommendations</h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Find and reserve the best padel clubs in your area.</p>
+          <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl font-black dark:text-white leading-none mb-2">Recommendations</h2>
+          <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Find and reserve the best padel clubs in your area.</p>
         </div>
 
         {/* Filter Bar */}

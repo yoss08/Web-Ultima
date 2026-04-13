@@ -144,13 +144,13 @@ export function DashboardLayout() {
                 <button 
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
                   className={`flex items-center justify-center w-10 h-10 rounded-[12px] transition-colors relative ${
-                    notificationsOpen ? "bg-[#39FF14]/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+                    notificationsOpen ? "bg-[#00E5FF]/10" : "hover:bg-black/5 dark:hover:bg-white/10"
                   }`}
                 >
                   <Bell className={`w-5 h-5 ${isDark ? "text-white" : "text-[#0A0E1A]"}`} />
                   {/* On n'affiche la pastille verte que s'il y a des activités */}
                   {activities.length > 0 && (
-                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#39FF14] rounded-full border-2 border-black"></span>
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#00E5FF] rounded-full border-2 border-black"></span>
                   )}
                 </button>
 
@@ -195,7 +195,7 @@ export function DashboardLayout() {
                       <Link 
                         to="/dashboard/notifications" 
           onClick={() => setNotificationsOpen(false)}
-          className="block p-4 text-center text-xs font-bold text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors border-t border-white/5 rounded-b-[24px]"
+          className="block p-4 text-center text-xs font-bold text-[#00E5FF] hover:bg-[#00E5FF]/5 transition-colors border-t border-white/5 rounded-b-[24px]"
         >
           View All Activity
         </Link>
@@ -244,7 +244,7 @@ export function DashboardLayout() {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all ${
                   active
-                     ? "bg-[#39FF14]/10 border border-[#39FF14]/30"
+                     ? "bg-[#00E5FF]/10 border border-[#00E5FF]/30"
                      : "hover:bg-black/5 dark:hover:bg-white/5"
 
                 }`}
@@ -252,7 +252,7 @@ export function DashboardLayout() {
                 <Icon
                   className={`w-5 h-5 flex-shrink-0 ${
                     active
-                      ? "text-[#39FF14]" : isDark ? "text-white/60" 
+                      ? "text-[#00E5FF]" : isDark ? "text-white/60" 
                       : "text-[#0A0E1A]/60"
 
                   }`}
@@ -260,7 +260,7 @@ export function DashboardLayout() {
                 <span
                   className={`font-['Poppins',sans-serif] text-[14px] font-medium transition-opacity duration-300 ${
                     active
-                      ? "text-[#39FF14]" : isDark ? "text-white" 
+                      ? "text-[#00E5FF]" : isDark ? "text-white" 
                       : "text-[#0A0E1A]"
                   } ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}
                 >
@@ -304,7 +304,7 @@ export function DashboardLayout() {
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 h-12 rounded-[12px] ${
-                      active ? "bg-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14]" : isDark ? "text-white/60" : "text-[#0A0E1A]/60"
+                      active ? "bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF]" : isDark ? "text-white/60" : "text-[#0A0E1A]/60"
                     }`}
                   >
                     <Icon size={20} />

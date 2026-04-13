@@ -151,19 +151,19 @@ export function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: User, color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF]/10' },
-    { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-[#39FF14]', bg: 'bg-[#39FF14]/10' },
+    { id: 'account', label: 'Account', icon: User, color: 'text-[#39FF14]', bg: 'bg-[#39FF14]/10' },
+    { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF]/10' },
     { id: 'notifications', label: 'Alerts', icon: Bell, color: 'text-[#FFD700]', bg: 'bg-[#FFD700]/10' },
     { id: 'security', label: 'Security', icon: Shield, color: 'text-[#FF4D4D]', bg: 'bg-[#FF4D4D]/10' },
   ];
 
-  const inputClassName = "w-full bg-gray-50 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#39FF14] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white font-['Poppins',sans-serif]";
+  const inputClassName = "w-full bg-gray-50 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white font-['Poppins',sans-serif]";
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">
+        <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-none mb-4">
           Settings
         </h1>
         <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
@@ -183,7 +183,7 @@ export function SettingsPage() {
                 onClick={() => handleTabChange(tab.id as TabType)}
                 className={`w-full flex items-center justify-between p-4 rounded-[16px] transition-all group ${
                   isActive 
-                    ? "bg-[#39FF14]/10 border border-[#39FF14]/20 shadow-sm" 
+                    ? "bg-[#00E5FF]/10 border border-[#00E5FF]/20 shadow-sm" 
                     : "hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
                 }`}
               >
@@ -197,7 +197,7 @@ export function SettingsPage() {
                     {tab.label}
                   </span>
                 </div>
-                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "text-[#39FF14] translate-x-1" : "text-gray-300 opacity-0 group-hover:opacity-100"}`} />
+                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "text-[#00E5FF] translate-x-1" : "text-gray-300 opacity-0 group-hover:opacity-100"}`} />
               </button>
             );
           })}
@@ -212,7 +212,7 @@ export function SettingsPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-white dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[28px] p-6 lg:p-10 shadow-sm"
+              className="bg-white dark:bg-[#1A1F2C]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[28px] p-6 lg:p-10 shadow-sm"
             >
               {/* ACCOUNT TAB */}
               {activeTab === 'account' && (
@@ -253,7 +253,7 @@ export function SettingsPage() {
                           value={userData.phone}
                           onChange={handleUserChange}
                           className={inputClassName}
-                          placeholder="+1 (555) 000-0000"
+                          placeholder="+216 00 000 000"
                         />
                       </div>
                     </div>
@@ -272,7 +272,7 @@ export function SettingsPage() {
                     <button
                       onClick={handleUpdateProfile}
                       disabled={loading}
-                      className="flex items-center gap-2 px-10 h-14 bg-[#39FF14] hover:bg-[#32E012] disabled:opacity-50 rounded-[18px] shadow-lg shadow-[#39FF14]/20 transition-all font-bold text-black"
+                      className="flex items-center gap-2 px-10 h-14 bg-[#00E5FF] hover:bg-[#00D4E6] disabled:opacity-50 rounded-[18px] shadow-lg shadow-[#00E5FF]/20 transition-all font-bold text-black"
                     >
                       {loading ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
                       Save Changes
@@ -280,7 +280,6 @@ export function SettingsPage() {
                   </div>
                 </div>
               )}
-
               {/* APPEARANCE TAB */}
               {activeTab === 'appearance' && (
                 <div className="space-y-10">
@@ -295,16 +294,16 @@ export function SettingsPage() {
                       onClick={() => handleThemeUpdate('light')}
                       className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
                         !isDark 
-                          ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_30px_rgba(57,255,20,0.15)]" 
+                          ? "border-[#00E5FF] bg-[#00E5FF]/5 shadow-[#00E5FF]" 
                           : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
                       }`}
                     >
-                      <div className={`p-5 rounded-full ${!isDark ? "bg-[#39FF14] text-black shadow-lg shadow-[#39FF14]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                      <div className={`p-5 rounded-full ${!isDark ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
                         <Sun size={32} />
                       </div>
                       <div className="text-center">
                         <p className={`font-black text-lg ${!isDark ? "text-black" : "text-gray-400"}`}>Light</p>
-                        {!isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Selected</span>}
+                        {!isDark && <span className="text-[10px] text-[#00E5FF] font-black uppercase tracking-widest">Selected</span>}
                       </div>
                     </button>
 
@@ -312,16 +311,16 @@ export function SettingsPage() {
                       onClick={() => handleThemeUpdate('dark')}
                       className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
                         isDark 
-                          ? "border-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_30px_rgba(57,255,20,0.15)]" 
+                          ? "border-[#00E5FF] bg-[#00E5FF]/5 shadow-[#00E5FF]" 
                           : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
                       }`}
                     >
-                      <div className={`p-5 rounded-full ${isDark ? "bg-[#39FF14] text-black shadow-lg shadow-[#39FF14]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                      <div className={`p-5 rounded-full ${isDark ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
                         <Moon size={32} />
                       </div>
                       <div className="text-center">
                         <p className={`font-black text-lg ${isDark ? "text-white" : "text-gray-400"}`}>Dark</p>
-                        {isDark && <span className="text-[10px] text-[#39FF14] font-black uppercase tracking-widest">Selected</span>}
+                        {isDark && <span className="text-[10px] text-[#00E5FF] font-black uppercase tracking-widest">Selected</span>}
                       </div>
                     </button>
                   </div>
@@ -397,7 +396,7 @@ export function SettingsPage() {
                         <button
                           onClick={() => handleNotificationToggle(key)}
                           className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
-                            value ? "bg-[#39FF14]" : "bg-gray-200 dark:bg-white/10"
+                            value ? "bg-[#00E5FF]" : "bg-gray-200 dark:bg-white/10"
                           }`}
                         >
                           <motion.span
@@ -442,7 +441,7 @@ export function SettingsPage() {
 
                   <div className="space-y-4">
                     <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
-                      <Lock size={18} className="text-[#39FF14]" />
+                      <Lock size={18} className="text-[#00E5FF]" />
                       Two-Factor Authentication
                     </h3>
                     <p className="text-sm opacity-50 px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
@@ -507,7 +506,7 @@ export function SettingsPage() {
                 <button 
                   onClick={handlePasswordChange} 
                   disabled={loading}
-                  className="flex-1 h-14 bg-[#39FF14] text-black font-black rounded-2xl hover:bg-[#32E012] transition-colors shadow-lg shadow-[#39FF14]/20 flex items-center justify-center gap-2"
+                  className="flex-1 h-14 bg-[#00E5FF] text-white font-black rounded-2xl hover:bg-[#00B8D4] transition-colors shadow-lg shadow-[#00E5FF]/20 flex items-center justify-center gap-2"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Update

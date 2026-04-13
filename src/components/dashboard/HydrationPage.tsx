@@ -108,13 +108,13 @@ export function HydrationPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">Hydration Tracker</h1>
-          <p className="font-['Poppins'] opacity-60">Personal intake & Almus Station monitoring.</p>
+          <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-tight mb-2 tracking-tighter">Hydration Tracker</h1>
+          <p className="font-['Poppins'] text-sm opacity-60">Personal intake & Almus Station monitoring.</p>
         </div>
-        <button onClick={resetProgress} className="p-3 rounded-full hover:bg-red-500/10 text-red-500 transition-all">
-          <RefreshCw size={20} />
+        <button onClick={resetProgress} className="p-3 rounded-full bg-red-500/5 hover:bg-red-500/10 text-red-500 transition-all border border-red-500/10">
+          <RefreshCw size={18} />
         </button>
       </div>
 
@@ -133,8 +133,8 @@ export function HydrationPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Left: Tracker & Log */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-10 flex flex-col items-center">
-            <div className="relative w-56 h-56 rounded-full border-8 border-[#00E5FF]/10 flex items-center justify-center overflow-hidden mb-10">
+          <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-10 flex flex-col items-center">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full border-8 border-[#00E5FF]/10 flex items-center justify-center overflow-hidden mb-8 sm:mb-10">
               <motion.div 
                 initial={{ height: 0 }}
                 animate={{ height: `${Math.min((consumed/goal)*100, 100)}%` }}
@@ -142,20 +142,20 @@ export function HydrationPage() {
                 transition={{ type: "spring", bounce: 0, duration: 1 }}
               />
               <div className="relative z-10 text-center">
-                <span className="text-5xl font-black dark:text-white">{Math.round((consumed/goal)*100)}%</span>
-                <p className="text-[10px] font-bold opacity-50 uppercase tracking-[2px] mt-1">{consumed}ML / {goal}ML</p>
+                <span className="text-4xl sm:text-6xl font-black dark:text-white">{Math.round((consumed/goal)*100)}%</span>
+                <p className="text-[9px] sm:text-[10px] font-bold opacity-50 uppercase tracking-[2px] mt-1">{consumed}ML / {goal}ML</p>
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {[250, 500, 750].map(amount => (
                 <button
                   key={amount}
                   onClick={() => addWater(amount)}
-                  className="px-8 py-4 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 hover:bg-[#00E5FF] hover:text-black transition-all font-bold flex flex-col items-center group"
+                  className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 hover:bg-[#00E5FF] hover:text-black transition-all font-bold flex flex-col items-center group"
                 >
-                  <Plus size={18} className="mb-1 group-hover:scale-125 transition-transform" />
-                  {amount}ml
+                  <Plus size={16} className="mb-1 group-hover:scale-125 transition-transform" />
+                  <span className="text-xs sm:text-sm">{amount}ml</span>
                 </button>
               ))}
             </div>

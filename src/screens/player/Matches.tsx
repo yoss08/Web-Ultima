@@ -58,7 +58,7 @@ export function Matches() {
     <div className="space-y-8 pb-20">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4 tracking-tighter">Match History</h1>
+          <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-none mb-4 tracking-tighter">Match History</h1>
           <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Detailed breakdown of your performance on court.</p>
         </div>
         
@@ -70,7 +70,7 @@ export function Matches() {
                 placeholder="Search courts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-12 pl-12 pr-6 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-[#39FF14]/50 transition-all"
+                className="h-12 pl-12 pr-6 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-[#00E5FF]/50 transition-all"
               />
            </div>
            
@@ -87,7 +87,7 @@ export function Matches() {
 
            <button 
              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-             className="h-12 px-4 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center gap-2 text-sm font-bold dark:text-white hover:border-[#39FF14]/50"
+             className="h-12 px-4 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center gap-2 text-sm font-bold dark:text-white hover:border-[#00E5FF]/50"
            >
              <ArrowUpDown size={16} className="text-[#39FF14]" />
              {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
@@ -107,14 +107,14 @@ export function Matches() {
               exit={{ opacity: 0, scale: 0.95 }}
               key={match.id} 
               onClick={() => setSelectedMatch(match)}
-              className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:border-[#39FF14]/50 transition-all group relative overflow-hidden"
+              className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:border-[#00E5FF]/50 transition-all group relative overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#39FF14] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#00E5FF] opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="flex items-center gap-6">
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-colors ${
                   match.result === 'Win' 
-                    ? 'bg-[#39FF14]/10 border-[#39FF14]/20 text-[#39FF14]' 
+                    ? 'bg-[#00E5FF]/10 border-[#00E5FF]/20 text-[#39FF14]' 
                     : match.result === 'Loss'
                     ? 'bg-red-500/10 border-red-500/20 text-red-500'
                     : 'bg-gray-100 dark:bg-white/5 border-transparent text-gray-400'
@@ -122,7 +122,7 @@ export function Matches() {
                   {match.result === 'Win' ? <Zap size={24} /> : match.result === 'Loss' ? <X size={24} /> : <Clock size={24} />}
                 </div>
                 <div>
-                  <h4 className="font-bold text-xl group-hover:text-[#39FF14] transition-colors">{match.courts?.name}</h4>
+                  <h4 className="font-bold text-xl group-hover:text-[#00E5FF] transition-colors">{match.courts?.name}</h4>
                   <div className="flex items-center gap-4 text-xs opacity-60 font-medium mt-1">
                     <span className="flex items-center gap-1.5"><Calendar size={14} className="text-[#39FF14]"/> {new Date(match.booking_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     <span className="flex items-center gap-1.5"><Clock size={14} className="text-[#00E5FF]"/> {match.time_slot}</span>
@@ -134,14 +134,14 @@ export function Matches() {
               <div className="mt-4 md:mt-0 flex items-center justify-between md:justify-end gap-10 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100 dark:border-white/5">
                 <div className="text-left md:text-center">
                   <p className="text-[9px] uppercase opacity-40 font-black tracking-widest mb-1">Final Score</p>
-                  <p className={`font-mono font-black text-2xl tracking-tighter ${match.result === 'Win' ? 'text-[#39FF14]' : ''}`}>
+                  <p className={`font-mono font-black text-2xl tracking-tighter ${match.result === 'Win' ? 'text-[#00E5FF]' : ''}`}>
                     {match.score || "---"}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="hidden sm:block">
                     {match.result === 'Win' ? (
-                       <span className="text-[10px] font-black uppercase text-[#39FF14] bg-[#39FF14]/10 px-3 py-1 rounded-full border border-[#39FF14]/20">Victory</span>
+                       <span className="text-[10px] font-black uppercase text-[#00E5FF] bg-[#00E5FF]/10 px-3 py-1 rounded-full border border-[#00E5FF]/20">Victory</span>
                     ) : match.result === 'Loss' ? (
                        <span className="text-[10px] font-black uppercase text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">Defeat</span>
                     ) : (
@@ -170,13 +170,13 @@ export function Matches() {
               <button onClick={() => setSelectedMatch(null)} className="absolute top-8 right-8 w-10 h-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center opacity-60 hover:opacity-100 hover:bg-red-500/20 hover:text-red-500 transition-all"><X size={20} /></button>
               
               <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-[10px] font-black uppercase tracking-[2px] mb-6 border border-[#39FF14]/20">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-black uppercase tracking-[2px] mb-6 border border-[#00E5FF]/20">
                   <Zap size={14} /> ALMUS Performance Core
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black mb-2 tracking-tighter">{selectedMatch.courts?.name}</h2>
                 <div className="flex items-center justify-center gap-4 text-sm font-black opacity-40 uppercase tracking-widest">
                    <span>{selectedMatch.time_slot}</span>
-                   <span className="w-1.5 h-1.5 rounded-full bg-[#39FF14]" />
+                   <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF]" />
                    <span>{new Date(selectedMatch.booking_date).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -191,14 +191,14 @@ export function Matches() {
               <div className="space-y-4 mb-10 bg-gray-50 dark:bg-white/5 p-6 rounded-[32px] border border-gray-100 dark:border-white/10">
                 <h4 className="text-xs font-black uppercase tracking-[3px] opacity-30 mb-2">Technical Breakdown</h4>
                 <div className="space-y-4">
-                  <ProgressBar label="First Serve In" value={72} color="#39FF14" />
+                  <ProgressBar label="First Serve In" value={72} color="#00E5FF" />
                   <ProgressBar label="Winners" value={18} max={25} color="#00E5FF" />
                   <ProgressBar label="Unforced Errors" value={12} max={20} color="#FF4D4D" inverse />
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                 <button className="flex-1 py-4 bg-[#39FF14] text-black font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-[#39FF14]/20">Watch Video Replay</button>
+                 <button className="flex-1 py-4 bg-[#00E5FF] text-black font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-[#00E5FF]/20">Watch Video Replay</button>
                  <button onClick={() => setSelectedMatch(null)} className="flex-1 py-4 bg-gray-100 dark:bg-white/10 dark:text-white font-black rounded-2xl hover:bg-gray-200 dark:hover:bg-white/20 transition-all">Dismiss</button>
               </div>
             </motion.div>

@@ -12,6 +12,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
+import padelArena from "../../assets/images/padel_arena.png";
 
 
 interface Court {
@@ -42,7 +43,18 @@ interface Booking {
 
 type Tab = "book" | "upcoming" | "history";
 
+const MOCK_CLUBS = [
+  { id: 1, name: "Padel Arena", location: "Tunis, Tunisia", image:  padelArena},
+  { id: 2, name: "Padel La Marsa", location: "La Marsa, Tunisia", image: "https://images.unsplash.com/photo-1672223550220-df93d147fa4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080" },
+  { id: 3, name: "Casa Del Padel", location: "Tunis, Tunisia", image: "https://images.unsplash.com/photo-1709587825393-84b6c1698f32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080" },
+];
 
+const MOCK_COURTS: Court[] = [
+  { id: 'c1', name: 'Court 1', type: 'Indoor', surface: 'Panoramic Crystal', image: 'https://images.unsplash.com/photo-1709587825415-814c2d7cfce7?auto=format&fit=crop&q=80', status: 'available' },
+  { id: 'c2', name: 'Court 2', type: 'Outdoor', surface: 'Premium Clay', image: 'https://images.unsplash.com/photo-1626245914129-43c75f6bc978?auto=format&fit=crop&q=80', status: 'available' },
+  { id: 'c3', name: 'Court 3', type: 'Indoor', surface: 'Hard Court', image: 'https://images.unsplash.com/photo-1595435061119-4a82a9eb1994?auto=format&fit=crop&q=80', status: 'maintenance' },
+  { id: 'c4', name: 'Court 4', type: 'Indoor', surface: 'Official WPT', image: 'https://images.unsplash.com/photo-1591491640784-3232eb748d4b?auto=format&fit=crop&q=80', status: 'occupied' },
+];
 const TIME_SLOTS = [
   "08:00 - 09:30", "09:30 - 11:00", "11:00 - 12:30",
   "12:30 - 14:00", "14:00 - 15:30", "15:30 - 17:00",
@@ -50,12 +62,11 @@ const TIME_SLOTS = [
 ];
 
 const DURATION_OPTIONS = [
-  { label: "1 hr", value: 1, slots: 1 },
-  { label: "1.5 hrs", value: 1.5, slots: 1 },
-  { label: "2 hrs", value: 2, slots: 2 },
+  { label: "1 session", value: 1, slots: 1 },
+  { label: "2 sessions", value: 2, slots: 2 },
 ];
 
-const PRICE_PER_SLOT = 25;
+const PRICE_PER_SLOT = 99;
 
 const DISCOUNT_CODES: Record<string, number> = {
   ULTIMA10: 0.1,
@@ -63,7 +74,7 @@ const DISCOUNT_CODES: Record<string, number> = {
 };
 
 const COURT_STATUS_CONFIG = {
-  available: { label: "Available", color: "text-[#39FF14] bg-[#39FF14]/10" },
+  available: { label: "Available", color: "text-[#00E5FF] bg-[#00E5FF]/10" },
   occupied:  { label: "Occupied",  color: "text-orange-400 bg-orange-400/10" },
   maintenance:{ label: "Maintenance", color: "text-red-400 bg-red-400/10" },
 };
@@ -102,7 +113,7 @@ function SectionHeading({ step, title }: { step?: number | string; title: string
   return (
     <div className="flex items-center gap-4 mb-6">
       {step !== undefined && (
-        <div className="w-10 h-10 bg-[#39FF14] rounded-xl flex items-center justify-center text-black font-black shrink-0">
+        <div className="w-10 h-10 bg-[#00E5FF] rounded-xl flex items-center justify-center text-black font-black shrink-0">
           {step}
         </div>
       )}
@@ -130,12 +141,12 @@ export function CourtBooking() {
   const [playersLoading, setPlayersLoading] = useState(false);
 
   // ── Booking form ──
+  const [selectedClub, setSelectedClub] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [selectedOpponentId, setSelectedOpponentId] = useState<string | null>(null);
-  const [duration, setDuration] = useState(1.5);
-  const [playerCount, setPlayerCount] = useState(2);
+  const [duration, setDuration] = useState(1);
   const [notes, setNotes] = useState("");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
@@ -157,10 +168,11 @@ export function CourtBooking() {
       try {
         const { data, error } = await supabase.from("courts").select("*");
         if (error) throw error;
-        setCourts(data || []);
-        if (data?.length) setSelectedCourt(data[0]);
+        // If Supabase has courts, use them; otherwise, use mock data
+        setCourts(data && data.length > 0 ? data : MOCK_COURTS);
       } catch {
-        toast.error("Failed to load courts");
+        setCourts(MOCK_COURTS);
+        toast.error("Using local court data");
       } finally {
         setLoading(false);
       }
@@ -286,7 +298,6 @@ export function CourtBooking() {
           time_slot: selectedSlot,
           status: "confirmed",
           duration,
-          player_count: playerCount,
           notes,
           total_price: totalPrice,
         },
@@ -365,15 +376,15 @@ export function CourtBooking() {
 
 
   return (
-    <div className="max-w-[1400px] mx-auto pb-20 px-4 md:px-0">
+    <div className="max-w-[1400px] mx-auto pb-20 px-4 sm:px-6 lg:px-8">
 
       {/* ── HEADER ── */}
       <header className="mb-8">
-        <div className="flex items-center gap-3 text-[#39FF14] font-black text-[10px] uppercase tracking-[4px] mb-3">
+        <div className="flex items-center gap-3 text-[#00E5FF] font-black text-[10px] uppercase tracking-[4px] mb-3">
           <Zap size={14} fill="#39FF14" />
           <span>Ultima Reservation System</span>
         </div>
-        <h2 className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black dark:text-white leading-none mb-4">
+        <h2 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-none mb-4">
           Court Booking
           
         </h2>
@@ -383,35 +394,48 @@ export function CourtBooking() {
       </header>
 
       {/* ── TOP NAV TABS ── */}
-      <nav className="flex gap-2 mb-10 p-1.5 bg-white dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 w-fit">
+      <div className="overflow-x-auto no-scrollbar mb-12">
+        <nav className="relative flex p-1.5 bg-black/5 dark:bg-white/5 rounded-[22px] border border-gray-100 dark:border-white/10 w-full min-w-max md:w-fit backdrop-blur-md">
         {(
           [
-            { id: "book",     label: "Book a Court", icon: <LayoutGrid size={15} /> },
-            { id: "upcoming", label: "Upcoming",     icon: <CalendarDays size={15} /> },
-            { id: "history",  label: "History",      icon: <History size={15} /> },
+            { id: "book",     label: "Book",     icon: <LayoutGrid size={15} /> },
+            { id: "upcoming", label: "Upcoming",  icon: <CalendarDays size={15} /> },
+            { id: "history",  label: "History",   icon: <History size={15} /> },
           ] as { id: Tab; label: string; icon: React.ReactNode }[]
-        ).map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${
-              activeTab === tab.id
-                ? "bg-[#39FF14] text-black shadow-lg shadow-[#39FF14]/20"
-                : "dark:text-white/50 hover:text-white"
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-            {tab.id === "upcoming" && upcomingBookings.length > 0 && (
-              <span className={`ml-1 w-5 h-5 rounded-full text-[9px] flex items-center justify-center font-black ${
-                activeTab === "upcoming" ? "bg-black text-[#39FF14]" : "bg-[#39FF14] text-black"
-              }`}>
-                {upcomingBookings.length}
+        ).map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3.5 rounded-[18px] text-[11px] font-black uppercase tracking-[1px] transition-all duration-300 z-10 ${
+                isActive ? "text-black" : "text-gray-500 dark:text-white/40 hover:text-white"
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabPill"
+                  className="absolute inset-0 bg-[#00E5FF] rounded-[17px] shadow-lg shadow-[#00E5FF]/20 z-[-1]"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              {tab.icon}
+              <span className={isActive ? "block" : "hidden sm:block"}>
+                {tab.label}
               </span>
-            )}
-          </button>
-        ))}
-      </nav>
+              
+              {tab.id === "upcoming" && upcomingBookings.length > 0 && (
+                <span className={`ml-1 w-5 h-5 rounded-full text-[9px] flex items-center justify-center font-black ${
+                  isActive ? "bg-black text-[#00E5FF]" : "bg-[#00E5FF] text-black"
+                }`}>
+                  {upcomingBookings.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+        </nav>
+      </div>
 
       <AnimatePresence mode="wait">
         {activeTab === "book" && (
@@ -426,349 +450,359 @@ export function CourtBooking() {
               {/* LEFT: Selection panels */}
               <div className="lg:col-span-8 space-y-10">
 
-                {/* ── 1. Court Selection ── */}
+                {/* ── 1. Club Selection ── */}
                 <section>
-                  <SectionHeading step={1} title="Select Surface" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {courts.map((court) => (
+                  <SectionHeading step={1} title="Choose Your Club" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {MOCK_CLUBS.map((club) => (
                       <button
-                        key={court.id}
-                        disabled={court.status === "maintenance"}
-                        onClick={() => setSelectedCourt(court)}
-                        className={`relative overflow-hidden rounded-[32px] p-6 text-left transition-all duration-500 border-2 ${
-                          court.status === "maintenance"
-                            ? "opacity-40 grayscale cursor-not-allowed border-gray-200 dark:border-white/5"
-                            : selectedCourt?.id === court.id
-                            ? "border-[#39FF14] bg-[#39FF14]/5 ring-4 ring-[#39FF14]/10"
-                            : "border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 hover:border-[#39FF14]/40"
+                        key={club.id}
+                        onClick={() => {
+                          setSelectedClub(club);
+                          setSelectedCourt(null);
+                        }}
+                        className={`relative group overflow-hidden rounded-[32px] border-2 transition-all ${
+                          selectedClub?.id === club.id
+                            ? "border-[#00E5FF] ring-4 ring-[#00E5FF]/10 scale-[0.98]"
+                            : "border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 hover:border-[#00E5FF]/40"
                         }`}
                       >
-                        <div className="flex justify-between items-start mb-6">
-                          <div>
-                            <h4 className="text-xl font-black dark:text-white uppercase leading-none mb-2">
-                              {court.name}
-                            </h4>
-                            <span className="text-[10px] font-bold text-[#39FF14] uppercase tracking-widest">
-                              {court.surface}
-                            </span>
-                          </div>
-                          {selectedCourt?.id === court.id && (
-                            <CheckCircle2 className="text-[#39FF14]" size={24} />
-                          )}
+                        <div className="h-32 overflow-hidden">
+                          <img src={club.image} alt={club.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         </div>
-
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <div className="flex items-center gap-4 opacity-60 text-xs font-bold dark:text-white">
-                            <span className="flex items-center gap-1.5"><MapPin size={14} /> Indoor</span>
-                            <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Official Grade</span>
+                        <div className="p-5 text-left">
+                          <h4 className="text-lg font-black dark:text-white uppercase leading-none mb-2">{club.name}</h4>
+                          <div className="flex items-center gap-1.5 opacity-50 text-[10px] font-bold dark:text-white uppercase tracking-wider">
+                            <MapPin size={12} className="text-[#00E5FF]" /> {club.location}
                           </div>
-                          <StatusBadge status={court.status ?? "available"} />
                         </div>
+                        {selectedClub?.id === club.id && (
+                          <div className="absolute top-4 right-4 bg-[#00E5FF] text-black p-1 rounded-full shadow-lg">
+                            <CheckCircle2 size={16} />
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>
                 </section>
 
-                {/* ── 2. Date & Time ── */}
-                <section>
-                  <SectionHeading step={2} title="Pick Your Time" />
-                  <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10">
-                    <div className="flex flex-col md:flex-row gap-8">
-                      {/* Date picker */}
-                      <div className="md:w-1/3 space-y-4">
-                        <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3 block">
-                            Choose Date
-                          </label>
-                          <input
-                            type="date"
-                            value={selectedDate}
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full h-14 px-6 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-[#39FF14]/50 transition-all"
-                          />
-                        </div>
-
-                        {/* Duration selector */}
-                        <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3 block">
-                            Duration
-                          </label>
-                          <div className="flex gap-2">
-                            {DURATION_OPTIONS.map((d) => (
-                              <button
-                                key={d.value}
-                                onClick={() => setDuration(d.value)}
-                                className={`flex-1 h-12 rounded-xl text-[11px] font-black transition-all border ${
-                                  duration === d.value
-                                    ? "bg-[#39FF14] border-[#39FF14] text-black"
-                                    : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#39FF14]"
-                                }`}
-                              >
-                                {d.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Player count */}
-                        <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3 block">
-                            Players
-                          </label>
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => setPlayerCount((p) => Math.max(1, p - 1))}
-                              className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 font-black dark:text-white hover:bg-[#39FF14] hover:text-black transition-all"
-                            >
-                              −
-                            </button>
-                            <span className="text-2xl font-black dark:text-white w-8 text-center">
-                              {playerCount}
-                            </span>
-                            <button
-                              onClick={() => setPlayerCount((p) => Math.min(4, p + 1))}
-                              className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 font-black dark:text-white hover:bg-[#39FF14] hover:text-black transition-all"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Time slots */}
-                      <div className="md:w-2/3">
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest opacity-40">
-                            Available Slots
-                          </label>
-                          {slotsLoading && (
-                            <Loader2 className="animate-spin text-[#39FF14]" size={14} />
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {TIME_SLOTS.map((slot) => {
-                            const isTaken = takenSlots.has(slot);
-                            const isSelected = selectedSlot === slot;
-                            return (
-                              <button
-                                key={slot}
-                                disabled={isTaken || slotsLoading}
-                                onClick={() => setSelectedSlot(slot)}
-                                className={`relative h-12 rounded-xl text-[11px] font-black transition-all border ${
-                                  isTaken
-                                    ? "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/5 text-gray-300 dark:text-white/20 cursor-not-allowed line-through"
-                                    : isSelected
-                                    ? "bg-[#39FF14] border-[#39FF14] text-black shadow-lg shadow-[#39FF14]/20 scale-105"
-                                    : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#39FF14]"
-                                }`}
-                              >
-                                {slot}
-                                {isTaken && (
-                                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                                    <XCircle size={10} className="text-white" />
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        <div className="flex items-center gap-4 mt-4 text-[10px] font-bold opacity-40 dark:text-white">
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded bg-[#39FF14]" /> Selected
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded bg-red-400" /> Taken
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded bg-gray-200 dark:bg-white/10" /> Available
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                {/* ── 3. Details & Extras ── */}
-                <section>
-                  <SectionHeading step={3} title="Details & Extras" />
-                  <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 space-y-6">
-                    {/* Notes */}
-                    <div>
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
-                        <FileText size={12} /> Notes / Equipment Requests
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="e.g. Need ball machine, extra rackets, specific court side..."
-                        className="w-full px-5 py-4 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-medium text-sm dark:text-white focus:ring-2 ring-[#39FF14]/50 transition-all resize-none placeholder:opacity-30"
-                      />
-                    </div>
-
-                    {/* Discount */}
-                    <div>
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
-                        <Tag size={12} /> Discount / Membership Code
-                      </label>
-                      <div className="flex gap-3">
-                        <input
-                          type="text"
-                          value={discountCode}
-                          onChange={(e) => {
-                            setDiscountCode(e.target.value);
-                            setDiscountError("");
-                          }}
-                          placeholder="Enter code"
-                          className="flex-1 h-12 px-5 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-[#39FF14]/50 transition-all placeholder:font-medium placeholder:opacity-30"
-                        />
+                {selectedClub && (
+                  <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <SectionHeading step={2} title="Select Surface" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {courts.map((court) => (
                         <button
-                          onClick={handleApplyDiscount}
-                          className="px-6 h-12 bg-[#39FF14] text-black font-black rounded-2xl text-[11px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-all"
+                          key={court.id}
+                          disabled={court.status === "maintenance"}
+                          onClick={() => setSelectedCourt(court)}
+                          className={`relative overflow-hidden rounded-[32px] p-6 text-left transition-all duration-500 border-2 ${
+                            court.status === "maintenance"
+                              ? "opacity-40 grayscale cursor-not-allowed border-gray-200 dark:border-white/5"
+                              : selectedCourt?.id === court.id
+                              ? "border-[#00E5FF] bg-[#00E5FF]/5 ring-4 ring-[#00E5FF]/10 scale-[0.98]"
+                              : "border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 hover:border-[#00E5FF]/40"
+                          }`}
                         >
-                          Apply
-                        </button>
-                      </div>
-                      {discountError && (
-                        <p className="mt-2 text-xs text-red-400 font-bold">{discountError}</p>
-                      )}
-                      {appliedDiscount > 0 && (
-                        <p className="mt-2 text-xs text-[#39FF14] font-bold">
-                          ✓ {appliedDiscount * 100}% discount applied
-                        </p>
-                      )}
-                    </div>
-
-                    {/* ── Opponent Selection (Match Logic) ── */}
-                    <div className="pt-6 border-t border-gray-100 dark:border-white/5">
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">
-                        <Users size={14} /> Who are you playing against? (Optional)
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-                        {playersLoading ? (
-                          <div className="col-span-2 py-8 flex items-center justify-center">
-                            <Loader2 className="animate-spin text-[#39FF14]" size={24} />
+                          <div className="flex justify-between items-start mb-6">
+                            <div>
+                              <h4 className="text-xl font-black dark:text-white uppercase leading-none mb-2">
+                                {court.name}
+                              </h4>
+                              <span className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-widest">
+                                {court.surface}
+                              </span>
+                            </div>
+                            {selectedCourt?.id === court.id && (
+                              <div className="bg-[#00E5FF] text-black p-1.5 rounded-full ring-4 ring-[#00E5FF]/20 animate-in zoom-in duration-300">
+                                <CheckCircle2 size={18} />
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          players.map(player => (
-                            <button
-                              key={player.id}
-                              onClick={() => setSelectedOpponentId(selectedOpponentId === player.id ? null : player.id)}
-                              className={`flex items-center gap-3 p-4 rounded-[20px] border transition-all duration-300 text-left ${
-                                selectedOpponentId === player.id
-                                  ? "bg-[#39FF14] border-[#39FF14] text-black shadow-lg shadow-[#39FF14]/20 scale-[0.98]"
-                                  : "bg-gray-100 dark:bg-white/5 border-transparent dark:text-white hover:border-[#39FF14]/40 hover:bg-white dark:hover:bg-white/10"
-                              }`}
-                            >
-                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden shrink-0 border-2 border-white/10">
-                                <img 
-                                  src={player.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.full_name}`} 
-                                  alt="" 
-                                  className="w-full h-full object-cover"
+
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <div className="flex items-center gap-4 opacity-60 text-xs font-bold dark:text-white">
+                              <span className="flex items-center gap-1.5"><MapPin size={14} /> Indoor</span>
+                              <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Official Grade</span>
+                            </div>
+                            <StatusBadge status={court.status ?? "available"} />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.section>
+                )}
+
+                <AnimatePresence>
+                  {selectedCourt && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-10"
+                    >
+                      {/* ── 3. Date & Time (Consolidated) ── */}
+                      <section>
+                        <SectionHeading step={3} title="Pick Your Time" />
+                        <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10">
+                          <div className="flex flex-col lg:flex-row gap-10">
+                            {/* Date & Duration */}
+                            <div className="w-full lg:w-1/3 space-y-8">
+                              <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3 block">
+                                  Choose Date
+                                </label>
+                                <input
+                                  type="date"
+                                  value={selectedDate}
+                                  min={new Date().toISOString().split("T")[0]}
+                                  onChange={(e) => setSelectedDate(e.target.value)}
+                                  className="w-full h-14 px-6 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-[#00E5FF]/50 transition-all cursor-pointer"
                                 />
                               </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-xs font-black truncate leading-none mb-1">{player.full_name}</span>
-                                <span className={`text-[9px] font-bold uppercase tracking-widest ${selectedOpponentId === player.id ? 'text-black/60' : 'opacity-40'}`}>
-                                  Player Profile
+
+                              <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3 block">
+                                  Duration
+                                </label>
+                                <div className="flex gap-2">
+                                  {DURATION_OPTIONS.map((d) => (
+                                    <button
+                                      key={d.value}
+                                      onClick={() => setDuration(d.value)}
+                                      className={`flex-1 h-12 rounded-xl text-[11px] font-black transition-all border ${
+                                        duration === d.value
+                                          ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20"
+                                          : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                      }`}
+                                    >
+                                      {d.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Time Slots */}
+                            <div className="w-full lg:w-2/3">
+                              <div className="flex items-center justify-between mb-4">
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                                  Available Slots for {selectedCourt.name}
+                                </label>
+                                {slotsLoading && <Loader2 className="animate-spin text-[#00E5FF]" size={14} />}
+                              </div>
+
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {TIME_SLOTS.map((slot) => {
+                                  const isTaken = takenSlots.has(slot);
+                                  const isSelected = selectedSlot === slot;
+                                  return (
+                                    <button
+                                      key={slot}
+                                      disabled={isTaken || slotsLoading}
+                                      onClick={() => setSelectedSlot(slot)}
+                                      className={`relative h-12 rounded-xl text-[11px] font-black transition-all border ${
+                                        isTaken
+                                          ? "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/5 text-gray-300 dark:text-white/20 cursor-not-allowed"
+                                          : isSelected
+                                          ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20 scale-105"
+                                          : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                      }`}
+                                    >
+                                      {slot}
+                                      {isTaken && (
+                                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                          <XCircle size={10} className="text-white" />
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              <div className="flex items-center gap-4 mt-6 text-[10px] font-bold opacity-40">
+                                <span className="flex items-center gap-1.5">
+                                  <span className="w-3 h-3 rounded bg-[#00E5FF]" /> Selected
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                  <span className="w-3 h-3 rounded bg-red-400" /> Taken
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                  <span className="w-3 h-3 rounded bg-gray-200 dark:bg-white/10" /> Available
                                 </span>
                               </div>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </section>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+
+                      {/* ── 4. Details & Extras ── */}
+                      <section>
+                        <SectionHeading step={4} title="Details & Extras" />
+                        <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 space-y-8">
+                          {/* Notes */}
+                          <div>
+                            <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
+                              <FileText size={12} /> Notes / Equipment Requests
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={notes}
+                              onChange={(e) => setNotes(e.target.value)}
+                              placeholder="e.g. Need ball machine, extra rackets..."
+                              className="w-full px-5 py-4 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-medium text-sm dark:text-white focus:ring-2 ring-[#00E5FF]/50 transition-all resize-none"
+                            />
+                          </div>
+
+                          {/* Discount & Opponent */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="min-w-0">
+                                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
+                                  <Tag size={12} /> Discount Code
+                                </label>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                  <input
+                                    type="text"
+                                    value={discountCode}
+                                    onChange={(e) => setDiscountCode(e.target.value)}
+                                    placeholder="Enter code"
+                                    className="flex-1 h-16 sm:h-12 px-6 bg-gray-100 dark:bg-white/5 rounded-2xl border-2 border-transparent outline-none font-bold text-base sm:text-sm dark:text-white focus:border-[#00E5FF]/50 focus:bg-white dark:focus:bg-black/40 transition-all placeholder:opacity-40"
+                                  />
+                                  <button
+                                    onClick={handleApplyDiscount}
+                                    className="px-8 sm:px-6 h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-[11px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+                                  >
+                                    Apply
+                                  </button>
+                                </div>
+                            </div>
+
+                            {/* Opponent Selection (Condensed) */}
+                            <div className="min-w-0 overflow-hidden">
+                                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
+                                  <Users size={14} /> Play Against (Optional)
+                                </label>
+                                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                                  {playersLoading ? (
+                                    <div className="flex items-center justify-center p-2">
+                                      <Loader2 className="animate-spin text-[#00E5FF]" size={20} />
+                                    </div>
+                                  ) : (
+                                    players.slice(0, 5).map(player => (
+                                      <button
+                                        key={player.id}
+                                        onClick={() => setSelectedOpponentId(selectedOpponentId === player.id ? null : player.id)}
+                                        className={`shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 transition-all p-0.5 ${
+                                          selectedOpponentId === player.id ? 'border-[#00E5FF] scale-110 ring-4 ring-[#00E5FF]/20' : 'border-transparent'
+                                        }`}
+                                      >
+                                        <img 
+                                          src={player.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.full_name}`} 
+                                          className="w-full h-full rounded-full object-cover"
+                                          alt={player.full_name}
+                                        />
+                                      </button>
+                                    ))
+                                  )}
+                                  <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center border border-dashed border-white/20">
+                                    <ChevronRight size={18} className="opacity-40" />
+                                  </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* RIGHT: Summary */}
+              {/* RIGHT: Summary - Only if court is selected */}
               <div className="lg:col-span-4">
-                <div className="sticky top-24 space-y-6">
-                  <div className="dark:bg-[#0F1423] rounded-[40px] p-8 dark:text-white border border-white/5 bg-white shadow-2xl">
-                    <h3 className="text-2xl font-black mb-8 tracking-tighter">SUMMARY</h3>
+                {selectedCourt ? (
+                  <div className="lg:sticky lg:top-24 space-y-6 animate-in fade-in slide-in-from-right duration-500">
+                    <div className="dark:bg-[#0F1423] rounded-[40px] p-8 dark:text-white border border-white/5 bg-white shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                      <h3 className="text-2xl font-black mb-8 tracking-tighter">BOOKING DETAILS</h3>
 
-                    <div className="space-y-5 mb-8">
-                      <SummaryRow
-                        icon={<Grid3X3 size={18} />}
-                        label="Court"
-                        value={selectedCourt?.name || "---"}
-                        accent
-                      />
-                      <SummaryRow
-                        icon={<CalendarDays size={18} />}
-                        label="Date"
-                        value={formatDate(selectedDate)}
-                      />
-                      <SummaryRow
-                        icon={<Clock size={18} />}
-                        label="Time"
-                        value={selectedSlot || "---"}
-                      />
-                      <SummaryRow
-                        icon={<Layers size={18} />}
-                        label="Duration"
-                        value={`${duration} hr${duration !== 1 ? "s" : ""}`}
-                      />
-                      <SummaryRow
-                        icon={<Users size={18} />}
-                        label="Players"
-                        value={`${playerCount}`}
-                      />
+                      <div className="space-y-5 mb-8">
+                        <SummaryRow
+                          icon={<MapPin size={18} />}
+                          label="Club"
+                          value={selectedClub?.name || "---"}
+                        />
+                        <SummaryRow
+                          icon={<Grid3X3 size={18} />}
+                          label="Court"
+                          value={selectedCourt?.name || "---"}
+                          accent
+                        />
+                        <SummaryRow
+                          icon={<CalendarDays size={18} />}
+                          label="Date"
+                          value={formatDate(selectedDate)}
+                        />
+                        <SummaryRow
+                          icon={<Clock size={18} />}
+                          label="Time"
+                          value={selectedSlot || "---"}
+                        />
+                        <SummaryRow
+                          icon={<Layers size={18} />}
+                          label="Duration"
+                          value={`${duration} session${duration !== 1 ? "s" : ""}`}
+                        />
 
-                      <div className="h-[1px] bg-gray-100 dark:bg-white/10 w-full" />
+                        <div className="h-[1px] bg-gray-100 dark:bg-white/10 w-full" />
 
-                      {/* Price breakdown */}
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between text-gray-400 dark:text-white/40">
-                          <span className="text-[11px] font-bold uppercase tracking-widest">Base</span>
-                          <span className="font-bold">${basePrice.toFixed(2)}</span>
-                        </div>
-                        {appliedDiscount > 0 && (
-                          <div className="flex justify-between text-[#39FF14]">
-                            <span className="text-[11px] font-bold uppercase tracking-widest">
-                              Discount ({appliedDiscount * 100}%)
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between items-end pt-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                              Total Amount
                             </span>
-                            <span className="font-bold">−${discount.toFixed(2)}</span>
+                            <span className="text-4xl font-black text-[#00E5FF] tracking-tighter">
+                              {totalPrice.toFixed(2)} DT
+                            </span>
                           </div>
-                        )}
-                        <div className="flex justify-between items-end pt-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
-                            Total
-                          </span>
-                          <span className="text-4xl font-black text-[#39FF14] tracking-tighter">
-                            ${totalPrice.toFixed(2)}
-                          </span>
                         </div>
                       </div>
+
+                      <button
+                        onClick={handleConfirmBooking}
+                        disabled={!selectedSlot || !selectedCourt || bookingLoading}
+                        className="w-full h-16 bg-[#00E5FF] text-black font-black rounded-2xl shadow-xl shadow-[#00E5FF]/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
+                      >
+                        {bookingLoading ? (
+                          <Loader2 className="animate-spin" size={20} />
+                        ) : (
+                          <>
+                            <span>CONFIRM SESSION</span>
+                            <ChevronRight size={20} />
+                          </>
+                        )}
+                      </button>
                     </div>
 
-                    <button
-                      onClick={handleConfirmBooking}
-                      disabled={!selectedSlot || !selectedCourt || bookingLoading || selectedCourt?.status === "maintenance"}
-                      className="w-full h-16 bg-[#39FF14] text-black font-black rounded-2xl shadow-xl shadow-[#39FF14]/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
-                    >
-                      {bookingLoading ? (
-                        <Loader2 className="animate-spin" size={20} />
-                      ) : (
-                        <>
-                          <span>CONFIRM BOOKING</span>
-                          <ChevronRight size={20} />
-                        </>
-                      )}
-                    </button>
+                    <div className="p-6 bg-[#00E5FF]/5 border border-[#00E5FF]/10 rounded-[24px] flex gap-4">
+                      <Info className="text-[#00E5FF] shrink-0 mt-0.5" size={18} />
+                      <p className="text-[11px] font-medium leading-relaxed dark:text-white/60">
+                        Cancellations must be made at least 24 hours in advance.
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="p-6 bg-[#39FF14]/5 border border-[#39FF14]/10 rounded-[24px] flex gap-4">
-                    <Info className="text-[#39FF14] shrink-0 mt-0.5" size={18} />
-                    <p className="text-[11px] font-medium leading-relaxed dark:text-white/60">
-                      Cancellations must be made at least 24 hours in advance for a full refund to your Ultima wallet.
-                    </p>
+                ) : (
+                  <div className="sticky top-24 p-8 rounded-[40px] border-2 border-dashed border-gray-100 dark:border-white/10 text-center space-y-4">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto">
+                      <LayoutGrid className="opacity-20" size={32} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold opacity-60">Complete Step 1 & 2</h4>
+                      <p className="text-xs opacity-40">Choose a club and court to view the price summary.</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -788,7 +822,7 @@ export function CourtBooking() {
           >
             {upcomingBookings.length === 0 ? (
               <EmptyState
-                icon={<CalendarX size={40} className="text-[#39FF14]" />}
+                icon={<CalendarX size={40} className="text-[#00E5FF]" />}
                 title="No upcoming bookings"
                 message="You don't have any confirmed bookings yet."
                 action={{ label: "Book a Court", onClick: () => setActiveTab("book") }}
@@ -802,7 +836,7 @@ export function CourtBooking() {
                     className="bg-white dark:bg-white/5 rounded-[32px] p-7 border border-gray-100 dark:border-white/10 flex flex-col md:flex-row md:items-center gap-6"
                   >
                     {/* Color accent */}
-                    <div className="w-2 h-full min-h-[60px] bg-[#39FF14] rounded-full shrink-0 hidden md:block" />
+                    <div className="w-2 h-full min-h-[60px] bg-[#00E5FF] rounded-full shrink-0 hidden md:block" />
 
                     <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
@@ -870,7 +904,7 @@ export function CourtBooking() {
           >
             {pastBookings.length === 0 ? (
               <EmptyState
-                icon={<History size={40} className="text-[#39FF14]" />}
+                icon={<History size={40} className="text-[#00E5FF]" />}
                 title="No booking history"
                 message="Your completed and cancelled bookings will appear here."
               />
@@ -900,7 +934,7 @@ export function CourtBooking() {
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Result</p>
                       <p className={`font-black text-sm ${
-                        booking.result === "Win" ? "text-[#39FF14]" :
+                        booking.result === "Win" ? "text-[#00E5FF]" :
                         booking.result === "Loss" ? "text-red-400" :
                         "dark:text-white/40"
                       }`}>
@@ -912,7 +946,7 @@ export function CourtBooking() {
                       <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
                         booking.status === "cancelled"
                           ? "bg-red-500/10 text-red-400"
-                          : "bg-[#39FF14]/10 text-[#39FF14]"
+                          : "bg-[#00E5FF]/10 text-[#00E5FF]"
                       }`}>
                         {booking.status}
                       </span>
@@ -942,8 +976,8 @@ export function CourtBooking() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white dark:bg-[#0F1423] rounded-[40px] p-10 max-w-sm w-full text-center border border-white/10 shadow-2xl"
             >
-              <div className="flex items-center gap-2 text-[#39FF14] font-black text-[10px] uppercase tracking-[4px] mb-5 justify-center">
-                <Zap size={12} fill="#39FF14" />
+              <div className="flex items-center gap-2 text-[#00E5FF] font-black text-[10px] uppercase tracking-[4px] mb-5 justify-center">
+                <Zap size={12} fill="#00E5FF" />
                 Check-in QR Code
               </div>
               <h3 className="text-2xl font-black dark:text-white mb-1">{qrBooking.courts?.name}</h3>
@@ -968,7 +1002,7 @@ export function CourtBooking() {
               </p>
               <button
                 onClick={() => setQrBooking(null)}
-                className="w-full h-12 bg-[#39FF14] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
+                className="w-full h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
               >
                 Close
               </button>
@@ -996,7 +1030,7 @@ function SummaryRow({
         {icon}
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
       </div>
-      <span className={`text-sm font-black ${accent ? "text-[#39FF14]" : "dark:text-white"}`}>
+      <span className={`text-sm font-black ${accent ? "text-[#00E5FF]" : "dark:text-white"}`}>
         {value}
       </span>
     </div>
@@ -1019,7 +1053,7 @@ function EmptyState({
       {action && (
         <button
           onClick={action.onClick}
-          className="px-8 h-12 bg-[#39FF14] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
+          className="px-8 h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
         >
           {action.label}
         </button>

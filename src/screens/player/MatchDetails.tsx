@@ -53,7 +53,7 @@ export function MatchDetails() {
   if (!match) return (
     <div className="text-center py-20">
       <p className="opacity-50 mb-4">Match not found.</p>
-      <Link to="/dashboard/player/stats" className="text-[#39FF14] font-bold">← Back to Stats</Link>
+      <Link to="/dashboard/player/stats" className="text-[#00E5FF] font-bold">← Back to Stats</Link>
     </div>
   );
 
@@ -70,12 +70,12 @@ export function MatchDetails() {
       {/* Header */}
       <div className="text-center">
         <div className={`inline-flex px-4 py-1.5 rounded-full text-sm font-black mb-4 ${
-          isWin ? "bg-[#39FF14]/10 text-[#39FF14]" : match.result === "Loss" ? "bg-red-500/10 text-red-500" : "bg-gray-100 dark:bg-white/10 opacity-40"
+          isWin ? "bg-[#00E5FF]/10 text-[#00E5FF]" : match.result === "Loss" ? "bg-red-500/10 text-red-500" : "bg-gray-100 dark:bg-white/10 opacity-40"
         }`}>
           {match.result || "Pending"}
         </div>
         <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black dark:text-white mb-2">
-          Match <span className="text-[#39FF14]">Details</span>
+          Match <span className="text-[#00E5FF]">Details</span>
         </h1>
         <p className="opacity-50 font-['Poppins']">{matchDate.toLocaleDateString("en", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
       </div>
@@ -149,7 +149,7 @@ export function MatchDetails() {
         </h3>
         {match.video_url ? (
           <a href={match.video_url} target="_blank" rel="noopener noreferrer"
-            className="px-6 py-3 bg-[#39FF14] text-black font-bold rounded-xl inline-flex items-center gap-2 hover:scale-105 transition-transform">
+            className="px-6 py-3 bg-[#00E5FF] text-black font-bold rounded-xl inline-flex items-center gap-2 hover:scale-105 transition-transform">
             Watch Replay <ArrowLeft size={14} className="rotate-180" />
           </a>
         ) : (

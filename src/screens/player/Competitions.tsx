@@ -135,11 +135,11 @@ export function Competitions() {
       {/* HEADER SECTION */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-3 text-[#39FF14] font-bold text-xs uppercase tracking-[3px] mb-2">
+          <div className="flex items-center gap-3 text-[#00E5FF] font-bold text-xs uppercase tracking-[3px] mb-2">
             <TrendingUp size={16} />
             <span>Tournament Center</span>
           </div>
-          <h1 className="font-['Playfair_Display',serif] text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black dark:text-white leading-none mb-4">Active Competitions</h1>
+          <h1 className="font-['Playfair_Display',serif] sm:text-2xl text-2xl md:text-4xl lg:text-4xl font-black dark:text-white leading-none mb-4">Active Competitions</h1>
           <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
             Register for upcoming tournaments and prove your skills.
           </p>
@@ -154,10 +154,10 @@ export function Competitions() {
               placeholder="Find a tournament..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 pl-12 pr-6 rounded-2xl bg-gray-50 dark:bg-black/20 border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-[#39FF14]/50 transition-all"
+              className="h-12 pl-12 pr-6 rounded-2xl bg-gray-50 dark:bg-black/20 border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-[#00E5FF]/50 transition-all"
             />
           </div>
-          <div className="relative flex items-center bg-gray-100/50 dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:border-[#39FF14]/50 transition-all px-4 group">
+          <div className="relative flex items-center bg-gray-100/50 dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:border-[#00E5FF]/50 transition-all px-4 group">
             <Filter size={16} className="text-[#39FF14] mr-2" />
             <select 
               value={selectedLevel}
@@ -190,20 +190,20 @@ export function Competitions() {
                 animate={{ opacity: 1, scale: 1 }}
                 key={t.id}
                 onClick={() => setSelectedComp(t)}
-                className="group relative bg-white dark:bg-[#0F1423] rounded-[40px] border border-gray-100 dark:border-white/5 overflow-hidden hover:border-[#39FF14]/40 transition-all duration-500 shadow-xl cursor-pointer"
+                className="group relative bg-white dark:bg-[#0F1423] rounded-[40px] border border-gray-100 dark:border-white/5 overflow-hidden hover:border-[#00E5FF]/40 transition-all duration-500 shadow-xl cursor-pointer"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#39FF14]/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-[#39FF14]/10 transition-colors" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-[#00E5FF]/10 transition-colors" />
 
                 <div className="p-8 md:p-10">
                   <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 bg-[#39FF14]/10 rounded-[22px] flex items-center justify-center shrink-0 border border-[#39FF14]/20">
+                      <div className="w-16 h-16 bg-[#00E5FF]/10 rounded-[22px] flex items-center justify-center shrink-0 border border-[#00E5FF]/20">
                         <Trophy className="text-[#39FF14]" size={28} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                             t.status === 'Open' ? 'bg-[#39FF14]/10 text-[#39FF14]' :
+                             t.status === 'Open' ? 'bg-[#00E5FF]/10 text-[#00E5FF]' :
                              t.status === 'Ongoing' ? 'bg-[#00E5FF]/10 text-[#00E5FF]' :
                              'bg-gray-100 dark:bg-white/5 text-gray-400'
                            }`}>
@@ -213,13 +213,13 @@ export function Competitions() {
                              {t.competition_type}
                            </span>
                         </div>
-                        <h3 className="text-2xl font-black dark:text-white group-hover:text-[#39FF14] transition-colors">
+                        <h3 className="text-2xl font-black dark:text-white group-hover:text-[#00E5FF] transition-colors">
                           {t.title}
                         </h3>
                       </div>
                     </div>
                     {isRegistered && (
-                      <div className="bg-[#39FF14] text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-lg shadow-[#39FF14]/20">
+                      <div className="bg-[#00E5FF] text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-lg shadow-[#00E5FF]/20">
                         <CheckCircle2 size={12} /> Registered
                       </div>
                     )}
@@ -246,7 +246,7 @@ export function Competitions() {
                         className={`px-8 h-12 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-lg ${
                           isRegistered ? 'bg-white/5 text-gray-400 shadow-none' :
                           isFull || t.status !== 'Open' ? 'bg-red-500/10 text-red-500 shadow-none' :
-                          'bg-[#39FF14] text-black hover:scale-105 active:scale-95 shadow-[#39FF14]/20'
+                          'bg-[#00E5FF] text-black hover:scale-105 active:scale-95 shadow-[#00E5FF]/20'
                         }`}
                      >
                        {registeringId === t.id ? <Loader2 className="animate-spin" size={16} /> : 
@@ -282,7 +282,7 @@ export function Competitions() {
                  {/* Left Panel: Info */}
                  <div className="p-10 lg:p-12 space-y-8 bg-gray-50/50 dark:bg-black/20">
                     <div>
-                       <div className="bg-[#39FF14]/10 text-[#39FF14] text-[10px] font-black uppercase tracking-[3px] px-3 py-1 rounded-full w-fit mb-6">
+                       <div className="bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-black uppercase tracking-[3px] px-3 py-1 rounded-full w-fit mb-6">
                          Competition Detail
                        </div>
                        <h2 className="text-4xl font-black mb-4 dark:text-white leading-none">{selectedComp.title}</h2>
@@ -296,13 +296,13 @@ export function Competitions() {
                        <DetailItem icon={Users} label="Mode" value={selectedComp.competition_type} />
                     </div>
 
-                    <div className="p-6 bg-[#39FF14]/5 border border-[#39FF14]/10 rounded-3xl">
+                    <div className="p-6 bg-[#00E5FF]/5 border border-[#00E5FF]/10 rounded-3xl">
                        <div className="flex justify-between items-center mb-4">
                           <span className="text-xs font-black uppercase tracking-widest opacity-40">Prize Pool</span>
-                          <span className="text-2xl font-black text-[#39FF14]">{selectedComp.prize_pool}</span>
+                          <span className="text-2xl font-black text-[#00E5FF]">{selectedComp.prize_pool}</span>
                        </div>
                        <div className="h-2 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#39FF14]" style={{ width: `${(selectedComp.current_players / selectedComp.max_players) * 100}%` }} />
+                          <div className="h-full bg-[#00E5FF]" style={{ width: `${(selectedComp.current_players / selectedComp.max_players) * 100}%` }} />
                        </div>
                        <p className="text-[10px] font-bold mt-2 text-right opacity-40">{selectedComp.current_players} / {selectedComp.max_players} Slots SECURED</p>
                     </div>
@@ -324,10 +324,10 @@ export function Competitions() {
                            <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
                               <div className="flex items-center gap-4">
                                  <span className="font-black opacity-20 text-xl">{i}</span>
-                                 <div className="w-10 h-10 rounded-full bg-[#39FF14]/10 border border-[#39FF14]/20" />
+                                 <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/20" />
                                  <span className="font-bold text-sm">Player {i}</span>
                               </div>
-                              <span className="text-xs font-black text-[#39FF14]">+ {100 - i * 10}pts</span>
+                              <span className="text-xs font-black text-[#00E5FF]">+ {100 - i * 10}pts</span>
                            </div>
                          ))}
                       </div>
@@ -337,7 +337,7 @@ export function Competitions() {
                        <button 
                          onClick={() => handleRegister(selectedComp)}
                          disabled={userRegistrations.includes(selectedComp.id) || selectedComp.current_players >= selectedComp.max_players || selectedComp.status !== 'Open'}
-                         className="w-full h-16 bg-[#39FF14] text-black font-black rounded-3xl shadow-xl shadow-[#39FF14]/20 hover:scale-[1.02] active:scale-95 transition-all"
+                         className="w-full h-16 bg-[#00E5FF] text-black font-black rounded-3xl shadow-xl shadow-[#00E5FF]/20 hover:scale-[1.02] active:scale-95 transition-all"
                        >
                          {userRegistrations.includes(selectedComp.id) ? "YOU ARE IN" : "REGISTER FOR EVENT"}
                        </button>

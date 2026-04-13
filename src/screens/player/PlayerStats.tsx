@@ -118,14 +118,14 @@ export function PlayerStats() {
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-10">
       <header>
-        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black dark:text-white mb-2">
-          My <span className="text-[#39FF14]">Statistics</span>
+        <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white mb-2">
+          My <span className="text-[#00E5FF]">Statistics</span>
         </h1>
         <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Your complete performance overview.</p>
       </header>
 
       {/* Career Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
         {[
           { icon: Activity, label: "Matches", value: career.total, color: "#39FF14" },
           { icon: Trophy, label: "Wins", value: career.wins, color: "#39FF14" },
@@ -135,14 +135,14 @@ export function PlayerStats() {
           { icon: Clock, label: "Hours", value: career.totalHours, color: "#00E5FF" },
           { icon: MapPin, label: "Fav Court", value: career.favoriteCourt, color: "#39FF14" },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="bg-white dark:bg-white/5 p-4 rounded-[20px] border border-gray-200 dark:border-white/10">
+          <div key={label} className="bg-white dark:bg-white/5 p-4 rounded-[20px] border border-gray-200 dark:border-white/10 group hover:border-[#00E5FF]/40 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 rounded-lg" style={{ backgroundColor: `${color}15` }}>
                 <Icon size={14} style={{ color }} />
               </div>
               <span className="text-[10px] font-bold uppercase tracking-wider opacity-50">{label}</span>
             </div>
-            <p className="text-xl font-black truncate">{value}</p>
+            <p className="text-xl font-black truncate group-hover:text-[#00E5FF] transition-colors">{value}</p>
           </div>
         ))}
       </div>
@@ -161,7 +161,7 @@ export function PlayerStats() {
                 <XAxis dataKey="month" tick={{ fill: "#888", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0, 100]} tick={{ fill: "#888", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ borderRadius: "16px", border: "none", fontSize: 12 }} />
-                <Line type="monotone" dataKey="winRate" stroke="#39FF14" strokeWidth={3} dot={{ r: 4, fill: "#39FF14" }} />
+                <Line type="monotone" dataKey="winRate" stroke="#00E5FF" strokeWidth={3} dot={{ r: 4, fill: "#00E5FF" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -234,7 +234,7 @@ export function PlayerStats() {
                   <td className="py-3">
                     <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
                       m.result === "Win"
-                        ? "bg-[#39FF14]/10 text-[#39FF14]"
+                        ? "bg-[#00E5FF]/10 text-[#00E5FF]"
                         : m.result === "Loss"
                         ? "bg-red-500/10 text-red-500"
                         : "bg-gray-100 dark:bg-white/5 opacity-40"
@@ -243,7 +243,7 @@ export function PlayerStats() {
                     </span>
                   </td>
                   <td className="py-3 text-right">
-                    <Link to={`/dashboard/player/matches/${m.id}`} className="text-[#39FF14] hover:underline text-xs font-bold flex items-center gap-1 justify-end">
+                    <Link to={`/dashboard/player/matches/${m.id}`} className="text-[#00E5FF] hover:underline text-xs font-bold flex items-center gap-1 justify-end">
                       Details <ArrowRight size={12} />
                     </Link>
                   </td>
