@@ -102,7 +102,7 @@ export function AdminBookingsPage() {
           </button>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-6 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-transform"
+            className="flex items-center gap-2 px-6 bg-[#00E5FF] text-black font-bold rounded-xl hover:scale-105 transition-transform"
           >
             <Plus size={20} /> New Booking
           </button>
@@ -116,7 +116,7 @@ export function AdminBookingsPage() {
           <input 
             type="text"
             placeholder="Search by player or court..."
-            className="w-full h-12 pl-12 pr-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl dark:text-white outline-none focus:border-[#39FF14] transition-all"
+            className="w-full h-12 pl-12 pr-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl dark:text-white outline-none focus:border-[#00E5FF] transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -181,7 +181,7 @@ export function AdminBookingsPage() {
                     </td>
                     <td className="px-4 sm:px-8 py-6">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
-                        booking.status === 'confirmed' ? 'bg-[#39FF14]/10 text-[#39FF14]' :
+                        booking.status === 'confirmed' ? 'bg-[#00E5FF]/10 text-[#00E5FF]' :
                         booking.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
                         'bg-yellow-500/10 text-yellow-500'
                       }`}>
@@ -193,10 +193,10 @@ export function AdminBookingsPage() {
                         {booking.status !== 'confirmed' && (
                           <button 
                             onClick={() => handleStatusChange(booking.id, 'confirmed')}
-                            className="p-2 bg-[#39FF14]/10 text-[#39FF14] rounded-lg hover:bg-[#39FF14] hover:text-black transition-all"
+                            className="p-2 bg-[#00E5FF]/10 rounded-lg hover:bg-[#00E5FF] group/btn transition-all"
                             title="Confirm"
                           >
-                            <CheckCircle2 size={18} />
+                            <CheckCircle2 size={18} className="text-[#39FF14] group-hover/btn:text-black" />
                           </button>
                         )}
                         <button 
@@ -238,7 +238,7 @@ export function AdminBookingsPage() {
                  {/* Simplified form for now */}
                  <div className="p-10 border-2 border-dashed border-gray-100 dark:border-white/10 rounded-2xl text-center">
                     <p className="text-gray-400">Booking Creation Form UI</p>
-                    <button className="mt-4 px-6 py-2 bg-[#39FF14] text-black font-bold rounded-xl" onClick={() => setShowAddModal(false)}>
+                    <button className="mt-4 px-6 py-2 bg-[#00E5FF] text-black font-bold rounded-xl" onClick={() => setShowAddModal(false)}>
                       Close Preview
                     </button>
                  </div>

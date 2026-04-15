@@ -36,7 +36,7 @@ export function VideoReviewPage() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#39FF14]/10 transition-colors"
+          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#00E5FF]/10 transition-colors"
         >
           <ChevronLeft size={20} />
         </button>
@@ -67,8 +67,8 @@ export function VideoReviewPage() {
                 onClick={() => setSelectedVideo(video)}
                 className={`p-4 rounded-[24px] border transition-all cursor-pointer flex gap-4 ${
                   selectedVideo?.id === video.id 
-                  ? "bg-[#39FF14]/5 border-[#39FF14]/30" 
-                  : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 hover:border-gray-200"
+                    ? "bg-[#00E5FF]/5 border-[#00E5FF]/30" 
+                    : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 hover:border-gray-200"
                 }`}
               >
                 <div className="w-24 h-24 rounded-2xl bg-gray-200 dark:bg-white/10 overflow-hidden relative flex-shrink-0">
@@ -98,15 +98,15 @@ export function VideoReviewPage() {
               <div className="aspect-video rounded-[32px] bg-black border border-white/10 overflow-hidden relative group">
                   <img src={selectedVideo.thumbnail} alt="" className="w-full h-full object-cover opacity-40" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="w-20 h-20 bg-[#39FF14] text-black rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(57,255,20,0.5)] cursor-pointer hover:scale-110 transition-transform">
+                     <div className="w-20 h-20 bg-[#00E5FF] text-black rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,229,255,0.5)] cursor-pointer hover:scale-110 transition-transform">
                         <Play size={40} className="ml-1 fill-black" />
                      </div>
                   </div>
                   <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
                      <span className="text-xs font-mono">02:15 / {selectedVideo.duration}</span>
                      <div className="flex gap-4">
-                        <Bookmark size={18} className="cursor-pointer hover:text-[#39FF14]" />
-                        <Share2 size={18} className="cursor-pointer hover:text-[#39FF14]" />
+                        <Bookmark size={18} className="cursor-pointer hover:text-[#00E5FF]" />
+                        <Share2 size={18} className="cursor-pointer hover:text-[#00E5FF]" />
                      </div>
                   </div>
               </div>
@@ -123,10 +123,10 @@ export function VideoReviewPage() {
                 </div>
                 
                 <textarea 
-                  className="w-full h-32 p-4 bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#39FF14] rounded-2xl outline-none text-sm dark:text-white resize-none"
+                  className="w-full h-32 p-4 bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#00E5FF] rounded-2xl outline-none text-sm dark:text-white resize-none"
                   placeholder="Timestamp 02:10 - Note: Student's elbow is too low during the take-back..."
                 />
-                <button className="w-full mt-4 h-12 bg-[#39FF14] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+                <button className="w-full mt-4 h-12 bg-[#00E5FF] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all">
                   <MessageSquare size={18} /> Send Annotation to Student
                 </button>
               </div>

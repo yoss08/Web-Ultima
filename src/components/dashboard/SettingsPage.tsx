@@ -142,11 +142,17 @@ export function SettingsPage() {
 
     if (error) {
       toast.error(error.message);
-    } else {
-      toast.success("Password updated!");
-      setShowPasswordModal(false);
-      setNewPassword("");
-      setConfirmPassword("");
+    }
+  };
+
+  const handleDisableAccount = () => {
+    toast.error("Account disabling is currently not available in this version.");
+  };
+
+  const handleDeleteAccount = () => {
+    const confirmed = window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.");
+    if (confirmed) {
+      toast.error("Account deletion requires admin permissions. Please contact support.");
     }
   };
 
@@ -445,6 +451,30 @@ export function SettingsPage() {
                       Two-Factor Authentication
                     </h3>
                     <p className="text-sm opacity-50 px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
+                  </div>
+
+                  {/* Account Removal Section */}
+                  <div className="pt-10 border-t border-gray-100 dark:border-white/5 space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold dark:text-white mb-2">Account Removal</h3>
+                      <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">
+                        Disabling your account means you can recover it at any time after taking this action.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      <button 
+                        onClick={handleDisableAccount}
+                        className="px-8 h-12 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#E11D48]/20"
+                      >
+                        Disable Account
+                      </button>
+                      <button 
+                        onClick={handleDeleteAccount}
+                        className="px-8 h-12 bg-gray-100 dark:bg-[#E11D48]/5 text-[#E11D48] font-bold rounded-xl border border-[#E11D48]/10 hover:bg-[#E11D48]/10 transition-all"
+                      >
+                        Delete Account
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

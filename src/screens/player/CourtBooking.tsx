@@ -13,6 +13,7 @@ import { useNavigate } from "react-router";
 import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
 import padelArena from "../../assets/images/padel_arena.png";
+import { CourtCard } from "../../components/dashboard/CourtCard";
 
 
 interface Court {
@@ -493,43 +494,20 @@ export function CourtBooking() {
                   >
                     <SectionHeading step={2} title="Select Surface" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {courts.map((court) => (
-                        <button
+                      {courts.map((court, index) => (
+                        <CourtCard
                           key={court.id}
-                          disabled={court.status === "maintenance"}
-                          onClick={() => setSelectedCourt(court)}
-                          className={`relative overflow-hidden rounded-[32px] p-6 text-left transition-all duration-500 border-2 ${
-                            court.status === "maintenance"
-                              ? "opacity-40 grayscale cursor-not-allowed border-gray-200 dark:border-white/5"
-                              : selectedCourt?.id === court.id
-                              ? "border-[#00E5FF] bg-[#00E5FF]/5 ring-4 ring-[#00E5FF]/10 scale-[0.98]"
-                              : "border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 hover:border-[#00E5FF]/40"
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-6">
-                            <div>
-                              <h4 className="text-xl font-black dark:text-white uppercase leading-none mb-2">
-                                {court.name}
-                              </h4>
-                              <span className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-widest">
-                                {court.surface}
-                              </span>
-                            </div>
-                            {selectedCourt?.id === court.id && (
-                              <div className="bg-[#00E5FF] text-black p-1.5 rounded-full ring-4 ring-[#00E5FF]/20 animate-in zoom-in duration-300">
-                                <CheckCircle2 size={18} />
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <div className="flex items-center gap-4 opacity-60 text-xs font-bold dark:text-white">
-                              <span className="flex items-center gap-1.5"><MapPin size={14} /> Indoor</span>
-                              <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Official Grade</span>
-                            </div>
-                            <StatusBadge status={court.status ?? "available"} />
-                          </div>
-                        </button>
+                          court={{
+                            id: court.id,
+                            name: court.name,
+                            status: court.status || "available",
+                            type: court.type,
+                            surface: court.surface
+                          }}
+                          index={index}
+                          isSelected={selectedCourt?.id === court.id}
+                          onClick={court.status === "maintenance" ? undefined : () => setSelectedCourt(court)}
+                        />
                       ))}
                     </div>
                   </motion.section>

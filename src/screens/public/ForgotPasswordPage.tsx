@@ -90,7 +90,7 @@ export function ForgotPasswordPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
+                      className="w-full bg-[#F0F2F5] dark:bg-[#1C2128]/50 h-[52px] pl-12 pr-4 rounded-[16px] border border-[#D1D5DB]/50 dark:border-[#2D333B]/50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white placeholder:text-[#0A0E1A]/30 dark:placeholder:text-white/30 font-['Poppins',sans-serif] text-[14px]"
                       placeholder="Enter your email"
                     />
                   </div>
@@ -100,7 +100,7 @@ export function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#00E5FF] hover:bg-[#00D4E6] disabled:bg-[#00E5FF]/50 h-[56px] rounded-[28px] shadow-[0_0_32px_rgba(0,229,255,0.5)] hover:shadow-[0_0_48px_rgba(0,229,255,0.7)] hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-black mt-8"
+                  className="w-full bg-blue-500 dark:bg-[#00E5FF] hover:bg-blue-500 dark:hover:bg-[#00E5FF] disabled:bg-blue-500 dark:disabled:bg-[#00E5FF] h-[56px] rounded-[28px] shadow-blue-500 dark:shadow-[#00E5FF]/50 hover:shadow-blue-500 dark:hover:shadow-[#00E5FF]/70 hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-black mt-8"
                 >
                   {loading ? "Sending..." : "Send reset link"}
                 </button>
@@ -112,7 +112,7 @@ export function ForgotPasswordPage() {
                   Remember your password?{" "}
                   <Link
                     to="/login"
-                    className="text-[#0A0E1A] dark:text-white font-semibold hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors"
+                    className="text-[#0A0E1A] dark:text-white font-semibold hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors"
                   >
                     Log in
                   </Link>
@@ -124,9 +124,9 @@ export function ForgotPasswordPage() {
               {/* Success State */}
               <div className="text-center py-8">
                 {/* Success Icon */}
-                <div className="w-20 h-20 bg-[#00E5FF]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-blue-500/10 dark:bg-[#00E5FF]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg
-                    className="w-10 h-10 text-[#00E5FF]"
+                    className="w-10 h-10 text-blue-500 dark:text-[#00E5FF]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -145,12 +145,12 @@ export function ForgotPasswordPage() {
                 </h2>
                 <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/60 dark:text-white/60 mb-8">
                   We've sent a password reset link to{" "}
-                  <span className="text-[#00E5FF] font-medium">{email}</span>
+                  <span className="text-blue-500 dark:text-[#00E5FF] font-medium">{email}</span>
                 </p>
 
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center w-full bg-[#00E5FF] hover:bg-[#00D4E6] h-[56px] rounded-[28px] shadow-[0_0_32px_rgba(0,229,255,0.5)] hover:shadow-[0_0_48px_rgba(0,229,255,0.7)] hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-black"
+                  className="inline-flex items-center justify-center w-full bg-blue-500 dark:bg-[#00E5FF] hover:bg-blue-500 dark:hover:bg-[#00D4E6] h-[56px] rounded-[28px] shadow-blue-500 dark:shadow-[#00E5FF]/50 hover:shadow-blue-500 dark:hover:shadow-[#00E5FF]/70 hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-black"
                 >
                   Back to login
                 </Link>
@@ -169,7 +169,7 @@ export function ForgotPasswordPage() {
       >
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/40 dark:text-white/40 hover:text-white/60 dark:hover:text-[#0A0E1A]/60 transition-colors"
+          className="inline-flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/40 dark:text-white/40 hover:blue-500/60 dark:hover:text-[#00E5FF]/60 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home

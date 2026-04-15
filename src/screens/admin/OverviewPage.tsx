@@ -72,10 +72,10 @@ export function OverviewPage() {
   };
 
   const summaryCards = [
-    { icon: Activity, label: "Active Matches", value: stats.activeMatches, color: "#39FF14" },
-    { icon: Grid3X3, label: "Available Courts", value: stats.availableCourts, color: "#00E5FF" },
-    { icon: Calendar, label: "Today's Matches", value: stats.totalMatchesToday, color: "#39FF14" },
-    { icon: Droplet, label: "Hydration Usage", value: stats.hydrationTotal, color: "#00E5FF" },
+    { icon: Activity, label: "Active Matches", value: stats.activeMatches, color: "#39FF14", iconColor: "#39FF14" },
+    { icon: Grid3X3, label: "Available Courts", value: stats.availableCourts, color: "#ffd500ff", iconColor: "#ffd500ff" },
+    { icon: Calendar, label: "Today's Matches", value: stats.totalMatchesToday, color: "#00E5FF", iconColor: "#00E5FF" },
+    { icon: Droplet, label: "Hydration Usage", value: stats.hydrationTotal, color: "#00E5FF", iconColor: "#00E5FF" },
   ];
 
   return (
@@ -125,7 +125,7 @@ export function OverviewPage() {
           >
             <div className="flex justify-between items-start mb-4">
               <div className="p-3 rounded-2xl" style={{ backgroundColor: `${card.color}15` }}>
-                <card.icon size={24} style={{ color: card.color }} />
+                <card.icon size={24} style={{ color: card.iconColor }} />
               </div>
             </div>
             <h3 className="text-3xl font-bold dark:text-white">{loading ? "..." : card.value}</h3>
@@ -156,7 +156,7 @@ export function OverviewPage() {
         <div className="lg:col-span-2 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-xl font-bold dark:text-white">Peak Hours Analysis</h2>
-            <Users className="text-[#00E5FF]" size={20} />
+            <Users className="text-[#39FF14]" size={20} />
           </div>
 
           <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-gray-100 dark:border-white/10 rounded-2xl">

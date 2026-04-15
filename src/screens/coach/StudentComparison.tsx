@@ -24,7 +24,7 @@ interface Student {
   wins?: number;
 }
 
-const COLORS = ["#39FF14", "#00E5FF", "#FFD700", "#FF4D4D"];
+const COLORS = ["#C084FC", "#00E5FF", "#FFD700", "#FF4D4D"];
 
 export function StudentComparison() {
   const { user } = useAuth();
@@ -121,7 +121,7 @@ export function StudentComparison() {
 
       <header>
         <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black dark:text-white mb-2">
-          Student <span className="text-[#39FF14]">Comparison</span>
+          Student <span className="text-[#00E5FF]">Comparison</span>
         </h1>
         <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Select up to 3 students to compare side-by-side.</p>
       </header>
@@ -137,7 +137,7 @@ export function StudentComparison() {
                 key={s.id} onClick={() => toggleStudent(s.id)}
                 className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                   isSelected
-                    ? "bg-[#39FF14] text-black shadow-md"
+                    ? "bg-[#00E5FF] text-black shadow-md"
                     : "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/50 hover:bg-gray-200 dark:hover:bg-white/10"
                 }`}
               >

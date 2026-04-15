@@ -94,7 +94,7 @@ export function DashboardLayout() {
       case 'coach':
         return { icon: Dumbbell, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/30" };
       default: 
-        return { icon: Trophy, color: "text-[#39FF14]", bg: "bg-[#39FF14]/20", border: "border-[#39FF14]" };
+        return { icon: Trophy, color: "text-green-400", bg: "bg-green-400/20", border: "border-green-400" };
   };
   } 
   const badge = getRoleBadge();

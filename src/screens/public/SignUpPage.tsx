@@ -94,7 +94,7 @@ export function SignUpPage() {
                 onClick={() => setFormData({ ...formData, accountType: "Player" })}
                 className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
                   formData.accountType === "Player"
-                    ? "border-[#00E5FF] bg-[#00E5FF]/5 text-[#00E5FF]"
+                    ? "border-blue-500 dark:border-[#00E5FF] bg-blue-500/5 dark:bg-[#00E5FF]/5 text-blue-500 dark:text-[#00E5FF]"
                     : "border-transparent bg-gray-50 dark:bg-white/5 text-gray-400"
                 }`}
               >
@@ -106,7 +106,7 @@ export function SignUpPage() {
                 onClick={() => setFormData({ ...formData, accountType: "Coach" })}
                 className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
                   formData.accountType === "Coach"
-                    ? "border-[#00E5FF] bg-[#00E5FF]/5 text-[#00E5FF]"
+                    ? "border-blue-500 dark:border-[#00E5FF] bg-blue-500/5 dark:bg-[#00E5FF]/5 text-blue-500 dark:text-[#00E5FF]"
                     : "border-transparent bg-gray-50 dark:bg-white/5 text-gray-400"
                 }`}
               >
@@ -143,7 +143,7 @@ export function SignUpPage() {
                 <input
                   type="text"
                   placeholder="Full Name"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
@@ -155,7 +155,7 @@ export function SignUpPage() {
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -167,7 +167,7 @@ export function SignUpPage() {
                 <input
                   type="tel"
                   placeholder="Phone Number"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   required
@@ -179,7 +179,7 @@ export function SignUpPage() {
                 <input
                   type="password"
                   placeholder="Password"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
@@ -190,7 +190,7 @@ export function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-14 bg-[#00E5FF] rounded-[28px] shadow-[0_0_32px_rgba(0,229,255,0.5)] hover:shadow-[0_0_48px_rgba(0,229,255,0.7)] hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-black mt-6"
+              className="w-full h-14 bg-blue-500 dark:bg-[#00E5FF] rounded-[28px] shadow-blue-500 dark:shadow-[#00E5FF]/50 hover:shadow-blue-500 dark:hover:shadow-[#00E5FF]/70 hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-black mt-6"
             >
               {loading ? "Creating account..." : "Create Account"}
             </button>
@@ -200,7 +200,7 @@ export function SignUpPage() {
           <div className="mt-8 text-center">
             <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/50 dark:text-white/50">
               Already have an account?{" "}
-              <Link to="/login" className="text-[#0A0E1A] dark:text-white font-semibold hover:text-[#00E5FF] transition-colors">
+              <Link to="/login" className="text-blue-500 dark:text-[#00E5FF] font-semibold hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">
                 Log in
               </Link>
             </p>
@@ -215,7 +215,7 @@ export function SignUpPage() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="mt-8"
       >
-        <Link to="/" className="flex items-center gap-2 text-[#0A0E1A]/50 dark:text-white/50 hover:text-[#00E5FF] transition-colors group">
+        <Link to="/" className="flex items-center gap-2 text-[#0A0E1A]/50 dark:text-white/50 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors group">
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-['Poppins',sans-serif] text-[14px] font-medium">Back to Home</span>
         </Link>

@@ -53,14 +53,14 @@ export function AdminCourtConfig() {
             <input 
               type="text"
               placeholder="Court Name (ex: Court Central)"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               required
             />
             <div className="grid grid-cols-2 gap-4">
               <select 
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
                 value={formData.type}
                 onChange={(e) => setFormData({...formData, type: e.target.value})}
               >
@@ -68,7 +68,7 @@ export function AdminCourtConfig() {
                 <option value="Outdoor">Outdoor</option>
               </select>
               <select 
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
                 value={formData.surface}
                 onChange={(e) => setFormData({...formData, surface: e.target.value})}
               >
@@ -80,7 +80,7 @@ export function AdminCourtConfig() {
             <input 
               type="number"
               placeholder="Capacity (Players)"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
               value={formData.capacity}
               onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value)})}
               required
@@ -93,7 +93,7 @@ export function AdminCourtConfig() {
               <input 
                 type="number"
                 placeholder="Peak Rate ($/hr)"
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
                 value={formData.pricing_peak}
                 onChange={(e) => setFormData({...formData, pricing_peak: parseFloat(e.target.value)})}
                 required
@@ -101,7 +101,7 @@ export function AdminCourtConfig() {
               <input 
                 type="number"
                 placeholder="Off-Peak Rate ($/hr)"
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
                 value={formData.pricing_offpeak}
                 onChange={(e) => setFormData({...formData, pricing_offpeak: parseFloat(e.target.value)})}
                 required
@@ -110,11 +110,11 @@ export function AdminCourtConfig() {
             <input 
               type="text"
               placeholder="ALMUS Hardware ID"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#39FF14]"
+              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
               value={formData.almus_hardware_id}
               onChange={(e) => setFormData({...formData, almus_hardware_id: e.target.value})}
             />
-            <button className="w-full h-12 bg-[#39FF14] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all mt-2">
+            <button className="w-full h-12 bg-[#00E5FF] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all mt-2">
               <Plus size={20} /> Add Court
             </button>
           </div>

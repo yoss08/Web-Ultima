@@ -40,7 +40,7 @@ export function CoachDashboard() {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Welcome Message Dynamique - Identique aux specs du PDF */}
       <div>
-        <h1 className="font-['Playfair_Display'] font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl dark:text-white mb-2 leading-tight">
+        <h1 className="font-['Playfair_Display'] font-bold text-2xl md:text-4xl dark:text-white mb-2 leading-tight">
           Welcome, Coach {coachName}!
         </h1>
         <p className="text-gray-500 font-['Poppins'] text-sm">
@@ -81,7 +81,7 @@ export function CoachDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link 
             to="/dashboard/coach/schedule" 
-            className="flex items-center gap-3 px-6 h-14 bg-[#39FF14] text-black rounded-[18px] font-bold shadow-lg shadow-[#39FF14]/20 hover:scale-105 active:scale-95 transition-all"
+            className="flex items-center gap-3 px-6 h-14 bg-[#00E5FF] text-black rounded-[18px] font-bold shadow-lg shadow-[#00E5FF]/20 hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={20} /> Schedule Session
           </Link>
@@ -122,8 +122,8 @@ export function CoachDashboard() {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-gray-50 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-12 text-center"
         >
-          <div className="w-16 h-16 bg-[#39FF14]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Plus className="text-[#39FF14]" size={32} />
+          <div className="w-16 h-16 bg-purple-400/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plus className="text-purple-400" size={32} />
           </div>
           <h3 className="text-xl font-bold dark:text-white mb-2">Ready to start coaching?</h3>
           <p className="text-gray-500 max-w-sm mx-auto mb-8 text-sm">
@@ -131,7 +131,7 @@ export function CoachDashboard() {
           </p>
           <Link 
             to="/dashboard/coach/schedule" 
-            className="inline-flex items-center gap-2 px-8 py-3 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-[#00E5FF] text-black font-bold rounded-xl hover:scale-105 transition-all"
           >
             Create Your First Session <ArrowRight size={18} />
           </Link>

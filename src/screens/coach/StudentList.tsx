@@ -39,7 +39,7 @@ export function StudentList() {
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">My Students</h1>
+          <h1 className="text-2xl md:text-4xl font-bold dark:text-white font-['Playfair_Display']">My Students</h1>
           <p className="text-gray-500 text-sm">Manage and track your players performance.</p>
         </div>
 
@@ -49,11 +49,11 @@ export function StudentList() {
             <input 
               type="text"
               placeholder="Find a student..."
-              className="w-full pl-12 pr-4 h-12 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[16px] dark:text-white focus:border-[#39FF14] outline-none transition-all"
+              className="w-full pl-12 pr-4 h-12 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[16px] dark:text-white focus:border-[#00E5FF] outline-none transition-all"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <select className="h-12 px-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[16px] dark:text-white outline-none focus:border-[#39FF14]">
+          <select className="h-12 px-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[16px] dark:text-white outline-none focus:border-[#00E5FF]">
             <option value="all">All Levels</option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
@@ -78,7 +78,7 @@ export function StudentList() {
           <p className="text-gray-500 mt-2 max-w-sm mx-auto">
             You don't have any students linked to your profile yet. Please contact the administrator to assign players to your coaching dashboard.
           </p>
-          <button className="mt-8 px-8 py-3 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-transform">
+          <button className="mt-8 px-8 py-3 bg-[#00E5FF] text-black font-bold rounded-xl hover:scale-105 transition-transform">
             Contact Admin
           </button>
         </div>
@@ -89,10 +89,10 @@ export function StudentList() {
             filteredStudents.map(student => (
               <div 
                 key={student.id} 
-                className="bg-white dark:bg-white/5 p-6 rounded-[24px] border border-gray-100 dark:border-white/10 hover:border-[#39FF14]/50 transition-all group relative overflow-hidden"
+                className="bg-white dark:bg-white/5 p-6 rounded-[24px] border border-gray-100 dark:border-white/10 hover:border-[#00E5FF]/50 transition-all group relative overflow-hidden"
               >
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-16 h-16 rounded-full bg-[#39FF14]/10 flex items-center justify-center border border-[#39FF14]/20 overflow-hidden">
+                  <div className="w-16 h-16 rounded-full bg-[#00E5FF]/10 flex items-center justify-center border border-[#00E5FF]/20 overflow-hidden">
                     {student.avatar_url ? (
                       <img src={student.avatar_url} alt={student.full_name} className="w-full h-full object-cover" />
                     ) : (
@@ -100,14 +100,14 @@ export function StudentList() {
                     )}
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg dark:text-white group-hover:text-[#39FF14] transition-colors">
+                    <h4 className="font-bold text-lg dark:text-white group-hover:text-[#00E5FF] transition-colors">
                       {student.full_name}
                     </h4>
                     <div className="flex gap-2 mt-1">
                       <span className="text-[10px] bg-white/10 text-gray-400 px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
                         {student.account_type || 'Player'}
                       </span>
-                      <span className="text-[10px] bg-[#39FF14]/10 text-[#39FF14] px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
+                      <span className="text-[10px] bg-[#00E5FF]/10 text-[#00E5FF] px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
                         {student.skill_level || 'Intermediate'}
                       </span>
                     </div>
@@ -127,7 +127,7 @@ export function StudentList() {
 
                 <Link 
                   to={`/dashboard/coach/students/${student.id}`}
-                  className="w-full mt-6 py-3 rounded-[14px] bg-black text-white dark:bg-[#39FF14] dark:text-black font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                  className="w-full mt-6 py-3 rounded-[14px] bg-black text-white dark:bg-[#00E5FF] dark:text-black font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all"
                 >
                   View Performance <ArrowRight size={16} />
                 </Link>

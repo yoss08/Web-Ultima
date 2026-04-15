@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 } from 'lucide-react';
 import { useTheme } from "../../styles/useTheme";
 import { supabase } from "../../config/supabase";
+import { CourtCard } from "../../components/dashboard/CourtCard";
 
 const MOCK_CLUBS = [
   {
@@ -304,40 +305,23 @@ export function ClubDetailsPage() {
                 className="space-y-4"
               >
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Available Courts Today</h3>
-                <div className="grid gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {displayClub.courts.map((court, index) => (
-                      <motion.div
+                      <CourtCard
                         key={court.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="rounded-2xl bg-gray-50 dark:bg-[#1A1F2C] border border-gray-200 dark:border-[#2A303C] p-4 hover:border-blue-400 dark:hover:border-[#00E5FF]/50 transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="mb-1 font-bold text-gray-900 dark:text-white">{court.name}</h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{court.type}</p>
-                            {!court.available && court.nextAvailable && (
-                              <p className="text-xs text-[#00E5FF] mt-1">
-                                Next: {court.nextAvailable}
-                              </p>
-                            )}
-                          </div>
-                          {court.available ? (
-                            <button
-                              onClick={() => {
-                                setSelectedCourt(court.id);
-                                document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
-                              }}
-                              className="px-5 py-2 rounded-xl font-semibold text-sm bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black hover:scale-105 transition-all shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20"
-                            >
-                              Book Now
-                            </button>
-                          ) : (
-                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest opacity-40">Occupied</span>
-                          )}
-                        </div>
-                      </motion.div>
+                        court={{
+                          id: court.id,
+                          name: court.name,
+                          status: court.available ? "available" : "in-use",
+                          type: court.type,
+                          next_booking: court.nextAvailable
+                        }}
+                        index={index}
+                        onClick={court.available ? () => {
+                          setSelectedCourt(court.id);
+                          document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
+                        } : undefined}
+                      />
                     ))}
                   </div>
                 </motion.div>

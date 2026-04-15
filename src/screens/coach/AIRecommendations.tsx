@@ -46,7 +46,7 @@ export function AIRecommendations() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)}
-            className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#39FF14]/10 transition-colors"
+            className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#00E5FF]/10 transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
@@ -59,7 +59,7 @@ export function AIRecommendations() {
         </div>
         <button 
           onClick={handleGenerateAnalysis}
-          className="px-6 py-3 bg-[#39FF14] text-black font-bold rounded-xl flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-[#39FF14]/20"
+          className="px-6 py-3 bg-[#00E5FF] text-black font-bold rounded-xl flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-[#00E5FF]/20"
         >
           {analyzing ? <Loader2 className="animate-spin" size={20} /> : <Brain size={20} />}
           Generate New Analysis
@@ -83,11 +83,11 @@ export function AIRecommendations() {
                   <div className="w-[60%] h-full bg-blue-400" />
                </div>
             </div>
-            <div className="p-6 bg-[#39FF14]/10 border border-[#39FF14]/20 rounded-[32px]">
-               <h4 className="text-[#39FF14] text-xs font-bold uppercase tracking-widest mb-2">Avg Improvement</h4>
+            <div className="p-6 bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-[32px]">
+               <h4 className="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-2">Avg Improvement</h4>
                <p className="text-3xl font-bold dark:text-white">{loading ? "..." : "+8.2%"}</p>
                <div className="w-full bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
-                  <div className="w-[75%] h-full bg-[#39FF14]" />
+                  <div className="w-[75%] h-full bg-[#00E5FF]" />
                </div>
             </div>
         </div>
@@ -131,7 +131,7 @@ export function AIRecommendations() {
                           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-white/10" />
                           <span className="text-sm font-bold dark:text-white">{rec.student_name}</span>
                        </div>
-                       <button className="flex items-center gap-2 text-sm font-bold text-[#39FF14] group-hover:translate-x-1 transition-transform">
+                       <button className="flex items-center gap-2 text-sm font-bold text-[#00E5FF] group-hover:translate-x-1 transition-transform">
                           Assign to Student <ArrowRight size={16} />
                        </button>
                     </div>

@@ -87,7 +87,7 @@ export function LoginPage() {
                   type="email"
                   name="email"
                   placeholder="Email Address"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -101,7 +101,7 @@ export function LoginPage() {
                   type="password"
                   name="password"
                   placeholder="Password"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -112,7 +112,7 @@ export function LoginPage() {
               <div className="text-right">
                 <Link
                   to="/forgot-password"
-                  className="font-['Poppins',sans-serif] text-[13px] text-[#00E5FF] hover:text-[#00D4E6] transition-colors"
+                  className="font-['Poppins',sans-serif] text-[13px] text-blue-500 dark:text-[#00E5FF] hover:text-blue-600 dark:hover:text-[#00E5FF] transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -129,7 +129,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-14 bg-[#00E5FF] rounded-[28px] shadow-[0_0_32px_rgba(0,229,255,0.5)] hover:shadow-[0_0_48px_rgba(0,229,255,0.7)] hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-black mt-6 flex items-center justify-center gap-2"
+              className="w-full h-14 bg-blue-500 dark:bg-[#00E5FF] rounded-[28px] shadow-blue-500 dark:shadow-[#00E5FF]/50 hover:shadow-blue-500 dark:hover:shadow-[#00E5FF]/70 hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-black mt-6 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -148,7 +148,7 @@ export function LoginPage() {
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="text-[#0A0E1A] dark:text-white font-semibold hover:text-[#00E5FF] transition-colors"
+                className="text-[#0A0E1A] dark:text-white font-semibold hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors"
               >
                 Sign up
               </Link>
@@ -166,7 +166,7 @@ export function LoginPage() {
       >
         <Link 
           to="/" 
-          className="flex items-center gap-2 text-[#0A0E1A]/50 dark:text-white/50 hover:text-[#00E5FF] transition-colors group"
+          className="flex items-center gap-2 text-[#0A0E1A]/50 dark:text-white/50 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors group"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-['Poppins',sans-serif] text-[14px] font-medium">Back to Home</span>

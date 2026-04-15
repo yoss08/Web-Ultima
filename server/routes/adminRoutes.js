@@ -25,12 +25,12 @@ router.get('/courts', async (req, res) => {
 // POST /api/admin/courts - create court
 router.post('/courts', async (req, res) => {
   try {
-    const { name, type, status, capacity, surface, pricing_peak, pricing_offpeak, almus_hardware_id } = req.body;
+    const { name, type, status, capacity, surface, pricing_peak, pricing_offpeak, hardware_id, club_id } = req.body;
     
     const { data, error } = await supabase
       .from('courts')
       .insert([{ 
-        name, type, status, capacity, surface, pricing_peak, pricing_offpeak, almus_hardware_id
+        name, type, status, capacity, surface, pricing_peak, pricing_offpeak, hardware_id, club_id
       }])
       .select();
       
@@ -150,7 +150,12 @@ router.get('/matches', async (req, res) => {
  */
 router.get('/players', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('profiles').select('*').eq('account_type', 'Player');
+    // Return players and coaches — frontend filters by tab
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, phone, role, avatar_url, created_at, club_id')
+      .in('role', ['player', 'coach', 'admin'])
+      .order('created_at', { ascending: false });
     if (error) throw error;
     res.json(data);
   } catch (error) { res.status(500).json({ error: error.message }); }

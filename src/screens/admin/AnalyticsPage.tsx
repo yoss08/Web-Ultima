@@ -112,7 +112,7 @@ export function AnalyticsPage() {
             <Filter size={18} /> Filter Period
           </button>
           <div className="relative group">
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#39FF14] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#00E5FF] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
               {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={18} />} Export
             </button>
             <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1a1e2e] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
@@ -148,7 +148,7 @@ export function AnalyticsPage() {
                   <XAxis dataKey="month" stroke={textStroke} />
                   <YAxis stroke={textStroke} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#39FF14" strokeWidth={3} dot={false} />
+                  <Line type="monotone" dataKey="value" stroke="#00E5FF" strokeWidth={3} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -195,7 +195,7 @@ export function AnalyticsPage() {
                   <Users className="text-purple-500" />
                 </div>
                 <p className="text-gray-500 text-sm">Analyze your member database growth and categories here.</p>
-                <button className="mt-4 text-[#39FF14] text-sm font-bold underline">Generate Member Report</button>
+                <button className="mt-4 text-[#00E5FF] text-sm font-bold underline">Generate Member Report</button>
               </div>
             )}
           </div>

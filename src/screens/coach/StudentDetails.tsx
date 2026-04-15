@@ -138,13 +138,13 @@ export function StudentDetails() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#39FF14]/10 transition-colors"
+          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#00E5FF]/10 transition-colors"
         >
           <ChevronLeft size={20} />
         </button>
         <div>
-          <h1 className="text-3xl font-bold dark:text-white">{student?.full_name}</h1>
-          <p className="text-gray-500 italic">Student Performance Management</p>
+          <h1 className="text-2xl sm:text-3xl font-bold dark:text-white truncate max-w-[200px] sm:max-w-none">{student?.full_name}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 italic">Student Performance Management</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export function StudentDetails() {
         
         {/* COLONNE GAUCHE : FORMULAIRE FEEDBACK */}
         <div className="lg:col-span-2 space-y-6">
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-8">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Star className="text-[#39FF14]" size={22} />
               Technical Evaluation
@@ -164,10 +164,10 @@ export function StudentDetails() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Analyze the student's progress, strengths, and weaknesses..."
-                className="w-full h-40 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#39FF14] outline-none transition-all resize-none text-sm"
+                className="w-full h-40 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#00E5FF] outline-none transition-all resize-none text-sm"
               />
               
-              <div className="flex items-center justify-between pt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pt-6 border-t border-gray-100 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium mr-2">Session Rating:</span>
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -180,7 +180,7 @@ export function StudentDetails() {
                 <button 
                   onClick={handleSubmitEvaluation}
                   disabled={submitting}
-                  className="bg-[#39FF14] text-black px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
+                  className="w-full sm:w-auto bg-[#00E5FF] text-black px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[#00E5FF]/20"
                 >
                   {submitting ? "Saving..." : "Save Evaluation"}
                   <Send size={18} />
@@ -190,7 +190,7 @@ export function StudentDetails() {
           </section>
 
           {/* PERFORMANCE CHART */}
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-8">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Activity className="text-blue-400" size={22} />
               Progress Over Time
@@ -200,8 +200,8 @@ export function StudentDetails() {
                 <AreaChart data={trend}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#39FF14" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#39FF14" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#00E5FF" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#00E5FF" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#888888" vertical={false} opacity={0.1} />
@@ -211,7 +211,7 @@ export function StudentDetails() {
                     contentStyle={{ backgroundColor: '#1a1a1a', border: 'none', borderRadius: '12px' }}
                     labelFormatter={(str) => new Date(str).toLocaleDateString()}
                   />
-                  <Area type="monotone" dataKey="technique" stroke="#39FF14" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="technique" stroke="#00E5FF" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
                   <Area type="monotone" dataKey="power" stroke="#FFD700" fillOpacity={0} strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -219,7 +219,7 @@ export function StudentDetails() {
           </section>
 
           {/* MATCH HISTORY */}
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-8">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
             <h3 className="text-xl font-bold mb-6">Recent Matches</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -251,7 +251,7 @@ export function StudentDetails() {
         {/* COLONNE DROITE : MISE À JOUR DES SCORES (SKILLS) */}
         <div className="space-y-6">
           {/* PRIVATE NOTES SECTION */}
-          <section className="bg-white dark:bg-white/5 text-slate-900 dark:text-white rounded-[32px] p-8 border border-gray-100 dark:border-white/10 shadow-sm">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               📝 Private Notes
             </h3>
@@ -281,7 +281,7 @@ export function StudentDetails() {
               {savingNotes ? 'Saving...' : 'Save Notes'}
             </button>
           </section>
-          <section className="bg-white dark:bg-white/5 text-slate-900 dark:text-white rounded-[32px] p-8 border border-gray-100 dark:border-white/10 shadow-sm transition-colors duration-300">
+          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm transition-colors duration-300">
             <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
               <Activity className="text-[#39FF14]" size={20} />
               Update Skills
@@ -292,21 +292,21 @@ export function StudentDetails() {
                 <div key={skill} className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-bold uppercase tracking-tighter text-slate-500 dark:text-white/70">{skill}</span>
-                    <span className="text-[#39FF14] font-mono font-bold">{value}%</span>
+                    <span className="text-[#00E5FF] font-mono font-bold">{value}%</span>
                   </div>
                   <input 
                     type="range" 
                     min="0" max="100" 
                     value={value}
                     onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value)})}
-                    className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#39FF14] transition-all"
+                    className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#00E5FF] transition-all"
                   />
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-[#39FF14]/10 rounded-2xl border border-[#39FF14]/20">
-              <p className="text-[11px] text-[#2ebd10] dark:text-[#39FF14] font-medium leading-relaxed">
+            <div className="mt-8 p-4 bg-[#00E5FF]/10 rounded-2xl border border-[#00E5FF]/20">
+              <p className="text-[11px] text-[#00E5FF] dark:text-[#00E5FF] font-medium leading-relaxed">
                 Updating these values will immediately refresh the histogram on the student's analytics dashboard.
               </p>
             </div>

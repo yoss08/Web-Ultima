@@ -60,7 +60,7 @@ export function AdminCompetitionsPage() {
           >
             <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
           </button>
-          <button className="flex items-center gap-2 px-6 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-transform">
+          <button className="flex items-center gap-2 px-6 bg-[#00E5FF] text-black font-bold rounded-xl hover:scale-105 transition-transform">
             <Plus size={20} /> Create New
           </button>
         </div>
@@ -79,10 +79,10 @@ export function AdminCompetitionsPage() {
           </div>
         ) : (
           competitions.map((comp) => (
-            <div key={comp.id} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 group hover:border-[#39FF14]/30 transition-all shadow-sm">
+            <div key={comp.id} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 group hover:border-[#00E5FF]/30 transition-all shadow-sm">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="p-3 rounded-2xl bg-[#39FF14]/10 text-[#39FF14]">
-                    <Trophy size={24} />
+                  <div className="p-3 rounded-2xl bg-[#00E5FF]/10">
+                    <Trophy size={24} className="text-[#39FF14]" />
                   </div>
                   <span className="text-[10px] font-bold uppercase py-1 px-3 bg-yellow-500/10 text-yellow-500 rounded-full">
                     {comp.status}
@@ -104,7 +104,7 @@ export function AdminCompetitionsPage() {
                       <Users size={16} className="text-[#39FF14]" />
                       {comp.participants_count || 0} Registered
                    </div>
-                   <button className="p-2 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-[#39FF14] group-hover:text-black transition-all">
+                   <button className="p-2 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-[#00E5FF] group-hover:text-black transition-all">
                       <ChevronRight size={20} />
                    </button>
                 </div>

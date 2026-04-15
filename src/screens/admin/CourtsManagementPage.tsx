@@ -70,13 +70,13 @@ export function CourtsManagementPage() {
   const getStatusConfig = (status: CourtStatus) => {
     switch (status) {
       case "available":
-        return { color: "#39FF14", icon: CheckCircle, label: "Available", bg: "bg-[#39FF14]/10" };
+        return { color: "#39FF14", iconColor: "#39FF14", icon: CheckCircle, label: "Available", bg: "bg-[#00E5FF]/10" };
       case "in-use":
-        return { color: "#00E5FF", icon: AlertCircle, label: "In Use", bg: "bg-[#00E5FF]/10" };
+        return { color: "#efff14ff", iconColor: "#efff14ff", icon: AlertCircle, label: "In Use", bg: "bg-[#00E5FF]/10" };
       case "maintenance":
-        return { color: "#FF3B30", icon: Wrench, label: "Maintenance", bg: "bg-[#FF3B30]/10" };
+        return { color: "#FF3B30", iconColor: "#FF3B30", icon: Wrench, label: "Maintenance", bg: "bg-[#FF3B30]/10" };
       default:
-        return { color: "#999", icon: AlertCircle, label: "Unknown", bg: "bg-gray-500/10" };
+        return { color: "#999", iconColor: "#999", icon: AlertCircle, label: "Unknown", bg: "bg-gray-500/10" };
     }
   };
 
@@ -98,7 +98,7 @@ export function CourtsManagementPage() {
           </button>
           <Link 
             to="/dashboard/admin/courts-config" 
-            className="flex items-center gap-2 px-6 bg-[#39FF14] text-black font-bold rounded-xl hover:scale-105 transition-transform"
+            className="flex items-center gap-2 px-6 bg-[#00E5FF] text-black font-bold rounded-xl hover:scale-105 transition-transform"
           >
             <Plus size={20} /> Add Court
           </Link>
@@ -131,20 +131,20 @@ export function CourtsManagementPage() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-bold dark:text-white group-hover:text-[#39FF14] transition-colors">
+                    <h3 className="text-xl font-bold dark:text-white group-hover:text-[#00E5FF] transition-colors">
                       {court.name}
                     </h3>
                     <div className="flex gap-2 mt-1">
                       <span className="text-[10px] bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
                         {court.type}
                       </span>
-                      <span className="text-[10px] bg-[#39FF14]/10 px-2 py-0.5 rounded text-[#39FF14] font-bold uppercase tracking-wider">
+                      <span className="text-[10px] bg-[#00E5FF]/10 px-2 py-0.5 rounded text-[#00E5FF] font-bold uppercase tracking-wider">
                         {court.surface}
                       </span>
                     </div>
                   </div>
                   <div className={`p-2 rounded-lg ${config.bg}`}>
-                    <Icon size={20} style={{ color: config.color }} />
+                    <Icon size={20} style={{ color: config.iconColor }} />
                   </div>
                 </div>
 
@@ -176,7 +176,7 @@ export function CourtsManagementPage() {
 
                   {court.almus_hardware_id && (
                     <div className="flex items-center gap-2 px-1">
-                      <div className="w-1.5 h-1.5 bg-[#39FF14] rounded-full animate-pulse shadow-[0_0_8px_#39FF14]"></div>
+                      <div className="w-1.5 h-1.5 bg-[#00E5FF] rounded-full animate-pulse shadow-[0_0_8px_#00E5FF]"></div>
                       <p className="text-[10px] text-gray-500 font-medium">ALMUS Linked: {court.almus_hardware_id}</p>
                     </div>
                   )}
@@ -188,7 +188,7 @@ export function CourtsManagementPage() {
                     onClick={() => toggleMaintenance(court.id, court.status)}
                     className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
                       court.status === "maintenance" 
-                      ? "bg-[#39FF14] text-black" 
+                      ? "bg-[#00E5FF] text-black" 
                       : "bg-gray-100 dark:bg-white/10 dark:text-white hover:bg-red-500 hover:text-white"
                     }`}
                   >

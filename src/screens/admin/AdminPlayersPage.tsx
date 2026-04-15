@@ -70,7 +70,7 @@ export function AdminPlayersPage() {
         <input 
           type="text"
           placeholder="Search by name or email..."
-          className="w-full h-14 pl-12 pr-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl dark:text-white outline-none focus:border-[#39FF14] transition-all"
+          className="w-full h-14 pl-12 pr-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl dark:text-white outline-none focus:border-[#00E5FF] transition-all"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -102,7 +102,7 @@ export function AdminPlayersPage() {
                   <tr key={player.id} className="group hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#39FF14]/10 flex items-center justify-center text-[#39FF14] font-bold text-lg border border-[#39FF14]/20 shadow-[0_0_15px_rgba(57,255,20,0.05)]">
+                        <div className="w-12 h-12 rounded-2xl bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF] font-bold text-lg border border-[#00E5FF]/20 shadow-[0_0_15px_rgba(0,229,255,0.05)]">
                           {player.full_name?.[0].toUpperCase()}
                         </div>
                         <div>
