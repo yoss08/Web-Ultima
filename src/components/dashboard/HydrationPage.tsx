@@ -122,7 +122,7 @@ export function HydrationPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[24px] p-6 shadow-sm">
-            <stat.icon className="w-6 h-6 text-[#00E5FF] mb-4" />
+            <stat.icon className="w-6 h-6 text-accent mb-4" />
             <h3 className="text-xs opacity-50 uppercase font-bold tracking-wider mb-1">{stat.label}</h3>
             <p className="text-2xl font-bold dark:text-white">{stat.value}</p>
             <p className="text-[10px] opacity-40 mt-1 font-medium">{stat.change}</p>
@@ -134,11 +134,11 @@ export function HydrationPage() {
         {/* Left: Tracker & Log */}
         <div className="lg:col-span-2 space-y-8">
           <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-10 flex flex-col items-center">
-            <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full border-8 border-[#00E5FF]/10 flex items-center justify-center overflow-hidden mb-8 sm:mb-10">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full border-8 border-accent/10 flex items-center justify-center overflow-hidden mb-8 sm:mb-10">
               <motion.div 
                 initial={{ height: 0 }}
                 animate={{ height: `${Math.min((consumed/goal)*100, 100)}%` }}
-                className="absolute bottom-0 w-full bg-gradient-to-t from-[#00E5FF]/40 to-[#00E5FF]/10"
+                className="absolute bottom-0 w-full bg-gradient-to-t from-accent/40 to-accent/10"
                 transition={{ type: "spring", bounce: 0, duration: 1 }}
               />
               <div className="relative z-10 text-center">
@@ -152,7 +152,7 @@ export function HydrationPage() {
                 <button
                   key={amount}
                   onClick={() => addWater(amount)}
-                  className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 hover:bg-[#00E5FF] hover:text-black transition-all font-bold flex flex-col items-center group"
+                  className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-accent/10 border border-accent/20 hover:bg-accent hover:text-accent-foreground transition-all font-bold flex flex-col items-center group"
                 >
                   <Plus size={16} className="mb-1 group-hover:scale-125 transition-transform" />
                   <span className="text-xs sm:text-sm">{amount}ml</span>
@@ -164,7 +164,7 @@ export function HydrationPage() {
           {/* WEEK TRACKER CHART */}
           <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
             <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-              <TrendingUp size={20} className="text-[#00E5FF]" /> Weekly Intake Tracker
+              <TrendingUp size={20} className="text-accent" /> Weekly Intake Tracker
             </h3>
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -184,9 +184,9 @@ export function HydrationPage() {
                     style={{ fontSize: "12px", fontFamily: "Poppins" }} 
                   />
                   <Tooltip 
-                    cursor={{ fill: 'rgba(0, 229, 255, 0.05)' }}
+                    cursor={{ fill: 'var(--theme-accent)', opacity: 0.05 }}
                     contentStyle={{ 
-                      backgroundColor: isDark ? "#0A0E1A" : "#fff", 
+                      backgroundColor: isDark ? "var(--theme-card)" : "#fff", 
                       border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "#eee"}`,
                       borderRadius: "12px",
                       fontSize: "12px"
@@ -194,7 +194,7 @@ export function HydrationPage() {
                   />
                   <Bar 
                     dataKey="usage" 
-                    fill="#00E5FF" 
+                    fill="var(--theme-accent)" 
                     radius={[10, 10, 0, 0]} 
                     barSize={40}
                   />
@@ -207,19 +207,19 @@ export function HydrationPage() {
         {/* Right: History & Station */}
         <div className="space-y-6">
           {/* Station 1 Card */}
-          <div className="bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-[24px] p-6 relative overflow-hidden group">
+          <div className="bg-accent/5 border border-accent/20 rounded-[24px] p-6 relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-bold dark:text-white">Station 1</h3>
-                <span className="bg-[#39FF14] text-black text-[9px] font-black px-2 py-0.5 rounded-full">ACTIVE</span>
+                <span className="bg-accent text-accent-foreground text-[9px] font-black px-2 py-0.5 rounded-full">ACTIVE</span>
               </div>
               <p className="text-xs opacity-50 mb-4">{machines[0].location}</p>
               <div className="flex justify-between text-xs font-bold mb-1">
                 <span>Water Level</span>
-                <span className="text-[#39FF14]">{machines[0].waterLevel}%</span>
+                <span className="text-accent">{machines[0].waterLevel}%</span>
               </div>
-              <div className="h-1.5 bg-[#39FF14]/10 rounded-full overflow-hidden">
-                <div className="h-full bg-[#39FF14]" style={{ width: `${machines[0].waterLevel}%` }} />
+              <div className="h-1.5 bg-accent/10 rounded-full overflow-hidden">
+                <div className="h-full bg-accent" style={{ width: `${machines[0].waterLevel}%` }} />
               </div>
             </div>
           </div>
@@ -239,10 +239,10 @@ export function HydrationPage() {
                       key={i}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="flex justify-between items-center p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-transparent hover:border-[#00E5FF]/20 transition-all"
+                      className="flex justify-between items-center p-3 bg-muted rounded-xl border border-transparent hover:border-accent/20 transition-all"
                     >
                       <span className="text-[10px] font-bold opacity-40">{item.time}</span>
-                      <span className="text-sm font-bold text-[#00E5FF]">+{item.amount}ml</span>
+                      <span className="text-sm font-bold text-accent">+{item.amount}ml</span>
                     </motion.div>
                   ))
                 )}

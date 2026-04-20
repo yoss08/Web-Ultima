@@ -24,7 +24,7 @@ interface Student {
   wins?: number;
 }
 
-const COLORS = ["#C084FC", "#00E5FF", "#FFD700", "#FF4D4D"];
+const COLORS = ["#CCFF00", "#00E5FF", "#C084FC", "#F43F5E"];
 
 export function StudentComparison() {
   const { user } = useAuth();
@@ -111,34 +111,34 @@ export function StudentComparison() {
     return entry;
   });
 
-  if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-[#39FF14]" /></div>;
+  if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-accent" /></div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-10">
-      <Link to="/dashboard/coach/students" className="inline-flex items-center gap-2 text-sm font-bold opacity-50 hover:opacity-100">
+      <Link to="/dashboard/coach/students" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
         <ArrowLeft size={16} /> Back to Students
       </Link>
 
       <header>
-        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black dark:text-white mb-2">
-          Student <span className="text-[#00E5FF]">Comparison</span>
+        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black text-foreground mb-2">
+          Student <span className="text-accent">Comparison</span>
         </h1>
-        <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Select up to 3 students to compare side-by-side.</p>
+        <p className="text-muted-foreground font-['Poppins']">Select up to 3 students to compare side-by-side.</p>
       </header>
 
       {/* Student Selection */}
-      <div className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-200 dark:border-white/10">
-        <h3 className="font-bold mb-4 flex items-center gap-2"><Users size={18} className="text-[#39FF14]" /> Select Students</h3>
-        <div className="flex flex-wrap gap-2">
+      <div className="bg-card p-6 rounded-[28px] border border-border">
+        <h3 className="font-bold mb-4 flex items-center gap-2 text-foreground"><Users size={18} className="text-accent" /> Select Students</h3>
+        <div className="flex flex-wrap gap-2 font-['Poppins']">
           {students.map((s) => {
             const isSelected = selected.includes(s.id);
             return (
               <button
                 key={s.id} onClick={() => toggleStudent(s.id)}
-                className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                className={`px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all ${
                   isSelected
-                    ? "bg-[#00E5FF] text-black shadow-md"
-                    : "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/50 hover:bg-gray-200 dark:hover:bg-white/10"
+                    ? "bg-accent text-accent-foreground shadow-md shadow-accent/20"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
                 {s.full_name}
@@ -152,42 +152,42 @@ export function StudentComparison() {
       {selectedStudents.length >= 2 && (
         <>
           {/* Radar Chart */}
-          <div className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-200 dark:border-white/10">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <BarChart3 size={18} className="text-[#00E5FF]" /> Skill Comparison
+          <div className="bg-card p-6 rounded-[28px] border border-border">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-foreground">
+              <BarChart3 size={18} className="text-accent" /> Skill Comparison
             </h3>
-            <div className="h-[350px]">
+            <div className="h-[350px] font-['Poppins']">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="#88888830" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: "#888", fontSize: 12 }} />
+                  <PolarGrid stroke="var(--theme-border)" opacity={0.3} />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: "var(--theme-muted-foreground)", fontSize: 10, fontWeight: 600 }} />
                   <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
                   {selectedStudents.map((s, i) => (
                     <Radar key={s.id} name={s.full_name} dataKey={s.full_name}
                       stroke={COLORS[i]} fill={COLORS[i]} fillOpacity={0.15} strokeWidth={2} />
                   ))}
-                  <Radar name="Average" dataKey="Average" stroke="#888" fill="#888" fillOpacity={0.05} strokeWidth={1} strokeDasharray="4 4" />
-                  <Legend />
+                  <Radar name="Average" dataKey="Average" stroke="var(--theme-muted-foreground)" fill="var(--theme-muted-foreground)" fillOpacity={0.05} strokeWidth={1} strokeDasharray="4 4" />
+                  <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', fontWeight: 'bold' }} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Stats Comparison Table */}
-          <div className="bg-white dark:bg-white/5 p-6 rounded-[28px] border border-gray-200 dark:border-white/10 overflow-x-auto">
-            <h3 className="font-bold mb-4">Stats Overview</h3>
-            <table className="w-full text-sm">
+          <div className="bg-card p-6 rounded-[28px] border border-border overflow-x-auto shadow-sm">
+            <h3 className="font-bold mb-4 text-foreground font-['Playfair_Display']">Stats Overview</h3>
+            <table className="w-full text-sm font-['Poppins']">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-white/10">
-                  <th className="text-left py-3 text-xs font-bold uppercase opacity-40">Metric</th>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 text-[10px] font-bold uppercase text-muted-foreground/60 tracking-widest">Metric</th>
                   {selectedStudents.map((s, i) => (
-                    <th key={s.id} className="text-center py-3 text-xs font-bold uppercase" style={{ color: COLORS[i] }}>
+                    <th key={s.id} className="text-center py-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: COLORS[i] }}>
                       {s.full_name}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-white/5">
+              <tbody className="divide-y divide-border/50">
                 {[
                   { label: "Matches Played", key: "matches_played" },
                   { label: "Wins", key: "wins" },
@@ -199,9 +199,9 @@ export function StudentComparison() {
                   { label: "Mental", key: "mental" },
                 ].map(({ label, key }) => (
                   <tr key={key}>
-                    <td className="py-3 font-bold opacity-60">{label}</td>
+                    <td className="py-3 font-bold text-muted-foreground">{label}</td>
                     {selectedStudents.map((s) => (
-                      <td key={s.id} className="py-3 text-center font-mono font-bold">
+                      <td key={s.id} className="py-3 text-center font-mono font-bold text-foreground">
                         {key === "winRate"
                           ? `${s.matches_played ? Math.round(((s.wins || 0) / s.matches_played) * 100) : 0}%`
                           : (s as any)[key] || 0}
@@ -216,7 +216,7 @@ export function StudentComparison() {
       )}
 
       {selectedStudents.length < 2 && (
-        <div className="text-center py-16 opacity-30">
+        <div className="text-center py-16 text-muted-foreground/30">
           <Users size={40} className="mx-auto mb-4" />
           <p className="font-['Poppins']">Select at least 2 students to compare.</p>
         </div>

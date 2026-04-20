@@ -7,6 +7,7 @@ import { toast, Toaster } from 'sonner';
 import { Mail, Phone } from 'lucide-react';
 import { useAuth } from "../../services/AuthContext";
 import Navigation from "../../components/Navigation";
+import Footer from "../../components/Footer";
 
 const scoringSystemImage = "https://www.vrpadel.co.za/wp-content/uploads/2025/03/WS_2.png";
 const athleteImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -160,25 +161,25 @@ export function SummaPage() {
 
   const handleContactClick = () => {
   toast.custom((t) => (
-    <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
+    <div className="bg-white dark:bg-card border border-gray-200 dark:border-border p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
+        <h3 className="font-bold text-gray-900 dark:text-foreground font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
         <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
       </div>
       
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[#00E5FF]/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
+          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+            <Phone className="w-4 h-4 text-accent" />
           </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
+          <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+            <Mail className="w-4 h-4 text-accent" />
           </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+          <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
         </div>
       </div>
     </div>
@@ -190,14 +191,14 @@ export function SummaPage() {
 
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-background transition-colors duration-300">
       <Toaster />
       <Navigation />
       
 {/* Hero Section */}
       <section className="relative min-h-[70vh] pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-       <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-       <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+       <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+       <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-[1200px] mx-auto w-full px-4 sm:px-6 md:px-8 lg:px-12 pb-12 sm:pb-16 relative z-10">
           <div className="text-center space-y-6 sm:space-y-8">
             {/* Title */}
@@ -207,12 +208,12 @@ export function SummaPage() {
               transition={{ duration: 0.8 }}
             >
               <h1
-                className="font-['Playfair_Display',serif] font-bold text-[56px] sm:text-[80px] md:text-[90px] lg:text-[120px] leading-[0.9] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
+                className="font-['Playfair_Display',serif] font-bold text-[56px] sm:text-[80px] md:text-[90px] lg:text-[120px] leading-[0.9] text-gray-900 dark:text-foreground mb-4 transition-colors duration-300"
                 style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
               >
                 SUMMA
               </h1>
-              <div className="w-32 sm:w-40 h-[6px] bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_20px_rgba(57,255,20,0.8)] mx-auto mb-6 sm:mb-8 transition-colors duration-300"></div>
+              <div className="w-32 sm:w-40 h-[6px] bg-accent rounded-full shadow-lg shadow-accent/40 mx-auto mb-6 sm:mb-8 transition-colors duration-300"></div>
             </motion.div>
 
             {/* Subtitle */}
@@ -220,7 +221,7 @@ export function SummaPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="font-['Poppins',sans-serif] text-[20px] sm:text-[24px] md:text-[28px] text-gray-700 dark:text-white/90 font-light tracking-wide transition-colors duration-300"
+              className="font-['Poppins',sans-serif] text-[20px] sm:text-[24px] md:text-[28px] text-gray-700 dark:text-foreground/90 font-light tracking-wide transition-colors duration-300"
             >
               Smart Scoring & Facility System
             </motion.h2>
@@ -230,7 +231,7 @@ export function SummaPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="font-['Poppins',sans-serif] text-[16px] sm:text-[18px] leading-[1.8] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300 px-4"
+              className="font-['Poppins',sans-serif] text-[16px] sm:text-[18px] leading-[1.8] text-gray-600 dark:text-foreground/60 max-w-2xl mx-auto transition-colors duration-300 px-4"
             >
               An intelligent scoring and facility management system designed for
               padel courts and professional sports environments
@@ -244,13 +245,13 @@ export function SummaPage() {
               className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4"
             >
               <button
-                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 dark:bg-[#39FF14] dark:hover:bg-[#32E012] h-[52px] sm:h-[60px] px-8 sm:px-12 rounded-full hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[16px] text-white dark:text-black shadow-lg dark:shadow-[0_0_20px_rgba(57,255,20,0.6)]"
+                className="w-full sm:w-auto bg-accent h-[52px] sm:h-[60px] px-8 sm:px-12 rounded-full hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[16px] text-accent-foreground shadow-lg shadow-accent/20"
               >
                 Request a demo
               </button>
               
               <button onClick={handleContactClick}
-                className="w-full sm:w-auto bg-transparent hover:bg-gray-100 dark:hover:bg-white/10 h-[52px] sm:h-[60px] px-8 sm:px-12 rounded-full border-2 border-gray-300 dark:border-white/40 hover:border-emerald-500 dark:hover:border-[#39FF14] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[16px] text-gray-800 dark:text-white"
+                className="w-full sm:w-auto bg-transparent hover:bg-gray-100 dark:hover:bg-accent/5 h-[52px] sm:h-[60px] px-8 sm:px-12 rounded-full border-2 border-gray-300 dark:border-border transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[16px] text-gray-800 dark:text-foreground"
               >
                 Contact sales
               </button>
@@ -261,8 +262,8 @@ export function SummaPage() {
 
       {/* Key Metrics Section */}
       <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-4 sm:px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {metrics.map((metric, index) => (
@@ -272,15 +273,15 @@ export function SummaPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="relative bg-gray-100 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-6 sm:p-8 text-center transition-colors duration-300"
+                className="relative bg-gray-100 dark:bg-card border border-gray-200 dark:border-border rounded-[20px] p-6 sm:p-8 text-center transition-colors duration-300"
               >
                 <h3
-                  className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] text-emerald-500 dark:text-[#39FF14] mb-2 transition-colors duration-300"
+                  className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[42px] md:text-[48px] text-accent mb-2 transition-colors duration-300"
                   style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
                 >
                   {metric.number}
                 </h3>
-                <p className="font-['Poppins',sans-serif] text-[13px] sm:text-[14px] text-gray-600 dark:text-white/70 uppercase tracking-wider transition-colors duration-300">
+                <p className="font-['Poppins',sans-serif] text-[13px] sm:text-[14px] text-gray-600 dark:text-foreground/70 uppercase tracking-wider transition-colors duration-300">
                   {metric.label}
                 </p>
               </motion.div>
@@ -292,8 +293,8 @@ export function SummaPage() {
 
       {/* What Is Summa Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -303,7 +304,7 @@ export function SummaPage() {
             className="text-center mb-16"
           >
             <h2
-              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
               style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
             >
               A complete scoring system
@@ -320,13 +321,13 @@ export function SummaPage() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              <div className="relative rounded-[24px] overflow-hidden border border-gray-200 dark:border-white/10 transition-colors duration-300">
+              <div className="relative rounded-[24px] overflow-hidden border border-gray-200 dark:border-border transition-colors duration-300">
                 <img
                   src={scoringSystemImage}
                   alt="SUMMA scoring system in action"
                   className="w-full h-auto"
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 dark:from-[#39FF14]/10 to-transparent pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent pointer-events-none"></div>
               </div>
             </motion.div>
 
@@ -337,19 +338,19 @@ export function SummaPage() {
               transition={{ duration: 0.8 }}
               className="space-y-6"
             >
-              <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.8] text-gray-600 dark:text-white/70 transition-colors duration-300">
+              <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.8] text-gray-600 dark:text-foreground/70 transition-colors duration-300">
                 SUMMA combines real-time scoring, hardware and software
                 integration, and centralized management in one intelligent
                 platform.
               </p>
 
-              <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.8] text-gray-600 dark:text-white/70 transition-colors duration-300">
+              <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.8] text-gray-600 dark:text-foreground/70 transition-colors duration-300">
                 Designed specifically for padel courts, it automates
                 match tracking while giving facility managers complete control
                 over court operations and player data.
               </p>
 
-              <div className="w-24 h-1 bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
+              <div className="w-24 h-1 bg-accent rounded-full shadow-lg shadow-accent/40 transition-colors duration-300"></div>
             </motion.div>
           </div>
         </div>
@@ -357,8 +358,8 @@ export function SummaPage() {
 
       {/* Core Features Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -385,18 +386,18 @@ export function SummaPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white dark:bg-black border border-gray-200 dark:border-white/10 p-10 rounded-[20px] hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300"
+                  className="bg-white dark:bg-card border border-gray-200 dark:border-border p-10 rounded-[20px] hover:border-accent transition-all duration-300"
                 >
                   <div className="mb-6">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                      <Icon className="w-7 h-7 text-emerald-500 dark:text-[#39FF14]" />
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-accent/10 border border-accent/30">
+                      <Icon className="w-7 h-7 text-accent" />
                     </div>
                   </div>
 
-                  <h3 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-gray-900 dark:text-white mb-3 leading-[1.3] transition-colors duration-300">
+                  <h3 className="font-['Poppins',sans-serif] font-semibold text-[20px] text-gray-900 dark:text-foreground mb-3 leading-[1.3] transition-colors duration-300">
                     {feature.title}
                   </h3>
-                  <p className="font-['Poppins',sans-serif] text-[15px] leading-[1.6] text-gray-600 dark:text-white/60 transition-colors duration-300">
+                  <p className="font-['Poppins',sans-serif] text-[15px] leading-[1.6] text-gray-600 dark:text-foreground/60 transition-colors duration-300">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -408,8 +409,8 @@ export function SummaPage() {
 
       {/* How It Works Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -419,7 +420,7 @@ export function SummaPage() {
             className="text-center mb-16"
           >
             <h2
-              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
               style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
             >
               How it works
@@ -436,21 +437,21 @@ export function SummaPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className="relative bg-gray-100 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 text-center transition-colors duration-300"
+                  className="relative bg-gray-100 dark:bg-card border border-gray-200 dark:border-border rounded-[20px] p-10 text-center transition-colors duration-300"
                 >
                   <div className="mb-6">
-                    <span className="font-['Playfair_Display',serif] font-bold text-[72px] text-emerald-200 dark:text-[#39FF14]/20 transition-colors duration-300">
+                    <span className="font-['Playfair_Display',serif] font-bold text-[72px] text-accent/20 transition-colors duration-300">
                       {step.number}
                     </span>
                   </div>
 
                   <div className="mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                      <Icon className="w-8 h-8 text-emerald-500 dark:text-[#39FF14]" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border border-accent/30">
+                      <Icon className="w-8 h-8 text-accent" />
                     </div>
                   </div>
 
-                  <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white leading-[1.4] transition-colors duration-300">
+                  <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-foreground leading-[1.4] transition-colors duration-300">
                     {step.title}
                   </h3>
                 </motion.div>
@@ -461,8 +462,8 @@ export function SummaPage() {
       </section>
        {/* Interfaces & Platforms Section */}
 <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-  <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+  <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -472,11 +473,11 @@ export function SummaPage() {
       className="text-center mb-16"
     >
       <h2
-        className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+        className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
       >
         Interfaces & platforms
       </h2>
-      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
+      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-foreground/60 max-w-2xl mx-auto transition-colors duration-300">
         SUMMA is a complete ecosystem accessible from every touchpoint
       </p>
     </motion.div>
@@ -491,23 +492,23 @@ export function SummaPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center text-center"
+            className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-[20px] p-10 hover:border-accent transition-all duration-300 flex flex-col items-center text-center"
           >
             <div className="mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-100 dark:bg-[#39FF14]/10 border border-emerald-200 dark:border-[#39FF14]/30">
-                <Icon className="w-10 h-10 text-emerald-500 dark:text-[#39FF14]" />
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-accent/10 border border-accent/30">
+                <Icon className="w-10 h-10 text-accent" />
               </div>
             </div>
 
-            <h3 className="font-['Poppins',sans-serif] font-bold text-[24px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+            <h3 className="font-['Poppins',sans-serif] font-bold text-[24px] text-gray-900 dark:text-foreground mb-2 transition-colors duration-300">
               {platform.title}
             </h3>
 
-            <p className="font-['Poppins',sans-serif] text-[15px] font-semibold text-emerald-500 dark:text-[#39FF14] mb-4 uppercase tracking-wider transition-colors duration-300">
+            <p className="font-['Poppins',sans-serif] text-[15px] font-semibold text-accent mb-4 uppercase tracking-wider transition-colors duration-300">
               {platform.description}
             </p>
 
-            <p className="font-['Poppins',sans-serif] text-[16px] leading-[1.6] text-gray-600 dark:text-white/60 transition-colors duration-300">
+            <p className="font-['Poppins',sans-serif] text-[16px] leading-[1.6] text-gray-600 dark:text-foreground/60 transition-colors duration-300">
               {platform.details}
             </p>
           </motion.div>
@@ -519,8 +520,8 @@ export function SummaPage() {
      
       {/* Why Choose Summa Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
 
           <motion.div
@@ -531,12 +532,12 @@ export function SummaPage() {
             className="text-center mb-16"
           >
             <h2
-              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
               style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
             >
               Why choose SUMMA
             </h2>
-            <p className="font-['Poppins',sans-serif] text-[16px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-3xl mx-auto transition-colors duration-300">
+            <p className="font-['Poppins',sans-serif] text-[16px] leading-[1.7] text-gray-600 dark:text-foreground/60 max-w-3xl mx-auto transition-colors duration-300">
               A complete scoring solution designed for professional sports facilities that demand accuracy, reliability, and seamless operation
             </p>
           </motion.div>
@@ -546,7 +547,7 @@ export function SummaPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="bg-gray-100 dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/10 rounded-[32px] overflow-hidden transition-colors duration-300"
+            className="bg-gray-100 dark:bg-card border border-gray-200 dark:border-border rounded-[32px] overflow-hidden transition-colors duration-300"
           >
             <div className="grid lg:grid-cols-2 gap-0">
               <div className="p-12 lg:p-16 flex flex-col justify-center">
@@ -563,16 +564,16 @@ export function SummaPage() {
                         className="flex gap-4"
                       >
                         <div className="flex-shrink-0">
-                          <div className="w-12 h-12 rounded-full bg-emerald-400 dark:bg-[#39FF14] flex items-center justify-center">
-                            <Icon className="w-6 h-6 text-white dark:text-black" />
+                          <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
+                            <Icon className="w-6 h-6 text-accent-foreground" />
                           </div>
                         </div>
 
                         <div>
-                          <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white mb-1 leading-[1.3] transition-colors duration-300">
+                          <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-foreground mb-1 leading-[1.3] transition-colors duration-300">
                             {benefit.title}
                           </h3>
-                          <p className="font-['Poppins',sans-serif] text-[14px] leading-[1.6] text-gray-600 dark:text-white/60 transition-colors duration-300">
+                          <p className="font-['Poppins',sans-serif] text-[14px] leading-[1.6] text-gray-600 dark:text-foreground/60 transition-colors duration-300">
                             {benefit.description}
                           </p>
                         </div>
@@ -602,8 +603,8 @@ export function SummaPage() {
       </section>
       {/* Where Summa Fits Section */}
 <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-  <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+  <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -613,11 +614,11 @@ export function SummaPage() {
       className="text-center mb-16"
     >
       <h2
-        className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+        className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
       >
         Where SUMMA fits
       </h2>
-      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 max-w-2xl mx-auto transition-colors duration-300">
+      <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-foreground/60 max-w-2xl mx-auto transition-colors duration-300">
         Built for professional sports environments that demand precision and reliability
       </p>
     </motion.div>
@@ -634,9 +635,9 @@ export function SummaPage() {
             transition={{ duration: 0.6, delay: index * 0.1 }}
             className="group"
           >
-            <div className="h-full p-8 rounded-[24px] bg-gray-50 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-emerald-400 dark:hover:border-[#39FF14] transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="h-full p-8 rounded-[24px] bg-gray-50 dark:bg-card border border-gray-200 dark:border-border hover:border-accent transition-all duration-300 flex flex-col items-center justify-center text-center">
               <div className="w-14 h-14 rounded-full bg-white dark:bg-white/5 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                <Icon className="w-6 h-6 text-emerald-500 dark:text-[#39FF14]" />
+                <Icon className="w-6 h-6 text-accent" />
               </div>
               <h3 className="font-['Poppins',sans-serif] font-semibold text-[18px] text-gray-900 dark:text-white leading-[1.3]">
                 {env.title}
@@ -650,8 +651,8 @@ export function SummaPage() {
 </section>
       {/* Ultima Ecosystem Section */}
       <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-5xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -661,7 +662,7 @@ export function SummaPage() {
             className="text-center"
           >
             <h2
-              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
               style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
             >
               Part of the ULTIMA ecosystem
@@ -673,15 +674,15 @@ export function SummaPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative bg-gray-100 dark:bg-[#0F1425] border-2 border-emerald-400 dark:border-[#39FF14] rounded-[20px] p-10 transition-colors duration-300"
+                className="relative bg-gray-100 dark:bg-card border-2 border-accent rounded-[20px] p-10 transition-colors duration-300"
               >
-                <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] text-gray-900 dark:text-foreground mb-2 transition-colors duration-300">
                   SUMMA
                 </h3>
-                <p className="font-['Poppins',sans-serif] text-[16px] text-gray-600 dark:text-white/60 mb-4 transition-colors duration-300">
+                <p className="font-['Poppins',sans-serif] text-[16px] text-gray-600 dark:text-foreground/60 mb-4 transition-colors duration-300">
                   Smart Scoring & Facility System
                 </p>
-                <div className="w-20 h-1 bg-emerald-400 dark:bg-[#39FF14] rounded-full shadow-lg dark:shadow-[0_0_12px_rgba(57,255,20,0.8)] transition-colors duration-300"></div>
+                <div className="w-20 h-1 bg-accent rounded-full shadow-lg shadow-accent/40 transition-colors duration-300"></div>
               </motion.div>
 
               <motion.div
@@ -692,15 +693,15 @@ export function SummaPage() {
               >
                 <Link
                   to="/almus"
-                  className="block group relative bg-gray-100 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-blue-500 dark:hover:border-[#00E5FF] rounded-[20px] p-10 transition-all duration-300 h-full"
+                  className="block group relative bg-gray-100 dark:bg-card border border-gray-200 dark:border-border hover:border-accent rounded-[20px] p-10 transition-all duration-300 h-full"
                 >
-                  <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                  <h3 className="font-['Playfair_Display',serif] font-bold text-[36px] text-gray-900 dark:text-foreground mb-2 transition-colors duration-300">
                     ALMUS
                   </h3>
-                  <p className="font-['Poppins',sans-serif] text-[16px] text-gray-600 dark:text-white/60 mb-4 transition-colors duration-300">
+                  <p className="font-['Poppins',sans-serif] text-[16px] text-gray-600 dark:text-foreground/60 mb-4 transition-colors duration-300">
                     Smart Hydration Station
                   </p>
-                  <div className="flex items-center gap-2 text-blue-500 dark:text-[#00E5FF] font-['Poppins',sans-serif] text-[14px] font-semibold">
+                  <div className="flex items-center gap-2 text-accent font-['Poppins',sans-serif] text-[14px] font-semibold">
                     Discover ALMUS
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -713,18 +714,18 @@ export function SummaPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="bg-gray-100 dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 rounded-[20px] p-10 transition-colors duration-300"
+              className="bg-gray-100 dark:bg-card border border-gray-200 dark:border-border rounded-[20px] p-10 transition-colors duration-300"
             >
               <div className="max-w-2xl mx-auto space-y-4">
-                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-white/80 transition-colors duration-300">
-                  <span className="text-emerald-500 dark:text-[#39FF14] font-semibold">SUMMA</span>{" "}
+                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-foreground/80 transition-colors duration-300">
+                  <span className="text-accent font-semibold">SUMMA</span>{" "}
                   manages scoring and performance.
                 </p>
-                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-white/80 transition-colors duration-300">
-                  <span className="text-blue-500 dark:text-[#00E5FF] font-semibold">ALMUS</span>{" "}
+                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-800 dark:text-foreground/80 transition-colors duration-300">
+                  <span className="text-accent font-semibold">ALMUS</span>{" "}
                   supports hydration and recovery.
                 </p>
-                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-900 dark:text-white font-semibold transition-colors duration-300">
+                <p className="font-['Poppins',sans-serif] text-[18px] leading-[1.8] text-gray-900 dark:text-foreground font-semibold transition-colors duration-300">
                   Together, they form the ULTIMA sport-tech ecosystem.
                 </p>
               </div>
@@ -738,8 +739,8 @@ export function SummaPage() {
         id="summa-cta"
         className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300"
       >
-        <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(39,255,20,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(39,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -749,12 +750,12 @@ export function SummaPage() {
             className="text-center mb-16"
           >
             <h2
-              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+              className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-foreground mb-16"
               style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
             >
               Bring SUMMA to your facility
             </h2>
-            <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-white/60 transition-colors duration-300">
+            <p className="font-['Poppins',sans-serif] text-[18px] lg:text-[16px] sm:text-[18px] md:text-[20px] leading-[1.7] text-gray-600 dark:text-foreground/60 transition-colors duration-300">
               Request a demo and discover how SUMMA can transform your sports facility
             </p>
           </motion.div>
@@ -766,13 +767,13 @@ export function SummaPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
             onSubmit={handleSubmit}
-            className="space-y-6 bg-white dark:bg-black border border-gray-200 dark:border-white/10 p-8 lg:p-12 rounded-[20px] transition-colors duration-300"
+            className="space-y-6 bg-white dark:bg-card border border-gray-200 dark:border-border p-8 lg:p-12 rounded-[20px] transition-colors duration-300"
           >
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="name"
-                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-white/90 transition-colors duration-300"
+                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-foreground/90 transition-colors duration-300"
                 >
                   Name *
                 </label>
@@ -783,7 +784,7 @@ export function SummaPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-black/20 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-gray-900 dark:text-foreground placeholder:text-gray-500 dark:placeholder:text-foreground/40"
                   placeholder="Your name"
                 />
               </div>
@@ -791,7 +792,7 @@ export function SummaPage() {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="company"
-                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-white/90 transition-colors duration-300"
+                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-foreground/90 transition-colors duration-300"
                 >
                   Facility / Company *
                 </label>
@@ -802,7 +803,7 @@ export function SummaPage() {
                   required
                   value={formData.company}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-black/20 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-gray-900 dark:text-foreground placeholder:text-gray-500 dark:placeholder:text-foreground/40"
                   placeholder="Facility or company name"
                 />
               </div>
@@ -812,7 +813,7 @@ export function SummaPage() {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="email"
-                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-white/90 transition-colors duration-300"
+                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-foreground/90 transition-colors duration-300"
                 >
                   Email *
                 </label>
@@ -823,7 +824,7 @@ export function SummaPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-black/20 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-gray-900 dark:text-foreground placeholder:text-gray-500 dark:placeholder:text-foreground/40"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -831,7 +832,7 @@ export function SummaPage() {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="phone"
-                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-white/90 transition-colors duration-300"
+                  className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-foreground/90 transition-colors duration-300"
                 >
                   Phone
                 </label>
@@ -841,7 +842,7 @@ export function SummaPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                  className="bg-gray-100 dark:bg-black/20 backdrop-blur-sm h-[52px] px-4 rounded-[14px] border border-gray-300 dark:border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-gray-900 dark:text-foreground placeholder:text-gray-500 dark:placeholder:text-foreground/40"
                   placeholder="+216 00 000 000"
                 />
               </div>
@@ -850,7 +851,7 @@ export function SummaPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="message"
-                className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-white/90 transition-colors duration-300"
+                className="font-['Poppins',sans-serif] font-medium text-[16px] text-gray-700 dark:text-foreground/90 transition-colors duration-300"
               >
                 Tell us about your facility
               </label>
@@ -860,7 +861,7 @@ export function SummaPage() {
                 value={formData.message}
                 onChange={handleChange}
                 rows={4}
-                className="bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-3 rounded-[14px] border border-gray-300 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/40"
+                className="bg-gray-100 dark:bg-black/20 backdrop-blur-sm px-4 py-3 rounded-[14px] border border-gray-300 dark:border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all resize-none text-gray-900 dark:text-foreground placeholder:text-gray-500 dark:placeholder:text-foreground/40"
                 placeholder="Number of courts, expected usage, specific requirements..."
               />
             </div>
@@ -868,7 +869,7 @@ export function SummaPage() {
             <div className="flex justify-center pt-4">
               <button
                 type="submit"
-                className="bg-emerald-400 hover:bg-emerald-500 dark:bg-[#39FF14] dark:hover:bg-[#32E012] h-[60px] px-16 rounded-full shadow-lg dark:shadow-[0_0_24px_rgba(57,255,20,0.4)] hover:shadow-xl dark:hover:shadow-[0_0_36px_rgba(57,255,20,0.7)] hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[18px] text-white dark:text-black"
+                className="bg-accent h-[60px] px-16 rounded-full shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[18px] text-accent-foreground"
               >
                 Request a demo
               </button>
@@ -877,94 +878,7 @@ export function SummaPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black border-t border-gray-700 dark:border-white/10 py-12 transition-colors duration-300">
-        <div className="max-w-[1096px] mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Logo Column */}
-            <div>
-              <h3 className="font-['Arial',sans-serif] font-bold text-[20px] text-white mb-4">
-                ULTIMA
-              </h3>
-            </div>
-
-            {/* ULTIMA Column */}
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                ULTIMA
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
-                  >
-                    About us
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support Column */}
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                Support
-              </h4>
-              <ul className="space-y-2">
-                
-                <li>
-                  <button
-                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
-                  >
-                    FAQ
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                Contact
-              </h4>
-              <ul className="space-y-2">
-               <ul className="space-y-4"> 
-               
-                <li>
-                 <a
-                    href="tel:+21699799368"
-                    className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span>+216 99 799 368</span>
-                 </a>
-               </li>
-
-               
-               <li>
-                 <a
-                   href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
-                   target="_blank"
-                    rel="noopener noreferrer"
-                   className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span>Ultima.contacus@gmail.com</span>
-                 </a>
-               </li>
-               </ul>
-              </ul>
-            </div>
-          </div>
-
-
-          {/* Copyright */}
-          <div className="pt-8 border-t border-gray-700 dark:border-white/10 text-center">
-            <p className="font-['Poppins',sans-serif] text-[14px] text-gray-400">
-              © {new Date().getFullYear()} ULTIMA. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

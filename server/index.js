@@ -13,14 +13,17 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 const httpServer = createServer(app);
 
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 // Flexible CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URL 
   ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) 
-  : ["http://localhost:5173", "http://127.0.0.1:5173"];
+  : ["http://localhost:5173", "https://ultima-web.vercel.app/"];
 
 const io = new Server(httpServer, {
   cors: {
@@ -85,10 +88,48 @@ import adminRoutes from './routes/adminRoutes.js';
 import coachRoutes from './routes/coachRoutes.js';
 import playerRoutes from './routes/playerRoutes.js';
 import competitionRoutes from './routes/competitionRoutes.js';
+import superAdminRoutes from './routes/superAdminRoutes.js';
 
 // Basic health check (public)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'ULTIMA API is running' });
+});
+
+// Public Clubs Data
+app.get('/api/public/clubs', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('clubs').select('*, courts(count)');
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Public Courts Data
+app.get('/api/public/courts', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('courts').select('*');
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Public Club Details
+app.get('/api/public/clubs/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('clubs')
+      .select('*, courts(*)')
+      .eq('id', req.params.id)
+      .single();
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Auth Routes (public — no middleware)
@@ -99,7 +140,4 @@ app.use('/api/admin', requireAuth, requireRole('admin'), adminRoutes);
 app.use('/api/coach', requireAuth, requireRole('coach', 'admin'), coachRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/competitions', requireAuth, competitionRoutes);
-
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.use('/api/superadmin', requireAuth, requireRole('admin', 'superadmin', 'super admin', 'super_admin'), superAdminRoutes);

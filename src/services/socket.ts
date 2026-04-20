@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
 const getSocketURL = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if ((import.meta as any).env?.VITE_API_URL) return (import.meta as any).env.VITE_API_URL;
   
   // Smart fallback: If on frontend.com, assume backend is at frontend.com:3001 or use current domain
   if (typeof window !== 'undefined') {

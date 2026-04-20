@@ -10,11 +10,13 @@ const router = express.Router();
 // GET /api/admin/courts - all courts
 router.get('/courts', async (req, res) => {
   try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
     const { data, error } = await supabase
       .from('courts')
       .select('*')
+      .eq('club_id', clubId)
       .order('name', { ascending: true });
-    
     if (error) throw error;
     res.json(data);
   } catch (error) {
@@ -25,15 +27,20 @@ router.get('/courts', async (req, res) => {
 // POST /api/admin/courts - create court
 router.post('/courts', async (req, res) => {
   try {
-    const { name, type, status, capacity, surface, pricing_peak, pricing_offpeak, hardware_id, club_id } = req.body;
-    
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { name, type, status, capacity, surface } = req.body;
     const { data, error } = await supabase
       .from('courts')
       .insert([{ 
-        name, type, status, capacity, surface, pricing_peak, pricing_offpeak, hardware_id, club_id
+        name, 
+        type: type ? type.toLowerCase() : null, 
+        status, 
+        capacity, 
+        surface, 
+        club_id: clubId
       }])
       .select();
-      
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (error) {
@@ -44,15 +51,16 @@ router.post('/courts', async (req, res) => {
 // PUT /api/admin/courts/:id - update court
 router.put('/courts/:id', async (req, res) => {
   try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
     const { id } = req.params;
     const updates = req.body;
-    
     const { data, error } = await supabase
       .from('courts')
       .update(updates)
       .eq('id', id)
+      .eq('club_id', clubId)
       .select();
-      
     if (error) throw error;
     res.json(data[0]);
   } catch (error) {
@@ -63,13 +71,14 @@ router.put('/courts/:id', async (req, res) => {
 // DELETE /api/admin/courts/:id - delete court
 router.delete('/courts/:id', async (req, res) => {
   try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
     const { id } = req.params;
-    
     const { error } = await supabase
       .from('courts')
       .delete()
-      .eq('id', id);
-      
+      .eq('id', id)
+      .eq('club_id', clubId);
     if (error) throw error;
     res.json({ success: true, message: "Court deleted successfully" });
   } catch (error) {
@@ -82,7 +91,12 @@ router.delete('/courts/:id', async (req, res) => {
  */
 router.get('/bookings', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('bookings').select('*, profiles(full_name), courts(name)');
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*, profiles(full_name), courts(name, club_id)')
+      .eq('club_id', clubId);
     if (error) throw error;
 
     // Transform data to include start_time and end_time for the Admin UI
@@ -107,7 +121,10 @@ router.get('/bookings', async (req, res) => {
 
 router.post('/bookings', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('bookings').insert([req.body]).select();
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const bookingData = { ...req.body, club_id: clubId };
+    const { data, error } = await supabase.from('bookings').insert([bookingData]).select();
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -115,7 +132,13 @@ router.post('/bookings', async (req, res) => {
 
 router.put('/bookings/:id', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('bookings').update(req.body).eq('id', req.params.id).select();
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { data, error } = await supabase.from('bookings')
+      .update(req.body)
+      .eq('id', req.params.id)
+      .eq('club_id', clubId)
+      .select();
     if (error) throw error;
     res.json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -123,7 +146,12 @@ router.put('/bookings/:id', async (req, res) => {
 
 router.delete('/bookings/:id', async (req, res) => {
   try {
-    const { error } = await supabase.from('bookings').delete().eq('id', req.params.id);
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { error } = await supabase.from('bookings')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('club_id', clubId);
     if (error) throw error;
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -134,10 +162,12 @@ router.delete('/bookings/:id', async (req, res) => {
  */
 router.get('/matches', async (req, res) => {
   try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
     const { data, error } = await supabase
       .from('matches')
-      .select('*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(booking_date, time_slot, courts(name))');
-    
+      .select('*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(booking_date, time_slot, courts(name, club_id))')
+      .eq('club_id', clubId);
     if (error) throw error;
     res.json(data);
   } catch (error) {
@@ -150,11 +180,14 @@ router.get('/matches', async (req, res) => {
  */
 router.get('/players', async (req, res) => {
   try {
-    // Return players and coaches — frontend filters by tab
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    // Return players and coaches for this club
     const { data, error } = await supabase
       .from('profiles')
       .select('id, full_name, email, phone, role, avatar_url, created_at, club_id')
       .in('role', ['player', 'coach', 'admin'])
+      .eq('club_id', clubId)
       .order('created_at', { ascending: false });
     if (error) throw error;
     res.json(data);
@@ -182,7 +215,9 @@ router.put('/players/:id', async (req, res) => {
  */
 router.get('/competitions', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('tournaments').select('*');
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { data, error } = await supabase.from('tournaments').select('*').eq('club_id', clubId);
     if (error) throw error;
     res.json(data);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -190,7 +225,10 @@ router.get('/competitions', async (req, res) => {
 
 router.post('/competitions', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('tournaments').insert([req.body]).select();
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const tournamentData = { ...req.body, club_id: clubId };
+    const { data, error } = await supabase.from('tournaments').insert([tournamentData]).select();
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -198,7 +236,13 @@ router.post('/competitions', async (req, res) => {
 
 router.put('/competitions/:id', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('tournaments').update(req.body).eq('id', req.params.id).select();
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    const { data, error } = await supabase.from('tournaments')
+      .update(req.body)
+      .eq('id', req.params.id)
+      .eq('club_id', clubId)
+      .select();
     if (error) throw error;
     res.json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -233,6 +277,60 @@ router.get('/reports/:type', async (req, res) => {
       res.json({ report: type, data: [] });
     }
   } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+/**
+ * ADMIN CLUB INFO ENDPOINT
+ */
+router.get('/club', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    console.log('[AdminClub] Admin club_id from auth:', clubId);
+    console.log('[AdminClub] Admin user:', req.user?.id, req.user?.email);
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    // Get club details
+    const { data: club, error: clubError } = await supabase
+      .from('clubs')
+      .select('*')
+      .eq('id', clubId)
+      .single();
+    console.log('[AdminClub] Fetched club:', club);
+    if (clubError) {
+      console.log('[AdminClub] Club error:', clubError);
+      throw clubError;
+    }
+    
+    // Get court count
+    const { count: courtCount } = await supabase
+      .from('courts')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', clubId);
+    
+    res.json({ ...club, court_count: courtCount || 0 });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/admin/club - update club info
+router.put('/club', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    const updates = req.body;
+    const { data, error } = await supabase
+      .from('clubs')
+      .update(updates)
+      .eq('id', clubId)
+      .select()
+      .single();
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;

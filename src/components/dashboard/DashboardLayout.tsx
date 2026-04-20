@@ -11,15 +11,18 @@ import {
   Menu,
   X,
   Bell,
-  Sun,
-  Moon,
   Trophy,
   ShieldCheck,
   Dumbbell,
-  User,
   Users,
-  CalendarDays, 
+  CalendarDays,
   ClipboardList,
+  Crown,
+  Building2,
+  UserCog,
+  BookOpen,
+  UserPlus,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
@@ -33,44 +36,119 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const role = user?.user_metadata?.account_type || "Player";
 
+  // Resolve role — profile DB takes priority over metadata
+  const role = (
+    user?.role ??
+    user?.user_metadata?.account_type ??
+    user?.user_metadata?.accountType ??
+    "player"
+  ).toLowerCase();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
   };
+
+  // ─── Navigation by role ──────────────────────────────────────
   const navItems = [
-    { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
+    // ── SUPER ADMIN ──────────────────────────────────────────
+    ...(role === "super_admin"
+      ? [
+          {
+            icon: LayoutDashboard,
+            label: "Overview",
+            path: "/dashboard/superadmin/overview",
+          },
+          {
+            icon: Building2,
+            label: "Club Management",
+            path: "/dashboard/superadmin/clubs",
+          },
+          {
+            icon: UserCog,
+            label: "Admin Accounts",
+            path: "/dashboard/superadmin/admins",
+          },
+          {
+            icon: Users,
+            label: "All Users",
+            path: "/dashboard/superadmin/users",
+          },
+          {
+            icon: CalendarDays,
+            label: "All Bookings",
+            path: "/dashboard/superadmin/bookings",
+          },
+          {
+            icon: Trophy,
+            label: "Matches & Competitions",
+            path: "/dashboard/superadmin/matches",
+          },
+          {
+            icon: BarChart3,
+            label: "Analytics",
+            path: "/dashboard/analytics",
+          },
+        ]
+      : []),
 
-    // MENU JOUEUR (Basé sur vos fichiers folder 'player')
-    ...(role === "Player" ? [
-      { icon: Zap, label: "Matches & Activity", path: "/dashboard/matches" },
-      { icon: Trophy, label: "Competitions", path: "/dashboard/competitions" },
-      { icon: Grid3X3, label: "Court Booking", path: "/dashboard/courts" },
-    ] : []),
+    // ── ADMIN (Business Owner) ────────────────────────────────
+    ...(role === "admin"
+      ? [
+          {
+            icon: LayoutDashboard,
+            label: "Club Overview",
+            path: "/dashboard/admin/overview",
+          },
+          {
+            icon: ClipboardList,
+            label: "Booking Requests",
+            path: "/dashboard/admin/bookings",
+          },
+          {
+            icon: Grid3X3,
+            label: "Court Management",
+            path: "/dashboard/courts",
+          },
+          {
+            icon: Users,
+            label: "Players",
+            path: "/dashboard/admin/players",
+          },
+          {
+            icon: Dumbbell,
+            label: "Coaches",
+            path: "/dashboard/admin/coaches",
+          },
+        ]
+      : []),
 
-    // MENU COACH (Basé sur vos fichiers folder 'coach')
-    ...(role === "Coach" ? [
-      { icon: Users, label: "My Students", path: "/dashboard/coach/students" },
-      { icon: CalendarDays, label: "Schedule Session", path: "/dashboard/coach/schedule" },
-      { icon: BarChart3, label: "Student Analytics", path: "/dashboard/coach/students/:id" },
-    ] : []),
+    // ── PLAYER ───────────────────────────────────────────────
+    ...(role === "player"
+      ? [
+          { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+          { icon: Zap, label: "Matches & Activity", path: "/dashboard/matches" },
+          { icon: Trophy, label: "Competitions", path: "/dashboard/competitions" },
+          { icon: Grid3X3, label: "Court Booking", path: "/dashboard/courts" },
+        ]
+      : []),
 
-    // MENU ADMIN (Basé sur vos fichiers folder 'admin')
-    ...(role === "Admin" ? [
-      { icon: Grid3X3, label: "Court Management", path: "/dashboard/courts" },
-      { icon: CalendarDays, label: "Bookings", path: "/dashboard/admin/bookings" },
-      { icon: Users, label: "Players", path: "/dashboard/admin/players" },
-      { icon: Trophy, label: "Competitions", path: "/dashboard/admin/competitions" },
-      { icon: BarChart3, label: "System Analytics", path: "/dashboard/analytics" },
-      { 
-      icon: ClipboardList, 
-      label: "Management", 
-      path: "/dashboard/admin/management" 
-    }
-    ] : []),
+    // ── COACH ────────────────────────────────────────────────
+    ...(role === "coach"
+      ? [
+          { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+          { icon: Users, label: "My Students", path: "/dashboard/coach/students" },
+          { icon: CalendarDays, label: "Schedule Session", path: "/dashboard/coach/schedule" },
+          {
+            icon: BarChart3,
+            label: "Student Analytics",
+            path: "/dashboard/coach/students/:id",
+          },
+        ]
+      : []),
 
+    // ── SHARED (all roles) ────────────────────────────────────
     { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
@@ -84,142 +162,159 @@ export function DashboardLayout() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const activities = [];
 
+  // ─── Role badge config ───────────────────────────────────────
   const getRoleBadge = () => {
-    const role = user?.role?.toLowerCase();
     switch (role) {
-      case 'admin':
-        return { icon: ShieldCheck, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/30" };
-      case 'coach':
-        return { icon: Dumbbell, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/30" };
-      default: 
-        return { icon: Trophy, color: "text-green-400", bg: "bg-green-400/20", border: "border-green-400" };
+      case "super_admin":
+        return {
+          icon: Crown,
+          color: "text-yellow-500",
+          bg: "bg-yellow-500/10",
+          border: "border-yellow-500/30",
+          label: "Super Admin",
+        };
+      case "admin":
+        return {
+          icon: ShieldCheck,
+          color: "text-accent",
+          bg: "bg-accent/10",
+          border: "border-accent/30",
+          label: "Admin",
+        };
+      case "coach":
+        return {
+          icon: Dumbbell,
+          color: "text-indigo-400",
+          bg: "bg-indigo-400/10",
+          border: "border-indigo-400/30",
+          label: "Coach",
+        };
+      default:
+        return {
+          icon: Trophy,
+          color: "text-accent",
+          bg: "bg-accent/10",
+          border: "border-accent/30",
+          label: "Player",
+        };
+    }
   };
-  } 
+
   const badge = getRoleBadge();
+  const activities: any[] = [];
+
+  const SidebarNavLink = ({
+    item,
+    onClick,
+  }: {
+    item: (typeof navItems)[0];
+    onClick?: () => void;
+  }) => {
+    const Icon = item.icon;
+    const active = location.pathname === item.path;
+    return (
+      <Link
+        to={item.path}
+        onClick={onClick}
+        className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all ${
+          active ? "bg-accent/10 border border-accent/30" : "hover:bg-accent/5"
+        }`}
+      >
+        <Icon
+          className={`w-5 h-5 flex-shrink-0 ${active ? "text-accent" : "text-foreground/60"}`}
+        />
+        <span
+          className={`font-['Poppins',sans-serif] text-[14px] font-medium transition-opacity duration-300 truncate ${
+            active ? "text-accent" : "text-foreground"
+          } ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}
+        >
+          {item.label}
+          {(item as any).badge && (
+            <span className="ml-1.5 text-[9px] px-1.5 py-0.5 bg-muted border border-border rounded text-muted-foreground font-bold uppercase tracking-wider">
+              {(item as any).badge}
+            </span>
+          )}
+        </span>
+      </Link>
+    );
+  };
+
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#0A0E1A]" : "bg-gray-50"} transition-colors duration-300`}>
+    <div className="min-h-screen bg-background transition-colors duration-300">
       {/* Top Navigation Bar */}
-      <header className={`fixed top-0 left-0 right-0 h-16 backdrop-blur-xl border-b z-50 ${
-        isDark 
-          ? "bg-black/80 border-white/10" 
-          : "bg-white/90 border-[#0A0E1A]/10"
-      }`}>
-        <div className="h-full px-6 flex items-center justify-between">
-          {/* Left: Menu Toggle + Logo */}
+      <header className="fixed top-0 left-0 right-0 h-16 backdrop-blur-xl border-b z-50 bg-background/80 border-border">
+        <div className="h-full px-3 sm:px-6 flex items-center justify-between">
+          {/* Left */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
+              className="hidden md:flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-accent/5 transition-colors"
             >
-              <Menu className={`w-5 h-5 ${isDark ? "text-white" : "text-[#0A0E1A]"}`} />
+              <Menu className="w-5 h-5 text-foreground" />
             </button>
-
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-colors"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-[12px] hover:bg-accent/5 transition-colors"
             >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
-              ) : (
-                <Menu className="w-5 h-5 text-[#0A0E1A] dark:text-white" />
-              )}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
             </button>
-
             <Link to="/">
-              <h1
-                className="font-['Arial',sans-serif] font-bold text-[24px] text-gray-900 dark:text-white tracking-[1.2px] transition-colors duration-300"
-              >
+              <h1 className="font-['Arial',sans-serif] font-bold text-[24px] text-foreground tracking-[1.2px]">
                 ULTIMA
               </h1>
             </Link>
           </div>
-        
-          {/* Right: Actions */}
+
+          {/* Right */}
           <div className="flex items-center gap-3">
-
-              {/* Notifications */}
-              <div className="relative" ref={notificationRef}>
-                <button 
-                  onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className={`flex items-center justify-center w-10 h-10 rounded-[12px] transition-colors relative ${
-                    notificationsOpen ? "bg-[#00E5FF]/10" : "hover:bg-black/5 dark:hover:bg-white/10"
-                  }`}
-                >
-                  <Bell className={`w-5 h-5 ${isDark ? "text-white" : "text-[#0A0E1A]"}`} />
-                  {/* On n'affiche la pastille verte que s'il y a des activités */}
-                  {activities.length > 0 && (
-                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#00E5FF] rounded-full border-2 border-black"></span>
-                  )}
-                </button>
-
-                {/* Dropdown Menu */}
-                {notificationsOpen && (
-                  <div className={`absolute right-0 mt-3 w-80 rounded-[24px] shadow-2xl border backdrop-blur-xl z-[100] animate-in fade-in zoom-in duration-200 ${
-                    isDark ? "bg-black/95 border-white/10 shadow-black/50" : "bg-white border-gray-200"
-                  }`}>
-                    <div className="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
-                      <h3 className={`font-bold text-sm ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>
-                        Notifications
-                      </h3>
-                      <span className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">
-                        Feed
-                      </span>
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <button
+                onClick={() => setNotificationsOpen(!notificationsOpen)}
+                className={`flex items-center justify-center w-10 h-10 rounded-[12px] transition-colors relative ${
+                  notificationsOpen ? "bg-accent/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+                }`}
+              >
+                <Bell className="w-5 h-5 text-foreground" />
+              </button>
+              {notificationsOpen && (
+                <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-80 max-w-xs sm:max-w-none rounded-[24px] shadow-2xl border backdrop-blur-xl z-[100] animate-in fade-in zoom-in duration-200 bg-background/95 border-border overflow-hidden">
+                  <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-border">
+                    <h3 className="font-bold text-sm text-foreground">Notifications</h3>
+                    <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">Feed</span>
+                  </div>
+                  <div className="py-8 px-6 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
+                      <Bell className="w-8 h-8 text-accent/40" />
                     </div>
-
-                    <div className="py-8 px-6 flex flex-col items-center justify-center text-center">
-                      {activities.length > 0 ? (
-         
-                        <div className="w-full">
-                          </div>
-                      ) : (
-          
-                          <div className="space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto">
-                              <Bell className="w-8 h-8 text-gray-300 dark:text-white/20" />
-                            </div>
-                            <div className="space-y-1">
-                              <p className={`font-semibold text-sm ${isDark ? "text-white" : "text-[#0A0E1A]"}`}>
-                                All caught up!
-                              </p>
-                              <p className="text-xs text-gray-400 max-w-[180px] mx-auto leading-relaxed">
-                                Matches and competitions will appear here once the season starts.
-                              </p>
-                            </div>
-                          </div>
-                      )}
+                    <div className="space-y-1 mt-4">
+                      <p className="font-semibold text-sm text-foreground">All caught up!</p>
+                      <p className="text-xs text-muted-foreground max-w-[180px] mx-auto leading-relaxed">
+                        Activity will appear here as it happens.
+                      </p>
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-                    {activities.length > 0 && (
-                      <Link 
-                        to="/dashboard/notifications" 
-          onClick={() => setNotificationsOpen(false)}
-          className="block p-4 text-center text-xs font-bold text-[#00E5FF] hover:bg-[#00E5FF]/5 transition-colors border-t border-white/5 rounded-b-[24px]"
-        >
-          View All Activity
-        </Link>
-      )}
-      </div>
-       )}
-</div>
             {/* User Profile */}
-            <Link 
-              to="/dashboard/profile" 
-              className="flex items-center gap-3 pl-2 pr-4 h-12 rounded-[16px] hover:bg-white/10 dark:hover:bg-[#0A0E1A]/10 transition-all border border-transparent hover:border-white/10 group"
+            <Link
+              to="/dashboard/profile"
+              className="flex items-center gap-3 pl-2 pr-4 h-12 rounded-[16px] hover:bg-accent/10 transition-all border border-transparent hover:border-accent/10 group"
             >
-              <div className={`w-9 h-9 rounded-full ${badge.bg} border ${badge.border} flex items-center justify-center transition-transform group-hover:scale-105`}>
+              <div
+                className={`w-9 h-9 rounded-full ${badge.bg} border ${badge.border} flex items-center justify-center transition-transform group-hover:scale-105`}
+              >
                 <badge.icon className={`w-5 h-5 ${badge.color}`} />
               </div>
-
-              <div className="hidden sm:flex flex-col items-start text-left">
-                <span className={`font-['Poppins',sans-serif] text-[14px] font-bold ${
-                                      isDark ? "text-white" : "text-[#0A0E1A]"
-                                      } leading-tight`}>
-                                      {user?.user_metadata?.full_name || "User"}
+              <div className="hidden sm:flex flex-col items-start text-left max-w-[120px] lg:max-w-none">
+                <span className="font-['Poppins',sans-serif] text-[14px] font-bold text-foreground leading-tight truncate">
+                  {user?.fullName ?? user?.user_metadata?.full_name ?? "User"}
                 </span>
                 <span className={`text-[10px] uppercase tracking-wider font-bold ${badge.color}`}>
-                  {user?.user_metadata?.account_type || "Player"}
+                  {badge.label}
                 </span>
               </div>
             </Link>
@@ -229,72 +324,72 @@ export function DashboardLayout() {
 
       {/* Desktop Sidebar */}
       <aside
-        className={` fixed left-0 top-16 bottom-0 ${isDark ? "bg-[#0A0E1A] border-white/10" : "bg-white border-gray-200"} border-r z-40 transition-all duration-300 hidden md:block ${
+        className={`fixed left-0 top-16 bottom-0 bg-background border-border border-r z-40 transition-all duration-300 hidden md:block ${
           sidebarOpen ? "lg:w-64 w-20" : "w-20"
         }`}
       >
-        <nav className="p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = location.pathname === item.path;
-
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-4 h-12 rounded-[12px] transition-all ${
-                  active
-                     ? "bg-[#00E5FF]/10 border border-[#00E5FF]/30"
-                     : "hover:bg-black/5 dark:hover:bg-white/5"
-
-                }`}
-              >
-                <Icon
-                  className={`w-5 h-5 flex-shrink-0 ${
-                    active
-                      ? "text-[#00E5FF]" : isDark ? "text-white/60" 
-                      : "text-[#0A0E1A]/60"
-
-                  }`}
-                />
-                <span
-                  className={`font-['Poppins',sans-serif] text-[14px] font-medium transition-opacity duration-300 ${
-                    active
-                      ? "text-[#00E5FF]" : isDark ? "text-white" 
-                      : "text-[#0A0E1A]"
-                  } ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}
-                >
-                  {item.label}
+        <nav className="p-4 space-y-1 h-full overflow-y-auto pb-8">
+          {/* Super Admin Crown indicator */}
+          {role === "super_admin" && sidebarOpen && (
+            <div className="mb-4 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+              <div className="flex items-center gap-2">
+                <Crown size={14} className="text-yellow-500" />
+                <span className="text-[11px] font-bold text-yellow-500 font-['Poppins'] uppercase tracking-wider">
+                  Super Admin
                 </span>
-              </Link>
-            );
-          })}
+              </div>
+            </div>
+          )}
+
+          {navItems.map((item) => (
+            <SidebarNavLink key={item.path} item={item} />
+          ))}
 
           {/* Logout */}
-          <Link
-            to="/"
-            onClick={handleSignOut}
-            className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-8"
-          >
-            <LogOut className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <span className={`font-['Poppins',sans-serif] text-[14px] font-medium text-red-500 transition-opacity duration-300 ${sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"}`}>
-              Logout
-            </span>
-          </Link>
+          <div className="pt-4">
+            <Link
+              to="/"
+              onClick={handleSignOut}
+              className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all"
+            >
+              <LogOut className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <span
+                className={`font-['Poppins',sans-serif] text-[14px] font-medium text-red-500 transition-opacity duration-300 ${
+                  sidebarOpen ? "lg:opacity-100 md:hidden lg:block" : "hidden"
+                }`}
+              >
+                Logout
+              </span>
+            </Link>
+          </div>
         </nav>
       </aside>
 
-      {/* Mobile Sidebar (Overlay) */}
+      {/* Mobile Sidebar */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[60] md:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
-          <nav className={`absolute left-0 top-0 bottom-0 w-72 ${isDark ? "bg-[#0A0E1A]" : "bg-white"} p-6 shadow-2xl`}>
-            <div className="flex justify-end mb-8">
-              <button onClick={() => setMobileMenuOpen(false)} className={isDark ? "text-white" : "text-black"}>
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <nav className="absolute left-0 top-0 bottom-0 w-72 bg-background p-6 shadow-2xl overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              {role === "super_admin" && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                  <Crown size={14} className="text-yellow-500" />
+                  <span className="text-xs font-bold text-yellow-500 font-['Poppins']">
+                    Super Admin
+                  </span>
+                </div>
+              )}
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="ml-auto text-foreground"
+              >
                 <X size={24} />
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {navItems.map((item) => {
                 const active = location.pathname === item.path;
                 const Icon = item.icon;
@@ -304,21 +399,24 @@ export function DashboardLayout() {
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 h-12 rounded-[12px] ${
-                      active ? "bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF]" : isDark ? "text-white/60" : "text-[#0A0E1A]/60"
+                      active
+                        ? "bg-accent/10 border border-accent/30 text-accent"
+                        : "text-foreground/60"
                     }`}
                   >
                     <Icon size={20} />
                     <span className="font-['Poppins'] text-[14px] font-medium">{item.label}</span>
+                    {(item as any).badge && (
+                      <Lock size={11} className="ml-auto text-muted-foreground/60" />
+                    )}
                   </Link>
                 );
               })}
             </div>
-    
-            {/* Logout */}
             <Link
               to="/"
               onClick={handleSignOut}
-              className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-8"
+              className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-4"
             >
               <LogOut className="w-5 h-5 text-red-500" />
               <span className="font-['Poppins',sans-serif] text-[14px] font-medium text-red-500">
@@ -335,7 +433,7 @@ export function DashboardLayout() {
           sidebarOpen ? "lg:pl-64 md:pl-20" : "md:pl-20"
         }`}
       >
-        <div className="p-6 lg:p-8">
+        <div className="p-4 sm:p-6 lg:p-8 pb-8">
           <Outlet />
         </div>
       </main>

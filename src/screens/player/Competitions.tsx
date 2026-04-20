@@ -125,7 +125,7 @@ export function Competitions() {
   if (loading && tournaments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="animate-spin text-[#39FF14]" size={40} />
+        <Loader2 className="animate-spin text-accent" size={40} />
       </div>
     );
   }
@@ -135,34 +135,34 @@ export function Competitions() {
       {/* HEADER SECTION */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-3 text-[#00E5FF] font-bold text-xs uppercase tracking-[3px] mb-2">
+          <div className="flex items-center gap-3 text-accent font-bold text-xs uppercase tracking-[3px] mb-2">
             <TrendingUp size={16} />
             <span>Tournament Center</span>
           </div>
-          <h1 className="font-['Playfair_Display',serif] sm:text-2xl text-2xl md:text-4xl lg:text-4xl font-black dark:text-white leading-none mb-4">Active Competitions</h1>
-          <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
+          <h1 className="font-['Playfair_Display',serif] sm:text-2xl text-2xl md:text-4xl lg:text-4xl font-black text-foreground leading-none mb-4">Active Competitions</h1>
+          <p className="text-muted-foreground font-['Poppins']">
             Register for upcoming tournaments and prove your skills.
           </p>
         </div>
 
         {/* SEARCH & FILTER BAR */}
-        <div className="flex flex-wrap gap-4 items-center bg-white dark:bg-white/5 p-2 rounded-[24px] border border-gray-100 dark:border-white/10">
+        <div className="flex flex-wrap gap-4 items-center bg-card p-2 rounded-[24px] border border-border">
           <div className="relative group flex-1 md:flex-none">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:text-[#39FF14] transition-colors" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:text-accent transition-colors" size={18} />
             <input 
               type="text"
               placeholder="Find a tournament..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 pl-12 pr-6 rounded-2xl bg-gray-50 dark:bg-black/20 border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-[#00E5FF]/50 transition-all"
+              className="h-12 pl-12 pr-6 rounded-2xl bg-muted border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-accent/50 transition-all text-foreground"
             />
           </div>
-          <div className="relative flex items-center bg-gray-100/50 dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:border-[#00E5FF]/50 transition-all px-4 group">
-            <Filter size={16} className="text-[#39FF14] mr-2" />
+          <div className="relative flex items-center bg-muted rounded-2xl border border-border hover:border-accent/50 transition-all px-4 group font-['Poppins']">
+            <Filter size={16} className="text-accent mr-2" />
             <select 
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="h-12 bg-transparent border-none outline-none text-sm font-black text-[#0A0E1A] dark:text-white cursor-pointer appearance-none pr-8"
+              className="h-12 bg-transparent border-none outline-none text-sm font-bold text-foreground cursor-pointer appearance-none pr-8 font-['Poppins']"
             >
               <option value="All">All Levels</option>
               <option value="Beginner">Beginner</option>
@@ -170,7 +170,7 @@ export function Competitions() {
               <option value="Advanced">Advanced</option>
             </select>
             <div className="absolute right-4 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
-              <ChevronRight size={14} className="rotate-90 text-[#39FF14]" />
+              <ChevronRight size={14} className="rotate-90 text-accent" />
             </div>
           </div>
         </div>
@@ -190,36 +190,36 @@ export function Competitions() {
                 animate={{ opacity: 1, scale: 1 }}
                 key={t.id}
                 onClick={() => setSelectedComp(t)}
-                className="group relative bg-white dark:bg-[#0F1423] rounded-[40px] border border-gray-100 dark:border-white/5 overflow-hidden hover:border-[#00E5FF]/40 transition-all duration-500 shadow-xl cursor-pointer"
+                className="group relative bg-card rounded-[40px] border border-border overflow-hidden hover:border-accent/40 hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500 shadow-xl cursor-pointer font-['Poppins']"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-[#00E5FF]/10 transition-colors" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-accent/10 transition-colors" />
 
                 <div className="p-8 md:p-10">
                   <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 bg-[#00E5FF]/10 rounded-[22px] flex items-center justify-center shrink-0 border border-[#00E5FF]/20">
-                        <Trophy className="text-[#39FF14]" size={28} />
+                      <div className="w-16 h-16 bg-accent/10 rounded-[22px] flex items-center justify-center shrink-0 border border-accent/20">
+                        <Trophy className="text-accent" size={28} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                             t.status === 'Open' ? 'bg-[#00E5FF]/10 text-[#00E5FF]' :
-                             t.status === 'Ongoing' ? 'bg-[#00E5FF]/10 text-[#00E5FF]' :
-                             'bg-gray-100 dark:bg-white/5 text-gray-400'
+                             t.status === 'Open' ? 'bg-accent/10 text-accent' :
+                             t.status === 'Ongoing' ? 'bg-accent/10 text-accent' :
+                             'bg-muted text-muted-foreground'
                            }`}>
                              {t.status}
                            </span>
-                           <span className="text-[10px] font-bold text-gray-400 dark:text-white/20 uppercase tracking-widest leading-none">
+                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">
                              {t.competition_type}
                            </span>
                         </div>
-                        <h3 className="text-2xl font-black dark:text-white group-hover:text-[#00E5FF] transition-colors">
+                        <h3 className="text-2xl font-black text-foreground group-hover:text-accent transition-colors font-['Playfair_Display']">
                           {t.title}
                         </h3>
                       </div>
                     </div>
                     {isRegistered && (
-                      <div className="bg-[#00E5FF] text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-lg shadow-[#00E5FF]/20">
+                      <div className="bg-accent text-accent-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-lg shadow-accent/20">
                         <CheckCircle2 size={12} /> Registered
                       </div>
                     )}
@@ -233,8 +233,8 @@ export function Competitions() {
                   </div>
 
                   <div className="flex items-center justify-between gap-4">
-                     <div className="flex items-center gap-2 text-xs font-bold dark:text-white/40">
-                        <Clock size={14} className="text-[#39FF14]" />
+                     <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                        <Clock size={14} className="text-accent" />
                         <span className="opacity-60">Deadline:</span> {t.registration_deadline ? new Date(t.registration_deadline).toLocaleDateString() : 'Rolling'}
                      </div>
                      <button 
@@ -246,7 +246,7 @@ export function Competitions() {
                         className={`px-8 h-12 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-lg ${
                           isRegistered ? 'bg-white/5 text-gray-400 shadow-none' :
                           isFull || t.status !== 'Open' ? 'bg-red-500/10 text-red-500 shadow-none' :
-                          'bg-[#00E5FF] text-black hover:scale-105 active:scale-95 shadow-[#00E5FF]/20'
+                          'bg-accent text-accent-foreground hover:scale-105 active:scale-95 shadow-[#00E5FF]/20'
                         }`}
                      >
                        {registeringId === t.id ? <Loader2 className="animate-spin" size={16} /> : 
@@ -269,24 +269,24 @@ export function Competitions() {
             <motion.div 
                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
                onClick={(e) => e.stopPropagation()}
-               className="bg-white dark:bg-[#0F1423] rounded-[48px] border border-white/10 w-full max-w-4xl overflow-hidden relative shadow-3xl"
+               className="bg-card rounded-[48px] border border-border w-full max-w-4xl overflow-hidden relative shadow-3xl text-foreground"
             >
               <button 
                 onClick={() => setSelectedComp(null)}
-                className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-500 transition-all z-10"
+                className="absolute top-8 right-8 w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all z-10 shadow-lg"
               >
                 <X size={24} />
               </button>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[90vh] overflow-y-auto">
                  {/* Left Panel: Info */}
-                 <div className="p-10 lg:p-12 space-y-8 bg-gray-50/50 dark:bg-black/20">
+                 <div className="p-10 lg:p-12 space-y-8 bg-muted font-['Poppins'] shadow-inner">
                     <div>
-                       <div className="bg-[#00E5FF]/10 text-[#00E5FF] text-[10px] font-black uppercase tracking-[3px] px-3 py-1 rounded-full w-fit mb-6">
+                       <div className="bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[3px] px-3 py-1 rounded-full w-fit mb-6 shadow-sm border border-accent/20">
                          Competition Detail
                        </div>
-                       <h2 className="text-4xl font-black mb-4 dark:text-white leading-none">{selectedComp.title}</h2>
-                       <p className="text-sm opacity-60 leading-relaxed font-medium">{selectedComp.description}</p>
+                       <h2 className="text-4xl font-black mb-4 text-foreground leading-none font-['Playfair_Display']">{selectedComp.title}</h2>
+                       <p className="text-sm text-muted-foreground leading-relaxed font-medium">{selectedComp.description}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -296,13 +296,13 @@ export function Competitions() {
                        <DetailItem icon={Users} label="Mode" value={selectedComp.competition_type} />
                     </div>
 
-                    <div className="p-6 bg-[#00E5FF]/5 border border-[#00E5FF]/10 rounded-3xl">
+                    <div className="p-6 bg-accent/5 border border-accent/10 rounded-3xl">
                        <div className="flex justify-between items-center mb-4">
                           <span className="text-xs font-black uppercase tracking-widest opacity-40">Prize Pool</span>
-                          <span className="text-2xl font-black text-[#00E5FF]">{selectedComp.prize_pool}</span>
+                          <span className="text-2xl font-black text-accent">{selectedComp.prize_pool}</span>
                        </div>
-                       <div className="h-2 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#00E5FF]" style={{ width: `${(selectedComp.current_players / selectedComp.max_players) * 100}%` }} />
+                       <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-accent shadow-[0_0_10px_var(--theme-accent)]" style={{ width: `${(selectedComp.current_players / selectedComp.max_players) * 100}%` }} />
                        </div>
                        <p className="text-[10px] font-bold mt-2 text-right opacity-40">{selectedComp.current_players} / {selectedComp.max_players} Slots SECURED</p>
                     </div>
@@ -313,21 +313,21 @@ export function Competitions() {
                     <h3 className="text-xs font-black uppercase tracking-[3px] opacity-40 mb-2">Live Brackets & Standings</h3>
                     
                     {selectedComp.status === 'Open' ? (
-                      <div className="flex flex-col items-center justify-center h-64 text-center opacity-30 border-2 border-dashed border-white/5 rounded-3xl p-8">
+                      <div className="flex flex-col items-center justify-center h-64 text-center opacity-30 border-2 border-dashed border-border rounded-3xl p-8">
                          <AlertCircle size={48} className="mb-4" />
-                         <p className="font-bold text-sm uppercase tracking-wider">Brackets will be generated once registration closes</p>
+                         <p className="font-bold text-sm uppercase tracking-wider text-foreground">Brackets will be generated once registration closes</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
                          {/* Mock Standing/Bracket UI */}
                          {[1, 2, 3, 4].map(i => (
-                           <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                           <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-border">
                               <div className="flex items-center gap-4">
                                  <span className="font-black opacity-20 text-xl">{i}</span>
-                                 <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/20" />
+                                 <div className="w-10 h-10 rounded-full bg-accent/10 border border-[#00E5FF]/20" />
                                  <span className="font-bold text-sm">Player {i}</span>
                               </div>
-                              <span className="text-xs font-black text-[#00E5FF]">+ {100 - i * 10}pts</span>
+                              <span className="text-xs font-black text-accent">+ {100 - i * 10}pts</span>
                            </div>
                          ))}
                       </div>
@@ -337,7 +337,7 @@ export function Competitions() {
                        <button 
                          onClick={() => handleRegister(selectedComp)}
                          disabled={userRegistrations.includes(selectedComp.id) || selectedComp.current_players >= selectedComp.max_players || selectedComp.status !== 'Open'}
-                         className="w-full h-16 bg-[#00E5FF] text-black font-black rounded-3xl shadow-xl shadow-[#00E5FF]/20 hover:scale-[1.02] active:scale-95 transition-all"
+                         className="w-full h-16 bg-accent text-accent-foreground font-black rounded-3xl shadow-xl shadow-[#00E5FF]/20 hover:scale-[1.02] active:scale-95 transition-all"
                        >
                          {userRegistrations.includes(selectedComp.id) ? "YOU ARE IN" : "REGISTER FOR EVENT"}
                        </button>
@@ -350,10 +350,10 @@ export function Competitions() {
       </AnimatePresence>
 
       {filteredTournaments.length === 0 && (
-        <div className="text-center py-32 bg-white dark:bg-white/5 rounded-[40px] border-2 border-dashed border-gray-100 dark:border-white/5">
+        <div className="text-center py-32 bg-card rounded-[40px] border-2 border-dashed border-border">
           <AlertCircle className="mx-auto mb-6 opacity-10" size={64} />
-          <h3 className="text-2xl font-black opacity-40 tracking-tighter uppercase">No Competitions Found</h3>
-          <p className="text-sm font-medium opacity-30 mt-2">Adjust your filters or check back later.</p>
+          <h3 className="text-2xl font-black opacity-40 tracking-tighter uppercase text-foreground">No Competitions Found</h3>
+          <p className="text-sm font-medium opacity-30 mt-2 text-foreground">Adjust your filters or check back later.</p>
         </div>
       )}
     </div>
@@ -362,24 +362,24 @@ export function Competitions() {
 
 function CardInfo({ icon: Icon, label, value }: any) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 text-gray-400 dark:text-white/20">
+    <div className="space-y-1 text-foreground">
+      <div className="flex items-center gap-2 opacity-50">
         <Icon size={14} />
         <span className="text-[10px] font-black uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-sm font-black dark:text-white uppercase leading-none">{value}</p>
+      <p className="text-sm font-black uppercase leading-none">{value}</p>
     </div>
   );
 }
 
 function DetailItem({ icon: Icon, label, value }: any) {
   return (
-    <div className="p-4 bg-white dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+    <div className="p-4 bg-muted rounded-2xl border border-border text-foreground">
       <div className="flex items-center gap-2 mb-2 opacity-30">
         <Icon size={14} />
         <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
       </div>
-      <p className="text-sm font-black dark:text-white uppercase">{value}</p>
+      <p className="text-sm font-black uppercase">{value}</p>
     </div>
   );
 }

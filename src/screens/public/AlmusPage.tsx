@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Moon, Sun, ArrowRight, Citrus, Leaf, Cherry, Palmtree, X, Menu, LayoutDashboard } from "lucide-react";
 import { useTheme } from "../../styles/useTheme";
 import Navigation from "../../components/Navigation";
+import Footer from "../../components/Footer";
 import { toast, Toaster } from 'sonner'; 
 import { Mail, Phone } from 'lucide-react';
 import { useAuth } from "../../services/AuthContext";
@@ -152,14 +153,14 @@ export function AlmusPage() {
 
   const { user } = useAuth();
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0A0E1A] dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen overflow-x-hidden bg-background transition-colors duration-300">
 <Navigation />
       {/* Hero Section */}
-<section className="relative min-h-[70vh] pt-20 sm:pt-24 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910]">
+<section className="relative min-h-[70vh] pt-20 sm:pt-24 md:pt-32 pb-16 overflow-hidden bg-background">
 
   {/* Background Blurs (hidden on mobile) */}
-  <div className="hidden md:block absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-  <div className="hidden md:block absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+  <div className="hidden md:block absolute bg-accent/5 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+  <div className="hidden md:block absolute bg-accent/3 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
 
   <div className="max-w-[1096px] mx-auto px-4 sm:px-6 lg:px-12 relative">
     <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -175,12 +176,12 @@ export function AlmusPage() {
           <h1
             className="font-['Playfair_Display',serif] font-bold 
                        text-[42px] sm:text-[64px] md:text-[72px] lg:text-[120px]
-                       text-gray-900 dark:text-white mb-2 transition-colors duration-300"
+                       text-foreground mb-2 transition-colors duration-300"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >
             ALMUS
           </h1>
-          <div className="bg-blue-500 dark:bg-[#00e5ff] h-[5px] sm:h-[6px] w-[96px] sm:w-[128px] mx-auto lg:mx-0 rounded-full shadow-lg dark:shadow-[0px_0px_20px_rgba(0,229,255,0.8)] transition-colors duration-300" />
+          <div className="bg-accent h-[5px] sm:h-[6px] w-[96px] sm:w-[128px] mx-auto lg:mx-0 rounded-full shadow-lg dark:shadow-accent/40 transition-colors duration-300" />
         </div>
 
         <h2 className="font-['Poppins',sans-serif] font-medium 
@@ -196,11 +197,11 @@ export function AlmusPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center lg:justify-start">
-          <button className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00e5ff] dark:hover:bg-[#00d4e6] 
+          <button className="bg-accent hover:bg-accent/90 
                              h-[48px] sm:h-[56px] px-6 sm:px-8 rounded-full shadow-lg 
                              hover:scale-[1.02] transition-all duration-300 
                              font-['Poppins',sans-serif] font-semibold text-[15px] sm:text-[16px] 
-                             text-white dark:text-black">
+                             text-accent-foreground">
             Request a quote
           </button>
 
@@ -256,7 +257,7 @@ export function AlmusPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-gray-900 dark:text-white mb-6"
+            className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-foreground mb-6"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >
             A hydration solution designed for your facility
@@ -284,7 +285,7 @@ export function AlmusPage() {
                   }}
                 />
               </div>
-              <div className="bg-blue-500 dark:bg-[#00e5ff] h-[4px] w-[96px] rounded-full shadow-lg dark:shadow-[0px_0px_12px_0px_rgba(0,229,255,0.8)] mt-8 transition-colors duration-300" />
+              <div className="bg-accent h-[4px] w-[96px] rounded-full shadow-lg dark:shadow-accent/40 mt-8 transition-colors duration-300" />
             </motion.div>
 
             {/* Right Content */}
@@ -321,12 +322,12 @@ export function AlmusPage() {
               transition={{ duration: 0.8 }}
             >
               <h2
-                className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[48px] lg:text-[64px] leading-[1.2] text-gray-900 dark:text-white transition-colors duration-300"
+                className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[48px] lg:text-[64px] leading-[1.2] text-foreground transition-colors duration-300"
                 style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
               >
                 Why choose ALMUS
               </h2>
-              <div className="bg-blue-500 dark:bg-[#00e5ff] h-[6px] w-[128px] rounded-full shadow-lg dark:shadow-[0px_0px_16px_0px_rgba(0,229,255,0.8)] mt-6 transition-colors duration-300" />
+              <div className="bg-accent h-[6px] w-[128px] rounded-full shadow-lg dark:shadow-accent/40 mt-6 transition-colors duration-300" />
             </motion.div>
 
             {/* Right Benefits - Animated one by one */}
@@ -352,12 +353,12 @@ export function AlmusPage() {
                     hidden: { opacity: 0, y: 30 },
                     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
                   }}
-                  className="bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-6 sm:p-10 shadow-xl dark:shadow-[0px_20px_60px_0px_rgba(0,0,0,0.6)] transition-colors duration-300"
+                  className="bg-card/50 border border-border rounded-[32px] p-6 sm:p-10 shadow-xl transition-colors duration-300"
                 >
                   <h3 className="font-['Poppins',sans-serif] font-bold text-[18px] sm:text-[16px] sm:text-[20px] md:text-[24px] leading-[36.4px] text-gray-800 dark:text-white mb-4 transition-colors duration-300">
                     {benefit.title}
                   </h3>
-                  <p className="font-['Poppins',sans-serif] text-[16px] sm:text-[16px] sm:text-[20px] md:text-[24px] leading-[34px] text-gray-600 dark:text-white/70 transition-colors duration-300">
+                  <p className="font-['Poppins',sans-serif] text-[16px] sm:text-[16px] sm:text-[20px] md:text-[24px] leading-[34px] text-foreground/70 transition-colors duration-300">
                     {benefit.description}
                   </p>
                 </motion.div>
@@ -376,7 +377,7 @@ export function AlmusPage() {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-gray-900 dark:text-white mb-6"
+        className="font-['Playfair_Display',serif] font-bold text-[48px] lg:text-[56px] text-foreground mb-6"
       >
         Flavored hydration options
       </motion.h2>
@@ -395,7 +396,7 @@ export function AlmusPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className="group relative p-8 rounded-[32px] bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 hover:border-blue-400 transition-all duration-300 text-center"
+            className="group relative p-8 rounded-[32px] bg-card border border-border hover:border-accent transition-all duration-300 text-center"
           >
             {/* Icône avec cercle de couleur en fond */}
             <div className={`w-16 h-16 rounded-2xl ${flavor.color} bg-opacity-10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -425,13 +426,13 @@ export function AlmusPage() {
     <motion.h2
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-gray-900 dark:text-white mb-16"
+      className="font-['Playfair_Display',serif] font-bold text-[44px] sm:text-[60px] lg:text-[72px] text-foreground mb-16"
     >
       How it works
     </motion.h2>
 
     {/* Glowing underline */}
-    <div className="w-32 h-1.5 bg-blue-500 dark:bg-[#00e5ff] mx-auto -mt-12 mb-20 rounded-full shadow-[0_0_15px_rgba(0,229,255,0.8)]" />
+    <div className="w-32 h-1.5 bg-accent mx-auto -mt-12 mb-20 rounded-full shadow-lg dark:shadow-accent/40" />
 
     <div className="relative flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12">
       {/* Step Card */}
@@ -439,11 +440,11 @@ export function AlmusPage() {
         key={currentStep}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-[650px] bg-white dark:bg-[#161B2C] border border-gray-200 dark:border-white/10 rounded-[40px] p-6 sm:p-12 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 shadow-2xl transition-colors duration-300"
+        className="relative w-full max-w-[650px] bg-card border border-border rounded-[40px] p-6 sm:p-12 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 shadow-2xl transition-colors duration-300"
       >
         {/* Circular Number Badge */}
         <div className="relative flex-shrink-0 w-32 h-32 rounded-full bg-gray-100 dark:bg-gradient-to-b dark:from-white/10 dark:to-transparent border border-gray-200 dark:border-white/20 flex items-center justify-center shadow-inner">
-          <span className="text-blue-600 dark:text-[#00e5ff] font-bold text-[48px] tracking-tighter">
+          <span className="text-accent font-bold text-[48px] tracking-tighter">
             {steps[currentStep].number}
           </span>
         </div>
@@ -462,9 +463,9 @@ export function AlmusPage() {
       {/* Right Arrow Button */}
       <button 
         onClick={nextStep}
-        className="w-16 h-16 rounded-full bg-blue-500/10 dark:bg-[#003B46]/40 border border-blue-500/30 dark:border-[#00e5ff]/30 flex items-center justify-center group hover:bg-blue-500/20 dark:hover:bg-[#00e5ff]/20 transition-all"
+        className="w-16 h-16 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center group hover:bg-accent/20 transition-all"
       >
-        <ArrowRight className="text-blue-600 dark:text-[#00e5ff] w-6 h-6 group-hover:translate-x-1 transition-transform" />
+        <ArrowRight className="text-accent w-6 h-6 group-hover:translate-x-1 transition-transform" />
       </button>
     </div>
 
@@ -475,8 +476,8 @@ export function AlmusPage() {
           key={index}
           className={`transition-all duration-300 rounded-full ${
             index === currentStep 
-              ? "w-8 h-3 bg-blue-600 dark:bg-[#00e5ff] shadow-[0_0_10px_rgba(0,229,255,0.5)]" 
-              : "w-3 h-3 bg-gray-300 dark:bg-white/20"
+              ? "w-8 h-3 bg-accent shadow-lg dark:shadow-accent/40" 
+              : "w-3 h-3 bg-muted"
           }`}
         />
       ))}
@@ -495,7 +496,7 @@ export function AlmusPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[48px] lg:text-[62px] leading-[1.1] text-gray-900 dark:text-white mb-4 transition-colors duration-300"
+            className="font-['Playfair_Display',serif] font-bold text-[36px] sm:text-[48px] lg:text-[62px] leading-[1.1] text-foreground mb-4 transition-colors duration-300"
             style={{ fontVariationSettings: "'opsz' 12, 'wdth' 100" }}
           >
             Bring ALMUS to your facility
@@ -579,7 +580,7 @@ export function AlmusPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 dark:bg-[#00e5ff] dark:hover:bg-[#00d4e6] h-[55px] w-full sm:w-auto px-12 rounded-full shadow-lg dark:shadow-[0px_0px_20px_0px_rgba(0,229,255,0.3)] hover:shadow-xl dark:hover:shadow-[0px_0px_30px_0px_rgba(0,229,255,0.5)] hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[15px] text-white dark:text-black flex items-center justify-center gap-2 mx-auto"
+              className="bg-accent hover:bg-accent/90 h-[55px] w-full sm:w-auto px-12 rounded-full shadow-lg dark:shadow-accent/40 hover:scale-[1.02] transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[15px] text-accent-foreground flex items-center justify-center gap-2 mx-auto"
             >
               Send inquiry
               <ArrowRight className="w-5 h-5" />
@@ -587,95 +588,7 @@ export function AlmusPage() {
           </motion.form>
         </div>
       </section>
-
- {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black border-t border-gray-700 dark:border-white/10 py-12 transition-colors duration-300">
-        <div className="max-w-[1096px] mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Logo Column */}
-            <div>
-              <h3 className="font-['Arial',sans-serif] font-bold text-[20px] text-white mb-4">
-                ULTIMA
-              </h3>
-            </div>
-
-            {/* ULTIMA Column */}
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                ULTIMA
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
-                  >
-                    About us
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support Column */}
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                Support
-              </h4>
-              <ul className="space-y-2">
-                
-                <li>
-                  <button
-                    className="font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300"
-                  >
-                    FAQ
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-['Poppins',sans-serif] font-semibold text-[14px] text-white mb-4">
-                Contact
-              </h4>
-              <ul className="space-y-2">
-               <ul className="space-y-4"> 
-               
-                <li>
-                 <a
-                    href="tel:+21699799368"
-                    className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Phone className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span> +216 99 799 368</span>
-                 </a>
-               </li>
-
-               
-               <li>
-                 <a
-                   href="https://mail.google.com/mail/?view=cm&fs=1&to=Ultima.contacus@gmail.com"
-                   target="_blank"
-                    rel="noopener noreferrer"
-                   className="flex items-center gap-2 font-['Poppins',sans-serif] text-[14px] text-gray-300 hover:text-white transition-colors duration-300 group"
-                    >
-                   <Mail className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                   <span>Ultima.contacus@gmail.com</span>
-                 </a>
-               </li>
-               </ul>
-              </ul>
-            </div>
-          </div>
-
-
-          {/* Copyright */}
-          <div className="pt-8 border-t border-gray-700 dark:border-white/10 text-center">
-            <p className="font-['Poppins',sans-serif] text-[14px] text-gray-400">
-              © {new Date().getFullYear()} ULTIMA. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

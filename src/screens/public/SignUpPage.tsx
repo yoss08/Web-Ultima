@@ -60,7 +60,7 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E8EBF0] via-[#F5F7FA] to-[#FFFFFF] dark:from-[#0A1F2E] dark:via-[#0A0E1A] dark:to-[#000000] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-muted/50 via-background to-background transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12">
       {/* Logo at top */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -68,7 +68,7 @@ export function SignUpPage() {
         transition={{ duration: 0.6 }}
         className="mb-12"
       >
-        <h1 className="font-['Arial',sans-serif] font-bold text-[32px] text-[#0A0E1A] dark:text-white tracking-[1.6px]">
+        <h1 className="font-['Arial',sans-serif] font-bold text-[32px] text-foreground tracking-[1.6px]">
           ULTIMA
         </h1>
       </motion.div>
@@ -76,12 +76,12 @@ export function SignUpPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-[560px] bg-white dark:bg-white/5 border border-[#0A0E1A]/5 dark:border-white/10 rounded-[40px] overflow-hidden shadow-2xl relative"
+        className="w-full max-w-[560px] bg-card border border-border rounded-[40px] overflow-hidden shadow-2xl relative"
       >
         <div className="p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="font-['Playfair_Display',serif] text-[40px] font-bold text-[#0A0E1A] dark:text-white mb-2">
+            <h1 className="font-['Playfair_Display',serif] text-[40px] font-bold text-foreground mb-2">
               Create Account
             </h1>
           </div>
@@ -94,8 +94,8 @@ export function SignUpPage() {
                 onClick={() => setFormData({ ...formData, accountType: "Player" })}
                 className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
                   formData.accountType === "Player"
-                    ? "border-blue-500 dark:border-[#00E5FF] bg-blue-500/5 dark:bg-[#00E5FF]/5 text-blue-500 dark:text-[#00E5FF]"
-                    : "border-transparent bg-gray-50 dark:bg-white/5 text-gray-400"
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-transparent bg-muted text-muted-foreground"
                 }`}
               >
                 <Dumbbell size={24} />
@@ -106,8 +106,8 @@ export function SignUpPage() {
                 onClick={() => setFormData({ ...formData, accountType: "Coach" })}
                 className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
                   formData.accountType === "Coach"
-                    ? "border-blue-500 dark:border-[#00E5FF] bg-blue-500/5 dark:bg-[#00E5FF]/5 text-blue-500 dark:text-[#00E5FF]"
-                    : "border-transparent bg-gray-50 dark:bg-white/5 text-gray-400"
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-transparent bg-muted text-muted-foreground"
                 }`}
               >
                 <Users size={24} />
@@ -139,11 +139,11 @@ export function SignUpPage() {
             {/* Form Fields */}
             <div className="space-y-4">
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0A0E1A]/30 dark:text-white/30" size={20} />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={20} />
                 <input
                   type="text"
                   placeholder="Full Name"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-muted border border-transparent focus:border-accent rounded-2xl text-foreground outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
@@ -151,11 +151,11 @@ export function SignUpPage() {
               </div>
 
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0A0E1A]/30 dark:text-white/30" size={20} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={20} />
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-muted border border-transparent focus:border-accent rounded-2xl text-foreground outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -163,11 +163,11 @@ export function SignUpPage() {
               </div>
 
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0A0E1A]/30 dark:text-white/30" size={20} />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={20} />
                 <input
                   type="tel"
                   placeholder="Phone Number"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-muted border border-transparent focus:border-accent rounded-2xl text-foreground outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   required
@@ -175,11 +175,11 @@ export function SignUpPage() {
               </div>
 
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0A0E1A]/30 dark:text-white/30" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={20} />
                 <input
                   type="password"
                   placeholder="Password"
-                  className="w-full h-14 pl-12 pr-4 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-blue-500 dark:focus:border-[#00E5FF] rounded-2xl dark:text-white outline-none transition-all font-['Poppins',sans-serif]"
+                  className="w-full h-14 pl-12 pr-4 bg-muted border border-transparent focus:border-accent rounded-2xl text-foreground outline-none transition-all font-['Poppins',sans-serif]"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
@@ -190,7 +190,7 @@ export function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-14 bg-blue-500 dark:bg-[#00E5FF] rounded-[28px] shadow-blue-500 dark:shadow-[#00E5FF]/50 hover:shadow-blue-500 dark:hover:shadow-[#00E5FF]/70 hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-white dark:text-black mt-6"
+              className="w-full h-14 bg-accent rounded-[28px] shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:scale-[1.02] disabled:scale-100 transition-all duration-300 font-['Poppins',sans-serif] font-bold text-[16px] text-accent-foreground mt-6"
             >
               {loading ? "Creating account..." : "Create Account"}
             </button>
@@ -198,9 +198,9 @@ export function SignUpPage() {
 
           {/* Login Link */}
           <div className="mt-8 text-center">
-            <p className="font-['Poppins',sans-serif] text-[14px] text-[#0A0E1A]/50 dark:text-white/50">
+            <p className="font-['Poppins',sans-serif] text-[14px] text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-500 dark:text-[#00E5FF] font-semibold hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors">
+              <Link to="/login" className="text-accent font-semibold hover:text-accent/80 transition-colors">
                 Log in
               </Link>
             </p>
@@ -215,7 +215,7 @@ export function SignUpPage() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="mt-8"
       >
-        <Link to="/" className="flex items-center gap-2 text-[#0A0E1A]/50 dark:text-white/50 hover:text-blue-500 dark:hover:text-[#00E5FF] transition-colors group">
+        <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group">
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-['Poppins',sans-serif] text-[14px] font-medium">Back to Home</span>
         </Link>

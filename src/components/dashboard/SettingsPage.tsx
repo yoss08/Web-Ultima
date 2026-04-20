@@ -157,22 +157,22 @@ export function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: User, color: 'text-[#39FF14]', bg: 'bg-[#39FF14]/10' },
-    { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF]/10' },
-    { id: 'notifications', label: 'Alerts', icon: Bell, color: 'text-[#FFD700]', bg: 'bg-[#FFD700]/10' },
-    { id: 'security', label: 'Security', icon: Shield, color: 'text-[#FF4D4D]', bg: 'bg-[#FF4D4D]/10' },
+    { id: 'account', label: 'Account', icon: User, color: 'text-[#39ff14]', bg: 'bg-[#39ff14]/10' },
+    { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-accent', bg: 'bg-accent/10' },
+    { id: 'notifications', label: 'Alerts', icon: Bell, color: 'text-[#14e9ff]', bg: 'bg-[#14e9ff]/10' },
+    { id: 'security', label: 'Security', icon: Shield, color: 'text-[#ff3d14]', bg: 'bg-[#ff3d14]/10' },
   ];
 
-  const inputClassName = "w-full bg-gray-50 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#00E5FF] focus:border-transparent transition-all text-[#0A0E1A] dark:text-white font-['Poppins',sans-serif]";
+  const inputClassName = "w-full bg-muted h-[52px] px-4 rounded-[14px] border border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-foreground font-['Poppins',sans-serif]";
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-none mb-4">
+        <h1 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black text-foreground leading-none mb-4">
           Settings
         </h1>
-        <p className="font-['Poppins',sans-serif] text-[16px] text-[#0A0E1A]/60 dark:text-white/60">
+        <p className="font-['Poppins',sans-serif] text-[16px] text-muted-foreground">
           Manage your account profile, appearance, and security preferences.
         </p>
       </div>
@@ -189,8 +189,8 @@ export function SettingsPage() {
                 onClick={() => handleTabChange(tab.id as TabType)}
                 className={`w-full flex items-center justify-between p-4 rounded-[16px] transition-all group ${
                   isActive 
-                    ? "bg-[#00E5FF]/10 border border-[#00E5FF]/20 shadow-sm" 
-                    : "hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
+                    ? "bg-accent/10 border border-accent/20 shadow-sm" 
+                    : "hover:bg-muted border border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -198,12 +198,12 @@ export function SettingsPage() {
                     <Icon className={`w-5 h-5 ${tab.color}`} />
                   </div>
                   <span className={`font-['Poppins',sans-serif] font-bold text-[15px] ${
-                    isActive ? "text-[#0A0E1A] dark:text-white" : "text-[#0A0E1A]/60 dark:text-white/40"
+                    isActive ? "text-foreground" : "text-muted-foreground"
                   }`}>
                     {tab.label}
                   </span>
                 </div>
-                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "text-[#00E5FF] translate-x-1" : "text-gray-300 opacity-0 group-hover:opacity-100"}`} />
+                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "text-accent translate-x-1" : "text-muted-foreground/30 opacity-0 group-hover:opacity-100"}`} />
               </button>
             );
           })}
@@ -218,19 +218,19 @@ export function SettingsPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-white dark:bg-[#1A1F2C]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[28px] p-6 lg:p-10 shadow-sm"
+              className="bg-card backdrop-blur-xl border border-border rounded-[28px] p-6 lg:p-10 shadow-sm"
             >
               {/* ACCOUNT TAB */}
               {activeTab === 'account' && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold dark:text-white mb-2">Account Profile</h2>
-                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Manage your public information and contact details.</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Account Profile</h2>
+                    <p className="text-sm text-muted-foreground">Manage your public information and contact details.</p>
                   </div>
 
                   <div className="space-y-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Full Name</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</label>
                       <input
                         type="text"
                         name="fullName"
@@ -243,7 +243,7 @@ export function SettingsPage() {
 
                     <div className="grid sm:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Email Address</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
                         <input
                           type="email"
                           value={userData.email}
@@ -252,7 +252,7 @@ export function SettingsPage() {
                         />
                       </div>
                       <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Phone Number</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone Number</label>
                         <input
                           type="tel"
                           name="phone"
@@ -265,9 +265,9 @@ export function SettingsPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold uppercase tracking-widest text-[#0A0E1A]/40 dark:text-white/40 ml-1">Account Role</label>
-                      <div className="w-full bg-gray-100 dark:bg-white/5 h-[52px] px-4 rounded-[14px] border border-gray-200 dark:border-white/10 flex items-center cursor-not-allowed">
-                        <span className="font-['Poppins',sans-serif] text-[15px] text-[#0A0E1A]/40 dark:text-white/40">
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Account Role</label>
+                      <div className="w-full bg-muted h-[52px] px-4 rounded-[14px] border border-border flex items-center cursor-not-allowed">
+                        <span className="font-['Poppins',sans-serif] text-[15px] text-muted-foreground">
                           {userData.role}
                         </span>
                       </div>
@@ -278,9 +278,9 @@ export function SettingsPage() {
                     <button
                       onClick={handleUpdateProfile}
                       disabled={loading}
-                      className="flex items-center gap-2 px-10 h-14 bg-[#00E5FF] hover:bg-[#00D4E6] disabled:opacity-50 rounded-[18px] shadow-lg shadow-[#00E5FF]/20 transition-all font-bold text-black"
+                      className="flex items-center gap-2 px-10 h-14 bg-accent hover:opacity-90 disabled:opacity-50 rounded-[18px] shadow-lg shadow-accent/20 transition-all font-bold text-accent-foreground"
                     >
-                      {loading ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
+                      {loading ? <Loader2 className="animate-spin text-accent-foreground" /> : <Save className="w-5 h-5 text-accent-foreground" />}
                       Save Changes
                     </button>
                   </div>
@@ -290,8 +290,8 @@ export function SettingsPage() {
               {activeTab === 'appearance' && (
                 <div className="space-y-10">
                   <div>
-                    <h2 className="text-2xl font-bold dark:text-white mb-2">Display & Appearance</h2>
-                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Customize how the application looks on your device.</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Display & Appearance</h2>
+                    <p className="text-sm text-muted-foreground">Customize how the application looks on your device.</p>
                   </div>
 
                   {/* Theme Selection */}
@@ -300,16 +300,16 @@ export function SettingsPage() {
                       onClick={() => handleThemeUpdate('light')}
                       className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
                         !isDark 
-                          ? "border-[#00E5FF] bg-[#00E5FF]/5 shadow-[#00E5FF]" 
-                          : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
+                          ? "border-accent bg-accent/5 shadow-accent" 
+                          : "border-border hover:border-accent/40"
                       }`}
                     >
-                      <div className={`p-5 rounded-full ${!isDark ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                      <div className={`p-5 rounded-full ${!isDark ? "bg-accent text-accent-foreground shadow-lg shadow-accent/30" : "bg-muted text-muted-foreground"}`}>
                         <Sun size={32} />
                       </div>
                       <div className="text-center">
-                        <p className={`font-black text-lg ${!isDark ? "text-black" : "text-gray-400"}`}>Light</p>
-                        {!isDark && <span className="text-[10px] text-[#00E5FF] font-black uppercase tracking-widest">Selected</span>}
+                        <p className={`font-black text-lg ${!isDark ? "text-foreground" : "text-muted-foreground"}`}>Light</p>
+                        {!isDark && <span className="text-[10px] text-accent font-black uppercase tracking-widest">Selected</span>}
                       </div>
                     </button>
 
@@ -317,16 +317,16 @@ export function SettingsPage() {
                       onClick={() => handleThemeUpdate('dark')}
                       className={`relative p-8 rounded-[24px] border-2 flex flex-col items-center gap-6 transition-all ${
                         isDark 
-                          ? "border-[#00E5FF] bg-[#00E5FF]/5 shadow-[#00E5FF]" 
-                          : "border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10"
+                          ? "border-accent bg-accent/5 shadow-accent" 
+                          : "border-border hover:border-accent/40"
                       }`}
                     >
-                      <div className={`p-5 rounded-full ${isDark ? "bg-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/30" : "bg-gray-100 dark:bg-white/5 text-gray-400"}`}>
+                      <div className={`p-5 rounded-full ${isDark ? "bg-accent text-accent-foreground shadow-lg shadow-accent/30" : "bg-muted text-muted-foreground"}`}>
                         <Moon size={32} />
                       </div>
                       <div className="text-center">
-                        <p className={`font-black text-lg ${isDark ? "text-white" : "text-gray-400"}`}>Dark</p>
-                        {isDark && <span className="text-[10px] text-[#00E5FF] font-black uppercase tracking-widest">Selected</span>}
+                        <p className={`font-black text-lg ${isDark ? "text-foreground" : "text-muted-foreground"}`}>Dark</p>
+                        {isDark && <span className="text-[10px] text-accent font-black uppercase tracking-widest">Selected</span>}
                       </div>
                     </button>
                   </div>
@@ -335,18 +335,18 @@ export function SettingsPage() {
                     {/* Language */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 bg-[#00E5FF]/10 rounded-xl">
-                          <Globe className="text-[#00E5FF]" size={20} />
+                        <div className="p-3 bg-accent/10 rounded-xl">
+                          <Globe className="text-accent" size={20} />
                         </div>
                         <div>
-                          <h4 className="font-bold dark:text-white">Global Language</h4>
-                          <p className="text-xs opacity-60">System-wide display language</p>
+                          <h4 className="font-bold text-foreground">Global Language</h4>
+                          <p className="text-xs text-muted-foreground">System-wide display language</p>
                         </div>
                       </div>
                       <select 
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
-                        className="h-11 px-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 outline-none text-sm font-bold dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                        className="h-11 px-4 bg-muted rounded-xl border border-border outline-none text-sm font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
                       >
                         <option value="en">English (US)</option>
                         <option value="fr">Français</option>
@@ -357,18 +357,18 @@ export function SettingsPage() {
                     {/* Privacy */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 bg-[#FF4D4D]/10 rounded-xl">
-                          <Lock className="text-[#FF4D4D]" size={20} />
+                        <div className="p-3 bg-red-500/10 rounded-xl">
+                          <Lock className="text-red-500" size={20} />
                         </div>
                         <div>
-                          <h4 className="font-bold dark:text-white">Profile Visibility</h4>
-                          <p className="text-xs opacity-60">Control who can see your stats</p>
+                          <h4 className="font-bold text-foreground">Profile Visibility</h4>
+                          <p className="text-xs text-muted-foreground">Control who can see your stats</p>
                         </div>
                       </div>
                       <select 
                         value={privacy}
                         onChange={(e) => setPrivacy(e.target.value)}
-                        className="h-11 px-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 outline-none text-sm font-bold dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                        className="h-11 px-4 bg-muted rounded-xl border border-border outline-none text-sm font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
                       >
                         <option value="public">Public</option>
                         <option value="friends">Friends</option>
@@ -383,26 +383,26 @@ export function SettingsPage() {
               {activeTab === 'notifications' && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold dark:text-white mb-2">Notification Preferences</h2>
-                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Choose which updates you want to receive and how.</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Notification Preferences</h2>
+                    <p className="text-sm text-muted-foreground">Choose which updates you want to receive and how.</p>
                   </div>
 
                   <div className="space-y-2">
                     {Object.entries(notifications).map(([key, value]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between p-5 rounded-[18px] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+                        className="flex items-center justify-between p-5 rounded-[18px] hover:bg-muted transition-colors group"
                       >
                         <div>
-                          <span className="font-bold text-[16px] text-[#0A0E1A] dark:text-white">
+                          <span className="font-bold text-[16px] text-foreground">
                             {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
                           </span>
-                          <p className="text-[12px] opacity-40">Get notified about {key.toLowerCase().replace('alerts', '')} instantly</p>
+                          <p className="text-[12px] text-muted-foreground">Get notified about {key.toLowerCase().replace('alerts', '')} instantly</p>
                         </div>
                         <button
                           onClick={() => handleNotificationToggle(key)}
                           className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
-                            value ? "bg-[#00E5FF]" : "bg-gray-200 dark:bg-white/10"
+                            value ? "bg-accent" : "bg-muted"
                           }`}
                         >
                           <motion.span
@@ -421,23 +421,23 @@ export function SettingsPage() {
               {activeTab === 'security' && (
                 <div className="space-y-10">
                   <div>
-                    <h2 className="text-2xl font-bold dark:text-white mb-2">Security & Privacy</h2>
-                    <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">Keep your account safe and manage authentication.</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Security & Privacy</h2>
+                    <p className="text-sm text-muted-foreground">Keep your account safe and manage authentication.</p>
                   </div>
 
-                  <div className="p-8 bg-[#FF4D4D]/5 border border-[#FF4D4D]/20 rounded-[24px]">
+                  <div className="p-8 bg-red-500/5 border border-red-500/20 rounded-[24px]">
                     <div className="flex items-start gap-5">
-                      <div className="w-12 h-12 rounded-full bg-[#FF4D4D] flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
                         <Shield className="text-white w-6 h-6" />
                       </div>
                       <div className="space-y-4">
                         <div>
-                          <h3 className="text-lg font-bold text-[#FF4D4D]">Password Protection</h3>
-                          <p className="text-sm opacity-70">We recommend using a strong password that you don't use elsewhere.</p>
+                          <h3 className="text-lg font-bold text-red-500">Password Protection</h3>
+                          <p className="text-sm text-foreground/70">We recommend using a strong password that you don't use elsewhere.</p>
                         </div>
                         <button 
                           onClick={() => setShowPasswordModal(true)}
-                          className="px-8 h-12 bg-white dark:bg-white/10 font-black text-sm rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/20 transition-all shadow-sm"
+                          className="px-8 h-12 bg-muted font-black text-sm rounded-xl border border-border hover:opacity-80 transition-all shadow-sm text-foreground"
                         >
                           Change Password
                         </button>
@@ -446,18 +446,18 @@ export function SettingsPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
-                      <Lock size={18} className="text-[#00E5FF]" />
+                    <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                      <Lock size={18} className="text-accent" />
                       Two-Factor Authentication
                     </h3>
-                    <p className="text-sm opacity-50 px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
+                    <p className="text-sm text-muted-foreground px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
                   </div>
 
                   {/* Account Removal Section */}
                   <div className="pt-10 border-t border-gray-100 dark:border-white/5 space-y-6">
                     <div>
-                      <h3 className="text-xl font-bold dark:text-white mb-2">Account Removal</h3>
-                      <p className="text-sm text-[#0A0E1A]/60 dark:text-white/60">
+                      <h3 className="text-xl font-bold text-foreground mb-2">Account Removal</h3>
+                      <p className="text-sm text-muted-foreground">
                         Disabling your account means you can recover it at any time after taking this action.
                       </p>
                     </div>
@@ -498,14 +498,14 @@ export function SettingsPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-[#0A0E1A] p-10 rounded-[36px] max-w-md w-full relative border border-gray-200 dark:border-white/10 shadow-2xl"
+              className="bg-card p-10 rounded-[36px] max-w-md w-full relative border border-gray-200 dark:border-white/10 shadow-2xl"
             >
               <h2 className="text-3xl font-black mb-2 dark:text-white">Security Update</h2>
               <p className="text-sm opacity-50 mb-8 font-['Poppins']">Enter your new password below to secure your account.</p>
               
               <div className="space-y-5 mb-10">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest text-[#0A0E1A] dark:text-white">New Password</label>
+                  <label className="text-[10px] font-black uppercase text-muted-foreground ml-1 tracking-widest">New Password</label>
                   <input 
                     type="password" 
                     value={newPassword} 
@@ -515,7 +515,7 @@ export function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase opacity-40 ml-1 tracking-widest text-[#0A0E1A] dark:text-white">Confirm New Password</label>
+                  <label className="text-[10px] font-black uppercase text-muted-foreground ml-1 tracking-widest">Confirm New Password</label>
                   <input 
                     type="password" 
                     value={confirmPassword} 
@@ -529,16 +529,16 @@ export function SettingsPage() {
               <div className="flex gap-4">
                 <button 
                   onClick={() => setShowPasswordModal(false)} 
-                  className="flex-1 h-14 bg-gray-100 dark:bg-white/5 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors dark:text-white"
+                  className="flex-1 h-14 bg-muted font-bold rounded-2xl hover:opacity-80 transition-colors text-foreground"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handlePasswordChange} 
                   disabled={loading}
-                  className="flex-1 h-14 bg-[#00E5FF] text-white font-black rounded-2xl hover:bg-[#00B8D4] transition-colors shadow-lg shadow-[#00E5FF]/20 flex items-center justify-center gap-2"
+                  className="flex-1 h-14 bg-accent text-accent-foreground font-black rounded-2xl hover:opacity-90 transition-colors shadow-lg shadow-accent/20 flex items-center justify-center gap-2"
                 >
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {loading && <Loader2 className="w-4 h-4 animate-spin text-accent-foreground" />}
                   Update
                 </button>
               </div>

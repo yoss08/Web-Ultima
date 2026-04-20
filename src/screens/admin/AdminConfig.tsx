@@ -1,39 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, MapPin, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
+import { adminService } from "../../services/adminService";
 
 export function AdminCourtConfig() {
+  const [clubId, setClubId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadClub() {
+      try {
+        const clubInfo = await adminService.getClubInfo();
+        setClubId(clubInfo.id);
+      } catch (err) {
+        console.error("Failed to load club info", err);
+      }
+    }
+    loadClub();
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     type: "Indoor",
     surface: "Clay",
-    capacity: 2,
-    pricing_peak: 0,
-    pricing_offpeak: 0,
-    almus_hardware_id: ""
+    capacity: 4
   });
 
   const handleAddCourt = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!clubId) {
+      toast.error("No club assigned. Please contact Super Admin.");
+      return;
+    }
     try {
-      const response = await fetch('/api/admin/courts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, status: 'available' })
+      await adminService.addCourt({
+        ...formData,
+        club_id: clubId,
+        status: 'available'
       });
-      
-      if (!response.ok) throw new Error("Failed to add court");
       
       toast.success("Court added successfully");
       setFormData({
         name: "",
         type: "Indoor",
         surface: "Clay",
-        capacity: 2,
-        pricing_peak: 0,
-        pricing_offpeak: 0,
-        almus_hardware_id: ""
+        capacity: 4
       });
     } catch (error: any) {
       toast.error(error.message);
@@ -42,25 +52,25 @@ export function AdminCourtConfig() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-8">
-        <h2 className="text-2xl font-bold dark:text-white mb-6 flex items-center gap-2">
-          <MapPin className="text-[#39FF14]" /> Add New Court
+      <div className="bg-card border border-border rounded-[32px] p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2 font-['Playfair_Display']">
+          <MapPin className="text-accent" /> Add New Court
         </h2>
         
         <form onSubmit={handleAddCourt} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <label className="text-sm font-medium dark:text-gray-400">Basic Information</label>
+          <div className="space-y-4 font-['Poppins']">
+            <label className="text-sm font-medium text-muted-foreground">Basic Information</label>
             <input 
               type="text"
               placeholder="Court Name (ex: Court Central)"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               required
             />
             <div className="grid grid-cols-2 gap-4">
               <select 
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+                className="h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
                 value={formData.type}
                 onChange={(e) => setFormData({...formData, type: e.target.value})}
               >
@@ -68,7 +78,7 @@ export function AdminCourtConfig() {
                 <option value="Outdoor">Outdoor</option>
               </select>
               <select 
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+                className="h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
                 value={formData.surface}
                 onChange={(e) => setFormData({...formData, surface: e.target.value})}
               >
@@ -80,41 +90,15 @@ export function AdminCourtConfig() {
             <input 
               type="number"
               placeholder="Capacity (Players)"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
               value={formData.capacity}
               onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value)})}
               required
             />
           </div>
 
-          <div className="space-y-4">
-            <label className="text-sm font-medium dark:text-gray-400">Pricing & Integration</label>
-            <div className="grid grid-cols-2 gap-4">
-              <input 
-                type="number"
-                placeholder="Peak Rate ($/hr)"
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
-                value={formData.pricing_peak}
-                onChange={(e) => setFormData({...formData, pricing_peak: parseFloat(e.target.value)})}
-                required
-              />
-              <input 
-                type="number"
-                placeholder="Off-Peak Rate ($/hr)"
-                className="h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
-                value={formData.pricing_offpeak}
-                onChange={(e) => setFormData({...formData, pricing_offpeak: parseFloat(e.target.value)})}
-                required
-              />
-            </div>
-            <input 
-              type="text"
-              placeholder="ALMUS Hardware ID"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
-              value={formData.almus_hardware_id}
-              onChange={(e) => setFormData({...formData, almus_hardware_id: e.target.value})}
-            />
-            <button className="w-full h-12 bg-[#00E5FF] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all mt-2">
+          <div className="space-y-4 font-['Poppins']">
+            <button className="w-full h-12 bg-accent text-accent-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-accent/20">
               <Plus size={20} /> Add Court
             </button>
           </div>
@@ -122,11 +106,11 @@ export function AdminCourtConfig() {
       </div>
 
       {/* Liste des courts configurés (Simulation) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[24px] flex justify-between items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-['Poppins']">
+        <div className="p-6 bg-card border border-border rounded-[24px] flex justify-between items-center shadow-sm">
           <div>
-            <h4 className="font-bold dark:text-white">Court Central</h4>
-            <p className="text-xs text-gray-500">Clay • Available</p>
+            <h4 className="font-bold text-foreground">Court Central</h4>
+            <p className="text-xs text-muted-foreground">Clay • Available</p>
           </div>
           <button className="text-red-500 p-2 hover:bg-red-500/10 rounded-lg transition-all">
             <Trash2 size={18} />

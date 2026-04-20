@@ -23,6 +23,7 @@ interface Court {
   surface: string;
   image: string;
   status?: "available" | "occupied" | "maintenance";
+  club_id?: string | number;
 }
 
 interface Booking {
@@ -44,18 +45,7 @@ interface Booking {
 
 type Tab = "book" | "upcoming" | "history";
 
-const MOCK_CLUBS = [
-  { id: 1, name: "Padel Arena", location: "Tunis, Tunisia", image:  padelArena},
-  { id: 2, name: "Padel La Marsa", location: "La Marsa, Tunisia", image: "https://images.unsplash.com/photo-1672223550220-df93d147fa4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080" },
-  { id: 3, name: "Casa Del Padel", location: "Tunis, Tunisia", image: "https://images.unsplash.com/photo-1709587825393-84b6c1698f32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080" },
-];
 
-const MOCK_COURTS: Court[] = [
-  { id: 'c1', name: 'Court 1', type: 'Indoor', surface: 'Panoramic Crystal', image: 'https://images.unsplash.com/photo-1709587825415-814c2d7cfce7?auto=format&fit=crop&q=80', status: 'available' },
-  { id: 'c2', name: 'Court 2', type: 'Outdoor', surface: 'Premium Clay', image: 'https://images.unsplash.com/photo-1626245914129-43c75f6bc978?auto=format&fit=crop&q=80', status: 'available' },
-  { id: 'c3', name: 'Court 3', type: 'Indoor', surface: 'Hard Court', image: 'https://images.unsplash.com/photo-1595435061119-4a82a9eb1994?auto=format&fit=crop&q=80', status: 'maintenance' },
-  { id: 'c4', name: 'Court 4', type: 'Indoor', surface: 'Official WPT', image: 'https://images.unsplash.com/photo-1591491640784-3232eb748d4b?auto=format&fit=crop&q=80', status: 'occupied' },
-];
 const TIME_SLOTS = [
   "08:00 - 09:30", "09:30 - 11:00", "11:00 - 12:30",
   "12:30 - 14:00", "14:00 - 15:30", "15:30 - 17:00",
@@ -75,9 +65,9 @@ const DISCOUNT_CODES: Record<string, number> = {
 };
 
 const COURT_STATUS_CONFIG = {
-  available: { label: "Available", color: "text-[#00E5FF] bg-[#00E5FF]/10" },
-  occupied:  { label: "Occupied",  color: "text-orange-400 bg-orange-400/10" },
-  maintenance:{ label: "Maintenance", color: "text-red-400 bg-red-400/10" },
+  available: { label: "Available", color: "text-accent bg-accent/10 border border-accent/20" },
+  occupied:  { label: "Occupied",  color: "text-orange-500 bg-orange-500/10 border border-orange-500/20" },
+  maintenance:{ label: "Maintenance", color: "text-rose-500 bg-rose-500/10 border border-rose-500/20" },
 };
 
 
@@ -104,7 +94,7 @@ function getCountdown(date: string, slot: string) {
 function StatusBadge({ status }: { status: Court["status"] }) {
   const cfg = COURT_STATUS_CONFIG[status ?? "available"];
   return (
-    <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${cfg.color}`}>
+    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${cfg.color} font-['Poppins']`}>
       {cfg.label}
     </span>
   );
@@ -114,11 +104,11 @@ function SectionHeading({ step, title }: { step?: number | string; title: string
   return (
     <div className="flex items-center gap-4 mb-6">
       {step !== undefined && (
-        <div className="w-10 h-10 bg-[#00E5FF] rounded-xl flex items-center justify-center text-black font-black shrink-0">
+        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-foreground font-black shrink-0 shadow-lg shadow-accent/20">
           {step}
         </div>
       )}
-      <h3 className="text-xl font-black dark:text-white uppercase tracking-tight">{title}</h3>
+      <h3 className="text-xl font-black text-foreground uppercase tracking-tight font-['Playfair_Display']">{title}</h3>
     </div>
   );
 }
@@ -132,6 +122,7 @@ export function CourtBooking() {
   const [activeTab, setActiveTab] = useState<Tab>("book");
 
   // ── Data ──
+  const [clubs, setClubs] = useState<any[]>([]);
   const [courts, setCourts] = useState<Court[]>([]);
   const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set());
   const [myBookings, setMyBookings] = useState<Booking[]>([]);
@@ -158,27 +149,44 @@ export function CourtBooking() {
   const [qrBooking, setQrBooking] = useState<Booking | null>(null);
 
   // ── Computed ──
-  const basePrice = PRICE_PER_SLOT * duration;
+  const basePricePerSlot = selectedClub?.price_per_court || PRICE_PER_SLOT;
+  const basePrice = basePricePerSlot * duration;
   const discount = basePrice * appliedDiscount;
   const totalPrice = basePrice - discount;
 
   
 
   useEffect(() => {
-    async function fetchCourts() {
+    async function fetchInitialData() {
       try {
-        const { data, error } = await supabase.from("courts").select("*");
-        if (error) throw error;
-        // If Supabase has courts, use them; otherwise, use mock data
-        setCourts(data && data.length > 0 ? data : MOCK_COURTS);
-      } catch {
-        setCourts(MOCK_COURTS);
-        toast.error("Using local court data");
+        const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
+        
+        const [clubsRes, courtsRes] = await Promise.all([
+          fetch(`${apiUrl}/api/public/clubs`),
+          fetch(`${apiUrl}/api/public/courts`)
+        ]);
+
+        if (!clubsRes.ok) throw new Error('Failed to fetch clubs');
+        const clubsData = await clubsRes.json();
+        const formattedClubs = (clubsData || []).map((c: any) => ({
+          ...c,
+          image: c.photo_url || padelArena,
+          courts_count: c.courts?.[0]?.count || 0,
+        }));
+        setClubs(formattedClubs);
+
+        if (!courtsRes.ok) throw new Error('Failed to fetch courts');
+        const courtsData = await courtsRes.json();
+        setCourts(courtsData || []);
+      } catch (err) {
+        console.error(err);
+        setCourts([]);
+        toast.error("Failed to load courts");
       } finally {
         setLoading(false);
       }
     }
-    fetchCourts();
+    fetchInitialData();
 
     // Fetch players for opponent selection
     async function fetchPlayers() {
@@ -195,16 +203,19 @@ export function CourtBooking() {
     }
     if (user) fetchPlayers();
 
-    // Real-time subscription for courts
-    const courtSub = supabase
-      .channel('courts_channel')
+    // Real-time subscription for clubs and courts
+    const dataSub = supabase
+      .channel('data_channel')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'courts' }, () => {
-         fetchCourts();
+         fetchInitialData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'clubs' }, () => {
+         fetchInitialData();
       })
       .subscribe();
 
     return () => {
-      supabase.removeChannel(courtSub);
+      supabase.removeChannel(dataSub);
     };
   }, []);
 
@@ -358,8 +369,8 @@ export function CourtBooking() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#39FF14] mb-4" size={40} />
-        <p className="text-xs font-black uppercase tracking-[4px] opacity-40">Initializing Courts</p>
+        <Loader2 className="animate-spin text-accent mb-4" size={40} />
+        <p className="text-xs font-black uppercase tracking-[4px] opacity-40 text-foreground">Initializing Courts</p>
       </div>
     );
   }
@@ -381,22 +392,21 @@ export function CourtBooking() {
 
       {/* ── HEADER ── */}
       <header className="mb-8">
-        <div className="flex items-center gap-3 text-[#00E5FF] font-black text-[10px] uppercase tracking-[4px] mb-3">
-          <Zap size={14} fill="#39FF14" />
+        <div className="flex items-center gap-3 text-accent font-black text-[10px] uppercase tracking-[4px] mb-3 font-['Poppins']">
+          <Zap size={14} className="fill-accent" />
           <span>Ultima Reservation System</span>
         </div>
-        <h2 className="font-['Playfair_Display',serif] text-2xl md:text-4xl font-black dark:text-white leading-none mb-4">
+        <h2 className="font-['Playfair_Display',serif] text-3xl md:text-5xl font-black text-foreground leading-none mb-4">
           Court Booking
-          
         </h2>
-        <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">
+        <p className="text-muted-foreground font-['Poppins'] text-lg">
           Reserve, track, and manage all your court sessions in one place.
         </p>
       </header>
 
       {/* ── TOP NAV TABS ── */}
       <div className="overflow-x-auto no-scrollbar mb-12">
-        <nav className="relative flex p-1.5 bg-black/5 dark:bg-white/5 rounded-[22px] border border-gray-100 dark:border-white/10 w-full min-w-max md:w-fit backdrop-blur-md">
+        <nav className="relative flex p-1.5 bg-muted rounded-[22px] border border-border w-full min-w-max md:w-fit backdrop-blur-md shadow-inner">
         {(
           [
             { id: "book",     label: "Book",     icon: <LayoutGrid size={15} /> },
@@ -409,14 +419,14 @@ export function CourtBooking() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3.5 rounded-[18px] text-[11px] font-black uppercase tracking-[1px] transition-all duration-300 z-10 ${
-                isActive ? "text-black" : "text-gray-500 dark:text-white/40 hover:text-white"
+              className={`relative flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-3.5 rounded-[18px] text-[11px] font-black uppercase tracking-[1px] transition-all duration-300 z-10 font-['Poppins'] ${
+                isActive ? "text-accent-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeTabPill"
-                  className="absolute inset-0 bg-[#00E5FF] rounded-[17px] shadow-lg shadow-[#00E5FF]/20 z-[-1]"
+                  className="absolute inset-0 bg-accent rounded-[17px] shadow-lg shadow-accent/40 z-[-1]"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -426,8 +436,8 @@ export function CourtBooking() {
               </span>
               
               {tab.id === "upcoming" && upcomingBookings.length > 0 && (
-                <span className={`ml-1 w-5 h-5 rounded-full text-[9px] flex items-center justify-center font-black ${
-                  isActive ? "bg-black text-[#00E5FF]" : "bg-[#00E5FF] text-black"
+                <span className={`ml-1 w-5 h-5 rounded-full text-[9px] flex items-center justify-center font-black transition-transform ${
+                  isActive ? "bg-accent-foreground text-accent scale-110" : "bg-accent text-accent-foreground"
                 }`}>
                   {upcomingBookings.length}
                 </span>
@@ -454,35 +464,75 @@ export function CourtBooking() {
                 {/* ── 1. Club Selection ── */}
                 <section>
                   <SectionHeading step={1} title="Choose Your Club" />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {MOCK_CLUBS.map((club) => (
-                      <button
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {clubs.map((club) => (
+                      <motion.div
+                        layout
                         key={club.id}
-                        onClick={() => {
-                          setSelectedClub(club);
-                          setSelectedCourt(null);
-                        }}
-                        className={`relative group overflow-hidden rounded-[32px] border-2 transition-all ${
-                          selectedClub?.id === club.id
-                            ? "border-[#00E5FF] ring-4 ring-[#00E5FF]/10 scale-[0.98]"
-                            : "border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 hover:border-[#00E5FF]/40"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className={`bg-card rounded-2xl border border-border overflow-hidden hover:border-accent transition-all duration-300 shadow-sm hover:shadow-md ${
+                          selectedClub?.id === club.id ? 'ring-2 ring-accent border-accent scale-[1.02]' : ''
                         }`}
                       >
-                        <div className="h-32 overflow-hidden">
-                          <img src={club.image} alt={club.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        <div className="relative h-48 overflow-hidden group cursor-pointer" onClick={() => {
+                          setSelectedClub(club);
+                          setSelectedCourt(null);
+                        }}>
+                          <img
+                            src={club.image}
+                            alt={club.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-3 right-3 flex gap-2">
+                            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                              {club.courts_count} Courts
+                            </div>
+                          </div>
+                          {selectedClub?.id === club.id && (
+                            <div className="absolute top-3 left-3 bg-accent text-accent-foreground p-1 rounded-full shadow-lg">
+                              <CheckCircle2 size={16} />
+                            </div>
+                          )}
                         </div>
-                        <div className="p-5 text-left">
-                          <h4 className="text-lg font-black dark:text-white uppercase leading-none mb-2">{club.name}</h4>
-                          <div className="flex items-center gap-1.5 opacity-50 text-[10px] font-bold dark:text-white uppercase tracking-wider">
-                            <MapPin size={12} className="text-[#00E5FF]" /> {club.location}
+
+                        <div className="p-4 cursor-pointer" onClick={() => {
+                          setSelectedClub(club);
+                          setSelectedCourt(null);
+                        }}>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h3 className="font-bold text-lg text-foreground mb-2">{club.name}</h3>
+
+                              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2">
+                                <MapPin className="w-4 h-4 text-accent" />
+                                <span>{club.location || 'Tunisia'}</span>
+                              </div>
+
+                              <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-sm mb-2">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-accent" />
+                                  <span>Open {club.open_time || '9:00 AM'} - {club.close_time || '06:00 PM'}</span>
+                                </div>
+                                <span className="text-foreground font-semibold">{club.price_per_court || PRICE_PER_SLOT} DT/hr</span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col justify-center h-full pt-2">
+                              <button
+                                className={`px-4 py-2 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap active:scale-95 text-center ${
+                                  selectedClub?.id === club.id
+                                    ? 'bg-accent text-accent-foreground'
+                                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                }`}
+                              >
+                                {selectedClub?.id === club.id ? 'Selected' : 'Select'}
+                              </button>
+                            </div>
                           </div>
                         </div>
-                        {selectedClub?.id === club.id && (
-                          <div className="absolute top-4 right-4 bg-[#00E5FF] text-black p-1 rounded-full shadow-lg">
-                            <CheckCircle2 size={16} />
-                          </div>
-                        )}
-                      </button>
+                      </motion.div>
                     ))}
                   </div>
                 </section>
@@ -494,7 +544,7 @@ export function CourtBooking() {
                   >
                     <SectionHeading step={2} title="Select Surface" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {courts.map((court, index) => (
+                      {courts.filter(c => c.club_id === selectedClub.id || !c.club_id).map((court, index) => (
                         <CourtCard
                           key={court.id}
                           court={{
@@ -524,7 +574,7 @@ export function CourtBooking() {
                       {/* ── 3. Date & Time (Consolidated) ── */}
                       <section>
                         <SectionHeading step={3} title="Pick Your Time" />
-                        <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10">
+                        <div className="bg-card rounded-[40px] p-8 border border-border">
                           <div className="flex flex-col lg:flex-row gap-10">
                             {/* Date & Duration */}
                             <div className="w-full lg:w-1/3 space-y-8">
@@ -537,7 +587,7 @@ export function CourtBooking() {
                                   value={selectedDate}
                                   min={new Date().toISOString().split("T")[0]}
                                   onChange={(e) => setSelectedDate(e.target.value)}
-                                  className="w-full h-14 px-6 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-[#00E5FF]/50 transition-all cursor-pointer"
+                                  className="w-full h-14 px-6 bg-muted rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-accent/50 transition-all cursor-pointer"
                                 />
                               </div>
 
@@ -552,8 +602,8 @@ export function CourtBooking() {
                                       onClick={() => setDuration(d.value)}
                                       className={`flex-1 h-12 rounded-xl text-[11px] font-black transition-all border ${
                                         duration === d.value
-                                          ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20"
-                                          : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                          ? "bg-accent border-accent text-accent-foreground shadow-lg shadow-accent/20"
+                                          : "bg-transparent border-gray-200 dark:border-border dark:text-white/60 hover:border-accent"
                                       }`}
                                     >
                                       {d.label}
@@ -569,7 +619,7 @@ export function CourtBooking() {
                                 <label className="text-[10px] font-black uppercase tracking-widest opacity-40">
                                   Available Slots for {selectedCourt.name}
                                 </label>
-                                {slotsLoading && <Loader2 className="animate-spin text-[#00E5FF]" size={14} />}
+                                {slotsLoading && <Loader2 className="animate-spin text-accent" size={14} />}
                               </div>
 
                               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -585,8 +635,8 @@ export function CourtBooking() {
                                         isTaken
                                           ? "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/5 text-gray-300 dark:text-white/20 cursor-not-allowed"
                                           : isSelected
-                                          ? "bg-[#00E5FF] border-[#00E5FF] text-black shadow-lg shadow-[#00E5FF]/20 scale-105"
-                                          : "bg-transparent border-gray-200 dark:border-white/10 dark:text-white/60 hover:border-[#00E5FF]"
+                                          ? "bg-accent border-accent text-accent-foreground shadow-lg shadow-accent/20 scale-105"
+                                          : "bg-transparent border-gray-200 dark:border-border dark:text-white/60 hover:border-accent"
                                       }`}
                                     >
                                       {slot}
@@ -602,13 +652,13 @@ export function CourtBooking() {
 
                               <div className="flex items-center gap-4 mt-6 text-[10px] font-bold opacity-40">
                                 <span className="flex items-center gap-1.5">
-                                  <span className="w-3 h-3 rounded bg-[#00E5FF]" /> Selected
+                                  <span className="w-3 h-3 rounded bg-accent" /> Selected
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-3 h-3 rounded bg-red-400" /> Taken
                                 </span>
                                 <span className="flex items-center gap-1.5">
-                                  <span className="w-3 h-3 rounded bg-gray-200 dark:bg-white/10" /> Available
+                                  <span className="w-3 h-3 rounded bg-gray-200 dark:bg-card" /> Available
                                 </span>
                               </div>
                             </div>
@@ -619,7 +669,7 @@ export function CourtBooking() {
                       {/* ── 4. Details & Extras ── */}
                       <section>
                         <SectionHeading step={4} title="Details & Extras" />
-                        <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 space-y-8">
+                        <div className="bg-card rounded-[40px] p-8 border border-border space-y-8">
                           {/* Notes */}
                           <div>
                             <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
@@ -630,7 +680,7 @@ export function CourtBooking() {
                               value={notes}
                               onChange={(e) => setNotes(e.target.value)}
                               placeholder="e.g. Need ball machine, extra rackets..."
-                              className="w-full px-5 py-4 bg-gray-100 dark:bg-black/40 rounded-2xl border-none outline-none font-medium text-sm dark:text-white focus:ring-2 ring-[#00E5FF]/50 transition-all resize-none"
+                              className="w-full px-5 py-4 bg-muted rounded-2xl border-none outline-none font-medium text-sm dark:text-white focus:ring-2 ring-accent/50 transition-all resize-none"
                             />
                           </div>
 
@@ -646,11 +696,11 @@ export function CourtBooking() {
                                     value={discountCode}
                                     onChange={(e) => setDiscountCode(e.target.value)}
                                     placeholder="Enter code"
-                                    className="flex-1 h-16 sm:h-12 px-6 bg-gray-100 dark:bg-white/5 rounded-2xl border-2 border-transparent outline-none font-bold text-base sm:text-sm dark:text-white focus:border-[#00E5FF]/50 focus:bg-white dark:focus:bg-black/40 transition-all placeholder:opacity-40"
+                                    className="flex-1 h-16 sm:h-12 px-6 bg-muted rounded-2xl border-2 border-transparent outline-none font-bold text-base sm:text-sm dark:text-white focus:border-accent/50 focus:bg-white dark:focus:bg-black/40 transition-all placeholder:opacity-40"
                                   />
                                   <button
                                     onClick={handleApplyDiscount}
-                                    className="px-8 sm:px-6 h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-[11px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+                                    className="px-8 sm:px-6 h-12 bg-accent text-accent-foreground font-black rounded-2xl text-[11px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
                                   >
                                     Apply
                                   </button>
@@ -665,7 +715,7 @@ export function CourtBooking() {
                                 <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                                   {playersLoading ? (
                                     <div className="flex items-center justify-center p-2">
-                                      <Loader2 className="animate-spin text-[#00E5FF]" size={20} />
+                                      <Loader2 className="animate-spin text-accent" size={20} />
                                     </div>
                                   ) : (
                                     players.slice(0, 5).map(player => (
@@ -673,7 +723,7 @@ export function CourtBooking() {
                                         key={player.id}
                                         onClick={() => setSelectedOpponentId(selectedOpponentId === player.id ? null : player.id)}
                                         className={`shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 transition-all p-0.5 ${
-                                          selectedOpponentId === player.id ? 'border-[#00E5FF] scale-110 ring-4 ring-[#00E5FF]/20' : 'border-transparent'
+                                          selectedOpponentId === player.id ? 'border-accent scale-110 ring-4 ring-accent/20' : 'border-transparent'
                                         }`}
                                       >
                                         <img 
@@ -701,8 +751,8 @@ export function CourtBooking() {
               <div className="lg:col-span-4">
                 {selectedCourt ? (
                   <div className="lg:sticky lg:top-24 space-y-6 animate-in fade-in slide-in-from-right duration-500">
-                    <div className="dark:bg-[#0F1423] rounded-[40px] p-8 dark:text-white border border-white/5 bg-white shadow-2xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="dark:bg-card rounded-[40px] p-8 dark:text-white border border-border bg-white shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
                       <h3 className="text-2xl font-black mb-8 tracking-tighter">BOOKING DETAILS</h3>
 
                       <div className="space-y-5 mb-8">
@@ -740,7 +790,7 @@ export function CourtBooking() {
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
                               Total Amount
                             </span>
-                            <span className="text-4xl font-black text-[#00E5FF] tracking-tighter">
+                            <span className="text-4xl font-black text-accent tracking-tighter">
                               {totalPrice.toFixed(2)} DT
                             </span>
                           </div>
@@ -750,32 +800,32 @@ export function CourtBooking() {
                       <button
                         onClick={handleConfirmBooking}
                         disabled={!selectedSlot || !selectedCourt || bookingLoading}
-                        className="w-full h-16 bg-[#00E5FF] text-black font-black rounded-2xl shadow-xl shadow-[#00E5FF]/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
+                        className="w-full h-16 bg-accent text-accent-foreground font-black rounded-2xl shadow-xl shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
                       >
                         {bookingLoading ? (
                           <Loader2 className="animate-spin" size={20} />
                         ) : (
                           <>
-                            <span>CONFIRM SESSION</span>
+                            <span>CONFIRM BOOKING</span>
                             <ChevronRight size={20} />
                           </>
                         )}
                       </button>
                     </div>
 
-                    <div className="p-6 bg-[#00E5FF]/5 border border-[#00E5FF]/10 rounded-[24px] flex gap-4">
-                      <Info className="text-[#00E5FF] shrink-0 mt-0.5" size={18} />
+                    <div className="p-6 bg-accent/5 border border-accent/10 rounded-[24px] flex gap-4">
+                      <Info className="text-accent shrink-0 mt-0.5" size={18} />
                       <p className="text-[11px] font-medium leading-relaxed dark:text-white/60">
                         Cancellations must be made at least 24 hours in advance.
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="sticky top-24 p-8 rounded-[40px] border-2 border-dashed border-gray-100 dark:border-white/10 text-center space-y-4">
-                    <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto">
+                  <div className="sticky top-24 p-8 rounded-[40px] border-2 border-dashed border-border text-center space-y-4">
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto text-foreground">
                       <LayoutGrid className="opacity-20" size={32} />
                     </div>
-                    <div>
+                    <div className="text-foreground">
                       <h4 className="font-bold opacity-60">Complete Step 1 & 2</h4>
                       <p className="text-xs opacity-40">Choose a club and court to view the price summary.</p>
                     </div>
@@ -800,7 +850,7 @@ export function CourtBooking() {
           >
             {upcomingBookings.length === 0 ? (
               <EmptyState
-                icon={<CalendarX size={40} className="text-[#00E5FF]" />}
+                icon={<CalendarX size={40} className="text-accent" />}
                 title="No upcoming bookings"
                 message="You don't have any confirmed bookings yet."
                 action={{ label: "Book a Court", onClick: () => setActiveTab("book") }}
@@ -811,29 +861,29 @@ export function CourtBooking() {
                 return (
                   <div
                     key={booking.id}
-                    className="bg-white dark:bg-white/5 rounded-[32px] p-7 border border-gray-100 dark:border-white/10 flex flex-col md:flex-row md:items-center gap-6"
+                    className="bg-card rounded-[32px] p-7 border border-border flex flex-col md:flex-row md:items-center gap-6"
                   >
                     {/* Color accent */}
-                    <div className="w-2 h-full min-h-[60px] bg-[#00E5FF] rounded-full shrink-0 hidden md:block" />
+                    <div className="w-2 h-full min-h-[60px] bg-accent rounded-full shrink-0 hidden md:block" />
 
                     <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
                         <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Court</p>
-                        <p className="font-black dark:text-white text-sm">{booking.courts?.name || "—"}</p>
-                        <p className="text-[10px] text-[#39FF14] font-bold uppercase">{booking.courts?.surface}</p>
+                        <p className="font-black text-foreground text-sm">{booking.courts?.name || "—"}</p>
+                        <p className="text-[10px] text-accent font-bold uppercase">{booking.courts?.surface}</p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Date</p>
-                        <p className="font-black dark:text-white text-sm">{formatDate(booking.booking_date)}</p>
+                        <p className="font-black text-foreground text-sm">{formatDate(booking.booking_date)}</p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Time</p>
-                        <p className="font-black dark:text-white text-sm">{booking.time_slot}</p>
+                        <p className="font-black text-foreground text-sm">{booking.time_slot}</p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Starts in</p>
                         {countdown ? (
-                          <p className="font-black text-[#39FF14] text-sm">{countdown}</p>
+                          <p className="font-black text-accent text-sm">{countdown}</p>
                         ) : (
                           <p className="font-black text-orange-400 text-sm">Starting soon</p>
                         )}
@@ -844,7 +894,7 @@ export function CourtBooking() {
                     <div className="flex items-center gap-3 shrink-0">
                       <button
                         onClick={() => setQrBooking(booking)}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/10 rounded-xl text-[11px] font-black dark:text-white hover:bg-[#39FF14] hover:text-black transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-muted rounded-xl text-[11px] font-black text-foreground hover:bg-accent hover:text-accent-foreground transition-all"
                       >
                         <QrCode size={14} /> QR
                       </button>
@@ -882,7 +932,7 @@ export function CourtBooking() {
           >
             {pastBookings.length === 0 ? (
               <EmptyState
-                icon={<History size={40} className="text-[#00E5FF]" />}
+                icon={<History size={40} className="text-accent" />}
                 title="No booking history"
                 message="Your completed and cancelled bookings will appear here."
               />
@@ -890,7 +940,7 @@ export function CourtBooking() {
               pastBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="bg-white dark:bg-white/5 rounded-[32px] p-7 border border-gray-100 dark:border-white/10 flex flex-col md:flex-row md:items-center gap-6 opacity-80 hover:opacity-100 transition-opacity"
+                  className="bg-card rounded-[32px] p-7 border border-border flex flex-col md:flex-row md:items-center gap-6 opacity-80 hover:opacity-100 transition-opacity"
                 >
                   <div className={`w-2 min-h-[60px] rounded-full shrink-0 hidden md:block ${
                     booking.status === "cancelled" ? "bg-red-500" : "bg-gray-300 dark:bg-white/20"
@@ -907,14 +957,14 @@ export function CourtBooking() {
                     </div>
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Time</p>
-                      <p className="font-black dark:text-white text-sm">{booking.time_slot}</p>
+                      <p className="font-black text-foreground text-sm">{booking.time_slot}</p>
                     </div>
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Result</p>
                       <p className={`font-black text-sm ${
-                        booking.result === "Win" ? "text-[#00E5FF]" :
+                        booking.result === "Win" ? "text-accent" :
                         booking.result === "Loss" ? "text-red-400" :
-                        "dark:text-white/40"
+                        "text-foreground/40"
                       }`}>
                         {booking.result || "—"}
                       </p>
@@ -924,7 +974,7 @@ export function CourtBooking() {
                       <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
                         booking.status === "cancelled"
                           ? "bg-red-500/10 text-red-400"
-                          : "bg-[#00E5FF]/10 text-[#00E5FF]"
+                          : "bg-accent/10 text-accent"
                       }`}>
                         {booking.status}
                       </span>
@@ -952,14 +1002,14 @@ export function CourtBooking() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-[#0F1423] rounded-[40px] p-10 max-w-sm w-full text-center border border-white/10 shadow-2xl"
+              className="bg-card rounded-[40px] p-10 max-w-sm w-full text-center border border-border shadow-2xl"
             >
-              <div className="flex items-center gap-2 text-[#00E5FF] font-black text-[10px] uppercase tracking-[4px] mb-5 justify-center">
-                <Zap size={12} fill="#00E5FF" />
+              <div className="flex items-center gap-2 text-accent font-black text-[10px] uppercase tracking-[4px] mb-5 justify-center">
+                <Zap size={12} fill="#CCFF00" />
                 Check-in QR Code
               </div>
-              <h3 className="text-2xl font-black dark:text-white mb-1">{qrBooking.courts?.name}</h3>
-              <p className="text-sm dark:text-white/40 font-medium mb-8">
+              <h3 className="text-2xl font-black text-foreground mb-1">{qrBooking.courts?.name}</h3>
+              <p className="text-sm text-muted-foreground font-medium mb-8">
                 {formatDate(qrBooking.booking_date)} · {qrBooking.time_slot}
               </p>
               <div className="bg-white p-5 rounded-[24px] inline-block mb-8 shadow-lg">
@@ -975,12 +1025,12 @@ export function CourtBooking() {
                   fgColor="#000000"
                 />
               </div>
-              <p className="text-[10px] font-bold dark:text-white/30 uppercase tracking-widest mb-6">
+              <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest mb-6 text-foreground">
                 Present this at the ALMUS kiosk
               </p>
               <button
                 onClick={() => setQrBooking(null)}
-                className="w-full h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
+                className="w-full h-12 bg-accent text-accent-foreground font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
               >
                 Close
               </button>
@@ -1008,7 +1058,7 @@ function SummaryRow({
         {icon}
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
       </div>
-      <span className={`text-sm font-black ${accent ? "text-[#00E5FF]" : "dark:text-white"}`}>
+      <span className={`text-sm font-black ${accent ? "text-accent" : "text-foreground"}`}>
         {value}
       </span>
     </div>
@@ -1031,7 +1081,7 @@ function EmptyState({
       {action && (
         <button
           onClick={action.onClick}
-          className="px-8 h-12 bg-[#00E5FF] text-black font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
+          className="px-8 h-12 bg-accent text-accent-foreground font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
         >
           {action.label}
         </button>

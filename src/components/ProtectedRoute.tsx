@@ -10,10 +10,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0A1F2E] via-[#0A0E1A] to-[#000000] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="font-['Poppins',sans-serif] text-white/60">Loading...</p>
+          <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="font-['Poppins',sans-serif] text-muted-foreground">Loading...</p>
         </div>
       </div>
     );

@@ -101,48 +101,48 @@ export function AdminManagement() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-4xl font-bold dark:text-white font-['Playfair_Display'] text-[#0A0E1A]">Admin Control Center</h1>
-        <p className="text-gray-500">Execute administrative actions and manage the club ecosystem.</p>
+        <h1 className="text-4xl font-bold text-foreground font-['Playfair_Display']">Admin Control Center</h1>
+        <p className="text-muted-foreground">Execute administrative actions and manage the club ecosystem.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Action : Assigner Coach */}
-        <section className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-gray-100 dark:border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#39FF14]/10 flex items-center justify-center">
-            <UserPlus size={20} className="text-[#39FF14]" />
+        <section className="bg-card border border-border rounded-[32px] overflow-hidden shadow-sm">
+        <div className="p-6 border-b border-border flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+            <UserPlus size={20} className="text-accent" />
           </div>
           <div>
-            <h3 className="text-lg font-bold dark:text-white font-['Poppins']">Assign Coach to Player</h3>
-            <p className="text-sm text-gray-500">Connect unassigned students with available coaches</p>
+            <h3 className="text-lg font-bold text-foreground font-['Poppins']">Assign Coach to Player</h3>
+            <p className="text-sm text-muted-foreground">Connect unassigned students with available coaches</p>
           </div>
         </div>
 
         <div className="p-6">
           {unassignedPlayers.length === 0 ? (
-            <div className="text-center py-10">
-              <CheckCircle2 size={40} className="mx-auto text-gray-300 mb-3" />
-              <p className="text-gray-500 font-medium">All players currently have a coach.</p>
+            <div className="text-center py-10 font-['Poppins']">
+              <CheckCircle2 size={40} className="mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-muted-foreground font-medium">All players currently have a coach.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  <tr className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     <th className="pb-4 px-2">Player Name</th>
                     <th className="pb-4 px-2">Select Coach</th>
                     <th className="pb-4 px-2 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                <tbody className="divide-y divide-border/50">
                   {unassignedPlayers.map((player) => (
                     <tr key={player.id} className="group">
                       <td className="py-4 px-2">
-                        <span className="font-semibold dark:text-white">{player.full_name}</span>
+                        <span className="font-semibold text-foreground">{player.full_name}</span>
                       </td>
                       <td className="py-4 px-2">
                         <select
-                          className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 h-10 text-sm dark:text-white outline-none focus:border-[#00E5FF] transition-all w-full max-w-[200px]"
+                          className="bg-muted border border-border rounded-xl px-3 h-10 text-sm text-foreground outline-none focus:border-accent transition-all w-full max-w-[200px]"
                           onChange={(e) => setSelectedCoachForPlayer({
                             ...selectedCoachForPlayer,
                             [player.id]: e.target.value
@@ -159,7 +159,7 @@ export function AdminManagement() {
                         <button
                           onClick={() => handleAssign(player.id)}
                           disabled={isAssigning === player.id}
-                          className="bg-[#00E5FF] text-black font-bold text-xs px-4 py-2 rounded-lg hover:scale-105 transition-all disabled:opacity-50"
+                          className="bg-accent text-accent-foreground font-bold text-xs px-4 py-2 rounded-lg hover:scale-105 transition-all disabled:opacity-50 shadow-md shadow-accent/20"
                         >
                           {isAssigning === player.id ? "Assigning..." : "Confirm"}
                         </button>
@@ -174,15 +174,15 @@ export function AdminManagement() {
       </section>
 
         {/* Action : Créer Match */}
-        <div className="bg-white dark:bg-white/5 p-8 rounded-[32px] border border-gray-100 dark:border-white/10 shadow-sm group hover:border-[#00E5FF]/50 transition-all">
-          <div className="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center mb-6">
-            <Zap className="text-yellow-500" size={28} />
+        <div className="bg-card p-8 rounded-[32px] border border-border shadow-sm group hover:border-accent/50 transition-all font-['Poppins']">
+          <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-6">
+            <Zap className="text-accent" size={28} />
           </div>
-          <h3 className="text-2xl font-bold dark:text-white mb-2">Start Live Match</h3>
-          <p className="text-sm text-gray-500 mb-8">Launch a new match with live scoring on a selected court.</p>
+          <h3 className="text-2xl font-bold text-foreground mb-2">Start Live Match</h3>
+          <p className="text-sm text-muted-foreground mb-8">Launch a new match with live scoring on a selected court.</p>
           <button 
             onClick={openMatchModal}
-            className="w-full py-4 bg-yellow-500 text-black rounded-2xl font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+            className="w-full py-4 bg-accent text-accent-foreground rounded-2xl font-bold hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-accent/20"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Match"}
           </button>
@@ -191,24 +191,24 @@ export function AdminManagement() {
 
       {/* MODAL : CREATE MATCH */}
       {isMatchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white dark:bg-[#0A0E1A] border dark:border-white/10 w-full max-w-lg rounded-[32px] p-8 shadow-2xl"
+            className="bg-card border border-border w-full max-w-lg rounded-[32px] p-8 shadow-2xl"
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold dark:text-white">New Live Match</h2>
-              <button onClick={() => setIsMatchModalOpen(false)} className="dark:text-white/40 hover:text-white">
+              <h2 className="text-2xl font-bold text-foreground">New Live Match</h2>
+              <button onClick={() => setIsMatchModalOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <X size={24} />
               </button>
             </div>
 
             <form onSubmit={handleCreateMatch} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Player 1</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Player 1</label>
                 <select 
-                  className="w-full h-14 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+                  className="w-full h-14 bg-muted border border-border rounded-2xl px-4 text-foreground outline-none focus:border-accent"
                   onChange={(e) => setMatchForm({...matchForm, player1_id: e.target.value})}
                 >
                   <option value="">Select first player</option>
@@ -217,9 +217,9 @@ export function AdminManagement() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Player 2</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Player 2</label>
                 <select 
-                  className="w-full h-14 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+                  className="w-full h-14 bg-muted border border-border rounded-2xl px-4 text-foreground outline-none focus:border-accent"
                   onChange={(e) => setMatchForm({...matchForm, player2_id: e.target.value})}
                 >
                   <option value="">Select second player</option>
@@ -228,9 +228,9 @@ export function AdminManagement() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Court Selection</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Court Selection</label>
                 <select 
-                  className="w-full h-14 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+                  className="w-full h-14 bg-muted border border-border rounded-2xl px-4 text-foreground outline-none focus:border-accent"
                   onChange={(e) => setMatchForm({...matchForm, court_id: e.target.value})}
                 >
                   <option value="">Select an available court</option>
@@ -241,7 +241,7 @@ export function AdminManagement() {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 bg-[#00E5FF] text-black font-bold rounded-2xl hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4"
+                className="w-full h-14 bg-accent text-accent-foreground font-bold rounded-2xl hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-accent/20"
               >
                 {loading ? <Loader2 className="animate-spin" /> : <><Check size={20} /> Start Match Now</>}
               </button>

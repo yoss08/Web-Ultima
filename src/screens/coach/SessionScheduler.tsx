@@ -57,21 +57,21 @@ export function SessionScheduler() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-2xl font-bold dark:text-white font-['Playfair_Display']">Schedule Training</h1>
-        <p className="text-gray-500 text-sm">Create a new session with your students.</p>
+      <div className="font-['Poppins']">
+        <h1 className="text-2xl font-bold text-foreground font-['Playfair_Display']">Schedule Training</h1>
+        <p className="text-muted-foreground text-sm font-medium">Create a new session with your students.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-[24px] p-8 space-y-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-[24px] p-8 space-y-6 shadow-sm font-['Poppins']">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Sélection de l'élève */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-              <Users size={16} className="text-[#39FF14]" /> Student
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <Users size={14} className="text-accent" /> Student
             </label>
             <select 
               required
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent"
               onChange={(e) => setFormData({...formData, student_id: e.target.value})}
             >
               <option value="">Select a student</option>
@@ -80,12 +80,12 @@ export function SessionScheduler() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-              <MapPin size={16} className="text-red-500" /> Court
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <MapPin size={14} className="text-accent" /> Court
             </label>
             <select 
               required
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent"
               onChange={(e) => setFormData({...formData, court_id: e.target.value})}
               value={formData.court_id}
             >
@@ -97,11 +97,11 @@ export function SessionScheduler() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-              <Zap size={16} className="text-purple-500" /> Session Type
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <Zap size={14} className="text-accent" /> Session Type
             </label>
             <select 
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white outline-none focus:border-[#00E5FF]"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent"
               onChange={(e) => setFormData({...formData, session_type: e.target.value})}
               value={formData.session_type}
             >
@@ -112,12 +112,12 @@ export function SessionScheduler() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-              <CalendarIcon size={16} className="text-blue-500" /> Date
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <CalendarIcon size={14} className="text-accent" /> Date
             </label>
             <input 
               type="date"
-              className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white"
+              className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground"
               value={formData.date}
               onChange={(e) => setFormData({...formData, date: e.target.value})}
             />
@@ -125,25 +125,25 @@ export function SessionScheduler() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-                <Clock size={16} className="text-yellow-500" /> Start
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Clock size={14} className="text-accent" /> Start
               </label>
               <input 
                 type="time"
-                className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white font-mono"
+                className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground font-mono"
                 value={formData.start_time}
                 onChange={(e) => setFormData({...formData, start_time: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-semibold dark:text-white flex items-center gap-2">
-                <Clock size={16} className="text-blue-400" /> Duration (min)
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Clock size={14} className="text-accent" /> Duration (min)
               </label>
               <input 
                 type="number"
                 min="30"
                 step="15"
-                className="w-full h-12 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 dark:text-white"
+                className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground"
                 value={formData.duration}
                 onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
               />
@@ -152,9 +152,9 @@ export function SessionScheduler() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold dark:text-white">Detailed session plan / Drills</label>
+          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Detailed session plan / Drills</label>
           <textarea 
-            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white h-24 outline-none focus:border-[#00E5FF]"
+            className="w-full p-4 bg-muted border border-border rounded-xl text-foreground h-24 outline-none focus:border-accent resize-none transition-all shadow-inner"
             placeholder="Focus on backhand cross-court drills and first serve percentage..."
             value={formData.drill_plan}
             onChange={(e) => setFormData({...formData, drill_plan: e.target.value})}
@@ -162,9 +162,9 @@ export function SessionScheduler() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold dark:text-white">Private Coach Notes</label>
+          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Private Coach Notes</label>
           <textarea 
-            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white h-24 outline-none focus:border-[#00E5FF]"
+            className="w-full p-4 bg-muted border border-border rounded-xl text-foreground h-24 outline-none focus:border-accent resize-none transition-all shadow-inner"
             placeholder="Student seems tired today, keep intensity moderate..."
             value={formData.notes}
             onChange={(e) => setFormData({...formData, notes: e.target.value})}
@@ -173,7 +173,7 @@ export function SessionScheduler() {
 
         <button 
           disabled={loading}
-          className="w-full h-14 bg-[#00E5FF] text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+          className="w-full h-14 bg-accent text-accent-foreground font-bold rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
         >
           {loading ? "Scheduling..." : <><Save size={20}/> Confirm Session</>}
         </button>

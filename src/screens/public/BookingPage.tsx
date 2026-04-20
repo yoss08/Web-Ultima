@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -10,73 +10,31 @@ import { useTheme } from "../../styles/useTheme";
 import { useAuth } from "../../services/AuthContext";
 import Navigation from "../../components/Navigation";
 import PadelArena from "../../assets/images/padel_arena.png";
+import { supabase } from "../../config/supabase";
 
-const clubs = [
-  {
-    id: 1,
-    name: 'Padel Arena',
-    image: PadelArena,
-    courts: 5,
-    distance: 2.5,
-    available: true,
-    price: 99,
-    level: 'intermediate',
-    type: 'indoor'
-  },
-  {
-    id: 2,
-    name: 'Padel Marsa',
-    image: 'https://images.unsplash.com/photo-1672223550220-df93d147fa4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
-    courts: 3,
-    distance: 5.2,
-    available: true,
-    price: 100,
-    level: 'beginner',
-    type: 'outdoor'
-  },
-  {
-    id: 3,
-    name: 'Casa Del Padel',
-    image: 'https://images.unsplash.com/photo-1709587825393-84b6c1698f32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
-    courts: 2,
-    distance: 1.8,
-    available: true,
-    price: 99,
-    level: 'advanced',
-    type: 'indoor'
-  },
-  {
-    id: 4,
-    name: 'Five Stars Padel',
-    image: 'https://images.unsplash.com/photo-1709587824751-dd30420f5cf3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
-    courts: 4,
-    distance: 3.7,
-    available: true,
-    price: 99,
-    level: 'intermediate',
-    type: 'outdoor'
-  },
-  {
-    id: 5,
-    name: 'Club De Padel',
-    image: 'https://images.unsplash.com/photo-1709587825415-814c2d7cfce7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
-    courts: 3,
-    distance: 4.1,
-    available: true,
-    price: 100,
-    level: 'beginner',
-    type: 'indoor'
-  }
-];
+interface Club {
+  id: number | string;
+  name: string;
+  image: string;
+  courts: number;
+  distance: number;
+  available: boolean;
+  price: number;
+  level: string;
+  type: string;
+  location?: string;
+  open_time?: string;
+  close_time?: string;
+}
 
-function ClubCard({ club }: { club: typeof clubs[0] }) {
+function ClubCard({ club }: { club: Club }) {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className={`bg-gray-200 dark:bg-[#1A1F2C] rounded-2xl border border-gray-200 dark:border-[#2A2A2A] overflow-hidden hover:border-blue-500 dark:hover:border-[#00E5FF] transition-all duration-300 shadow-sm hover:shadow-md ${!club.available ? 'opacity-70 grayscale-[0.5]' : ''}`}
+      className={`bg-card rounded-2xl border border-border overflow-hidden hover:border-accent transition-all duration-300 shadow-sm hover:shadow-md ${!club.available ? 'opacity-70 grayscale-[0.5]' : ''}`}
     >
       <div className="relative h-48 overflow-hidden group">
         <img
@@ -85,7 +43,7 @@ function ClubCard({ club }: { club: typeof clubs[0] }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3 flex gap-2">
-          <div className="bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+          <div className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
             {club.courts} Courts
           </div>
           {club.available && (
@@ -105,35 +63,35 @@ function ClubCard({ club }: { club: typeof clubs[0] }) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-bold text-lg text-gray-900 dark:text-white">{club.name}</h3>
+              <h3 className="font-bold text-lg text-foreground">{club.name}</h3>
               {club.type && (
-                <span className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-[#2A2A2A] px-2 py-0.5 rounded-full capitalize">
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full capitalize">
                   {club.type}
                 </span>
               )}
             </div>
 
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2">
-              <MapPin className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-              <span>Tunisia, Tunis</span>
+              <MapPin className="w-4 h-4 text-accent" />
+              <span>{club.location || 'Tunisia'}</span>
               {club.distance && (
-                <span className="text-blue-500 dark:text-[#00E5FF] font-semibold">• {club.distance} km</span>
+                <span className="text-accent font-semibold">• {club.distance} km</span>
               )}
             </div>
 
             <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-sm mb-2">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                <span>Open 9:00 AM - 06:00 PM</span>
+                <Calendar className="w-4 h-4 text-accent" />
+                <span>Open {club.open_time || '9:00 AM'} - {club.close_time || '06:00 PM'}</span>
               </div>
               {club.price && (
-                <span className="text-gray-900 dark:text-white font-semibold">{club.price} DT/hr</span>
+                <span className="text-foreground font-semibold">{club.price} DT/hr</span>
               )}
             </div>
 
             {club.level && (
               <div className="mt-2 text-left">
-                <span className="text-xs bg-blue-500/10 dark:bg-[#00E5FF]/10 text-blue-600 dark:text-[#00E5FF] px-2 py-1 rounded-full font-medium inline-block">
+                <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded-full font-medium inline-block">
                   {club.level.charAt(0).toUpperCase() + club.level.slice(1)}
                 </span>
               </div>
@@ -142,7 +100,7 @@ function ClubCard({ club }: { club: typeof clubs[0] }) {
 
           <div className="flex flex-col justify-center h-full pt-2">
             {club.available ? (
-              <Link to={`/club/${club.id}`} state={{ club }} className="px-6 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap active:scale-95 text-center bg-gradient-to-r from-blue-500 to-blue-400 dark:from-[#00E5FF] dark:to-[#00D4E6] text-white dark:text-black hover:shadow-xl hover:shadow-blue-500/20 dark:hover:shadow-[#00E5FF]/20">
+              <Link to={`/club/${club.id}`} state={{ club }} className="px-6 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap active:scale-95 text-center bg-accent text-accent-foreground hover:opacity-90 hover:shadow-accent/20">
                 Order Now
               </Link>
             ) : (
@@ -162,6 +120,8 @@ export default function BookingPage() {
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     maxDistance: 10,
     availableNow: false,
@@ -169,6 +129,51 @@ export default function BookingPage() {
     level: 'all' as 'all' | 'beginner' | 'intermediate' | 'advanced',
     type: 'all' as 'all' | 'indoor' | 'outdoor'
   });
+
+  useEffect(() => {
+    async function fetchClubs() {
+      setLoading(true);
+      try {
+        const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/api/public/clubs`);
+        if (!response.ok) throw new Error('Failed to fetch clubs from server');
+        const data = await response.json();
+        
+        const formattedClubs: Club[] = (data || []).map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          image: c.photo_url || PadelArena,
+          courts: c.courts?.[0]?.count || 0,
+          distance: Math.floor(Math.random() * 8) + 1, // Mock distance
+          available: true,
+          price: c.price_per_court || 0,
+          level: 'all',
+          type: 'all',
+          location: c.location,
+          open_time: c.open_time,
+          close_time: c.close_time
+        }));
+        setClubs(formattedClubs);
+      } catch (err) {
+        console.error("Error fetching clubs:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchClubs();
+
+    const subscription = supabase
+      .channel('public:clubs')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'clubs' }, () => {
+        fetchClubs();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   const filteredClubs = clubs
     .filter(club => club.distance <= filters.maxDistance)
@@ -182,7 +187,7 @@ export default function BookingPage() {
     });
 
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0A0E1A] dark:to-gray-900 pb-24">
+    <div className="min-h-screen transition-colors duration-300 bg-background pb-24">
       {/* Navigation Bar */}
       <Navigation />
 
@@ -190,21 +195,21 @@ export default function BookingPage() {
       <div className="max-w-[1096px] mx-auto pt-28 px-4">
         {/* Page Title */}
         <div className="mb-6">
-          <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl font-black dark:text-white leading-none mb-2">Recommendations</h2>
-          <p className="text-[#0A0E1A]/60 dark:text-white/60 font-['Poppins']">Find and reserve the best padel clubs in your area.</p>
+          <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl font-black text-foreground leading-none mb-2">Recommendations</h2>
+          <p className="text-muted-foreground font-['Poppins']">Find and reserve the best padel clubs in your area.</p>
         </div>
 
         {/* Filter Bar */}
-        <div className="mb-6 bg-white dark:bg-[#1A1F2C] rounded-[20px] border border-gray-200 dark:border-white/10 p-4 shadow-sm">
+        <div className="mb-6 bg-card rounded-[20px] border border-border p-4 shadow-sm">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="w-full flex items-center justify-between text-gray-900 dark:text-white"
           >
             <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-5 h-5 text-blue-500 dark:text-[#00E5FF]" />
+              <SlidersHorizontal className="w-5 h-5 text-accent" />
               <span className="font-semibold">Filters</span>
               {(filters.availableNow || filters.priceSort !== 'none' || filters.level !== 'all' || filters.type !== 'all') && (
-                <span className="bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black text-xs px-2 py-0.5 rounded-full font-bold">Active</span>
+                <span className="bg-accent text-accent-foreground text-xs px-2 py-0.5 rounded-full font-bold">Active</span>
               )}
             </div>
             <span className="text-gray-400 transition-transform duration-300" style={{ transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
@@ -221,8 +226,8 @@ export default function BookingPage() {
                 {/* Distance */}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <MapPin className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                    <label className="text-sm font-medium text-gray-700 dark:text-white">Distance: {filters.maxDistance} km</label>
+                    <MapPin className="w-4 h-4 text-accent" />
+                    <label className="text-sm font-medium text-foreground">Distance: {filters.maxDistance} km</label>
                   </div>
                   <input
                     type="range"
@@ -230,9 +235,9 @@ export default function BookingPage() {
                     max="20"
                     value={filters.maxDistance}
                     onChange={(e) => setFilters({ ...filters, maxDistance: parseInt(e.target.value) })}
-                    className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-muted"
                     style={{
-                      background: `linear-gradient(to right, ${isDark ? '#00E5FF' : '#3B82F6'}  0%, ${isDark ? '#00E5FF' : '#3B82F6'}  ${(filters.maxDistance / 20) * 100}%, ${isDark ? '#2A2A2A' : '#E5E7EB'} ${(filters.maxDistance / 20) * 100}%, ${isDark ? '#2A2A2A' : '#E5E7EB'} 100%)`
+                      background: `linear-gradient(to right, var(--theme-accent) 0%, var(--theme-accent) ${(filters.maxDistance / 20) * 100}%, var(--theme-border) ${(filters.maxDistance / 20) * 100}%, var(--theme-border) 100%)`
                     }}
                   />
                 </div>
@@ -240,13 +245,13 @@ export default function BookingPage() {
                 {/* Available Now */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                    <label className="text-sm font-medium text-gray-700 dark:text-white">Available Now</label>
+                    <Clock className="w-4 h-4 text-accent" />
+                    <label className="text-sm font-medium text-foreground">Available Now</label>
                   </div>
                   <button
                     onClick={() => setFilters({ ...filters, availableNow: !filters.availableNow })}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      filters.availableNow ? 'bg-blue-500 dark:bg-[#00E5FF]' : 'bg-gray-300 dark:bg-white/10'
+                      filters.availableNow ? 'bg-accent' : 'bg-muted'
                     }`}
                   >
                     <div
@@ -261,16 +266,16 @@ export default function BookingPage() {
                   {/* Price Sort */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <DollarSign className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                      <label className="text-sm font-medium text-gray-700 dark:text-white">Price</label>
+                      <DollarSign className="w-4 h-4 text-accent" />
+                      <label className="text-sm font-medium text-foreground">Price</label>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => setFilters({ ...filters, priceSort: 'asc' })}
                         className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
                           filters.priceSort === 'asc'
-                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
-                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                            ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20'
+                            : 'bg-muted text-muted-foreground hover:bg-gray-200 dark:hover:bg-white/10'
                         }`}
                       >
                         Low High
@@ -279,8 +284,8 @@ export default function BookingPage() {
                         onClick={() => setFilters({ ...filters, priceSort: 'desc' })}
                         className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
                           filters.priceSort === 'desc'
-                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
-                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                            ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20'
+                            : 'bg-muted text-muted-foreground hover:bg-gray-200 dark:hover:bg-white/10'
                         }`}
                       >
                         High Low
@@ -289,8 +294,8 @@ export default function BookingPage() {
                         onClick={() => setFilters({ ...filters, priceSort: 'none' })}
                         className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
                           filters.priceSort === 'none'
-                            ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
-                            : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                            ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20'
+                            : 'bg-muted text-muted-foreground hover:bg-gray-200 dark:hover:bg-white/10'
                         }`}
                         title="Reset Price Filter"
                       >
@@ -302,8 +307,8 @@ export default function BookingPage() {
                   {/* Level */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                      <label className="text-sm font-medium text-gray-700 dark:text-white">Level</label>
+                      <TrendingUp className="w-4 h-4 text-accent" />
+                      <label className="text-sm font-medium text-foreground">Level</label>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {['all', 'beginner', 'intermediate', 'advanced'].map((level) => (
@@ -312,8 +317,8 @@ export default function BookingPage() {
                           onClick={() => setFilters({ ...filters, level: level as any })}
                           className={`flex-1 min-w-[70px] py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-transparent ${
                             filters.level === level
-                              ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
-                              : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                              ? 'bg-accent text-accent-foreground shadow-lg dark:shadow-accent/20'
+                              : 'bg-muted text-muted-foreground hover:bg-muted/80'
                           }`}
                         >
                           {level === 'all' ? 'All' : level.slice(0, 3)}
@@ -325,8 +330,8 @@ export default function BookingPage() {
                   {/* Indoor/Outdoor */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <HomeIcon className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-                      <label className="text-sm font-medium text-gray-700 dark:text-white">Court Type</label>
+                      <HomeIcon className="w-4 h-4 text-accent" />
+                      <label className="text-sm font-medium text-foreground">Court Type</label>
                     </div>
                     <div className="flex gap-2">
                       {['all', 'indoor', 'outdoor'].map((type) => (
@@ -335,8 +340,8 @@ export default function BookingPage() {
                           onClick={() => setFilters({ ...filters, type: type as any })}
                           className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-transparent ${
                             filters.type === type
-                              ? 'bg-blue-500 dark:bg-[#00E5FF] text-white dark:text-black shadow-lg shadow-blue-500/20 dark:shadow-[#00E5FF]/20'
-                              : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+                              ? 'bg-accent text-accent-foreground shadow-lg dark:shadow-accent/20'
+                              : 'bg-muted text-muted-foreground hover:bg-muted/80'
                           }`}
                         >
                           {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -353,26 +358,26 @@ export default function BookingPage() {
         {/* Results Count & View Toggle */}
         <div className="mb-6 flex justify-between items-center text-sm">
           <div className="flex items-center gap-4">
-            <p className="text-gray-500 dark:text-gray-400">
-              Showing <span className="font-bold text-blue-500 dark:text-[#00E5FF]">{filteredClubs.length}</span> of {clubs.length} clubs
+            <p className="text-muted-foreground text-sm">
+              Showing <span className="font-bold text-accent">{filteredClubs.length}</span> of {clubs.length} clubs
             </p>
             {filteredClubs.length !== clubs.length && (
                <button 
                 onClick={() => setFilters({ maxDistance: 10, availableNow: false, priceSort: 'none', level: 'all', type: 'all' })}
-                className="text-blue-500 dark:text-[#00E5FF] text-xs font-bold uppercase tracking-widest hover:underline"
+                className="text-accent text-xs font-bold uppercase tracking-widest hover:underline"
                >
                 Reset Filters
                </button>
             )}
           </div>
 
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-[#1A1F2C] text-blue-500 dark:text-[#00E5FF] shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  ? 'bg-card text-accent shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <List className="w-4 h-4" />
@@ -382,8 +387,8 @@ export default function BookingPage() {
               onClick={() => setViewMode('map')}
               className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
                 viewMode === 'map'
-                  ? 'bg-white dark:bg-[#1A1F2C] text-blue-500 dark:text-[#00E5FF] shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  ? 'bg-card text-accent shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Map className="w-4 h-4" />
@@ -413,7 +418,7 @@ export default function BookingPage() {
                   animate={{ opacity: 1 }}
                   className="col-span-full py-20 text-center space-y-4"
                 >
-                  <div className="w-20 h-20 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                     <Info className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                   </div>
                   <div>

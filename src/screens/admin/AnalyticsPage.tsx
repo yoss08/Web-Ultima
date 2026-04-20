@@ -95,35 +95,35 @@ export function AnalyticsPage() {
     }
   };
 
-  const chartStroke = isDark ? "#ffffff10" : "#0A0E1A10";
-  const textStroke = isDark ? "#ffffff60" : "#0A0E1A60";
+  const chartStroke = "currentColor opacity-10";
+  const textStroke = "currentColor opacity-50";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header avec Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold dark:text-white font-['Playfair_Display']">Analytics & Reports</h1>
-          <p className="text-gray-500 text-sm">Deep dive into club performance and usage patterns.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground font-['Playfair_Display']">Analytics & Reports</h1>
+          <p className="text-muted-foreground text-sm font-['Poppins']">Deep dive into club performance and usage patterns.</p>
         </div>
         
-        <div className="flex gap-3 flex-wrap">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl dark:text-white text-sm font-semibold">
+        <div className="flex gap-3 flex-wrap font-['Poppins']">
+          <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-foreground text-sm font-semibold">
             <Filter size={18} /> Filter Period
           </button>
           <div className="relative group">
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#00E5FF] text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform">
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-xl text-sm font-bold hover:scale-105 transition-transform shadow-lg shadow-accent/20">
               {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={18} />} Export
             </button>
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1a1e2e] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
-              <button onClick={() => handleExportCSV("bookings")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
-                <FileSpreadsheet size={14} /> Bookings CSV
+            <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+              <button onClick={() => handleExportCSV("bookings")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-muted flex items-center gap-2 text-foreground">
+                <FileSpreadsheet size={14} className="text-accent" /> Bookings CSV
               </button>
-              <button onClick={() => handleExportCSV("players")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
-                <FileSpreadsheet size={14} /> Players CSV
+              <button onClick={() => handleExportCSV("players")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-muted flex items-center gap-2 text-foreground">
+                <FileSpreadsheet size={14} className="text-accent" /> Players CSV
               </button>
-              <button onClick={() => handleExportCSV("courts")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2">
-                <FileSpreadsheet size={14} /> Courts CSV
+              <button onClick={() => handleExportCSV("courts")} className="w-full text-left px-4 py-3 text-sm font-bold hover:bg-muted flex items-center gap-2 text-foreground">
+                <FileSpreadsheet size={14} className="text-accent" /> Courts CSV
               </button>
             </div>
           </div>
@@ -134,68 +134,73 @@ export function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Graphique 1: Revenus ou Activité Mensuelle */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8">
-          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
-            <TrendingUp size={20} className="text-[#39FF14]" /> Monthly Activity
+        <div className="bg-card border border-border rounded-[32px] p-6 sm:p-8 shadow-sm">
+          <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2 font-['Playfair_Display']">
+            <TrendingUp size={20} className="text-accent" /> Monthly Activity
           </h3>
-          <div className="h-[300px] w-full flex items-center justify-center">
+          <div className="h-[300px] w-full flex items-center justify-center font-['Poppins']">
             {loading ? (
               <Loader2 className="animate-spin text-gray-400" />
             ) : data.monthlyRevenue.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data.monthlyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} vertical={false} />
-                  <XAxis dataKey="month" stroke={textStroke} />
-                  <YAxis stroke={textStroke} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#00E5FF" strokeWidth={3} dot={false} />
+                  <XAxis dataKey="month" stroke="currentColor" className="text-muted-foreground/50" />
+                  <YAxis stroke="currentColor" className="text-muted-foreground/50" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-border)', borderRadius: '12px', color: 'var(--theme-foreground)' }}
+                  />
+                  <Line type="monotone" dataKey="value" stroke="var(--theme-accent)" strokeWidth={3} dot={{ fill: "var(--theme-accent)", r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-gray-500 text-sm italic">No activity recorded for this period.</p>
+              <p className="text-muted-foreground text-sm italic">No activity recorded for this period.</p>
             )}
           </div>
         </div>
 
         {/* Graphique 2: Utilisation des Courts */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8">
-          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
-            <BarChart3 size={20} className="text-[#00E5FF]" /> Court Usage %
+        <div className="bg-card border border-border rounded-[32px] p-6 sm:p-8 shadow-sm">
+          <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2 font-['Playfair_Display']">
+            <BarChart3 size={20} className="text-accent" /> Court Usage %
           </h3>
-          <div className="h-[300px] w-full flex items-center justify-center">
+          <div className="h-[300px] w-full flex items-center justify-center font-['Poppins']">
             {loading ? (
               <Loader2 className="animate-spin text-gray-400" />
             ) : data.courtUsage.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.courtUsage}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartStroke} vertical={false} />
-                  <XAxis dataKey="name" stroke={textStroke} />
-                  <YAxis stroke={textStroke} />
-                  <Tooltip />
-                  <Bar dataKey="usage" fill="#00E5FF" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="name" stroke="currentColor" className="text-muted-foreground/50" />
+                  <YAxis stroke="currentColor" className="text-muted-foreground/50" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-border)', borderRadius: '12px', color: 'var(--theme-foreground)' }}
+                    cursor={{ fill: 'var(--theme-muted)', opacity: 0.1 }}
+                  />
+                  <Bar dataKey="usage" fill="var(--theme-accent)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-gray-500 text-sm italic">Waiting for booking data to analyze usage.</p>
+              <p className="text-muted-foreground text-sm italic">Waiting for booking data to analyze usage.</p>
             )}
           </div>
         </div>
 
         {/* Graphique 3: Distribution par type de match */}
-        <div className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[32px] p-6 sm:p-8 lg:col-span-2">
-          <h3 className="text-lg font-bold dark:text-white mb-6 flex items-center gap-2">
-            <PieChartIcon size={20} className="text-purple-400" /> Member Segment Distribution
+        <div className="bg-card border border-border rounded-[32px] p-6 sm:p-8 lg:col-span-2 shadow-sm font-['Poppins']">
+          <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2 font-['Playfair_Display']">
+            <PieChartIcon size={20} className="text-accent" /> Member Segment Distribution
           </h3>
           <div className="h-[300px] w-full flex items-center justify-center">
             {loading ? (
               <Loader2 className="animate-spin text-gray-400" />
             ) : (
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="text-purple-500" />
+              <div className="text-center font-['Poppins']">
+                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="text-accent" />
                 </div>
-                <p className="text-gray-500 text-sm">Analyze your member database growth and categories here.</p>
-                <button className="mt-4 text-[#00E5FF] text-sm font-bold underline">Generate Member Report</button>
+                <p className="text-muted-foreground text-sm">Analyze your member database growth and categories here.</p>
+                <button className="mt-4 text-accent text-sm font-bold underline hover:text-accent/80 transition-colors">Generate Member Report</button>
               </div>
             )}
           </div>

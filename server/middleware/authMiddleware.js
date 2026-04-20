@@ -31,19 +31,24 @@ export async function requireAuth(req, res, next) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Fetch role from profiles table
+    // Fetch role and club_id from profiles table
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, full_name')
+      .select('role, full_name, club_id')
       .eq('id', user.id)
       .single();
+
+    console.log('[AuthMiddleware] User ID:', user.id);
+    console.log('[AuthMiddleware] Profile:', profile);
 
     req.user = {
       id: user.id,
       email: user.email,
       role: profile?.role || user.user_metadata?.account_type || 'player',
       fullName: profile?.full_name || user.user_metadata?.full_name || '',
+      club_id: profile?.club_id || null,
     };
+    console.log('[AuthMiddleware] req.user:', req.user);
 
     next();
   } catch (err) {
@@ -64,6 +69,8 @@ export function requireRole(...roles) {
 
     const userRole = req.user.role?.toLowerCase();
     const allowed = roles.map(r => r.toLowerCase());
+
+    console.log('[RequireRole] User role:', userRole, 'Allowed:', allowed);
 
     if (!allowed.includes(userRole)) {
       return res.status(403).json({ 

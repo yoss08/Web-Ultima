@@ -105,23 +105,23 @@ export function PlayerSchedule() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-white/5 rounded-[32px] p-12 flex flex-col items-center justify-center border border-gray-100 dark:border-white/10">
-        <Loader2 className="animate-spin text-[#39FF14] mb-4" size={32} />
-        <p className="text-xs font-black opacity-40 uppercase tracking-widest">Loading Schedule...</p>
+      <div className="bg-card rounded-[32px] p-12 flex flex-col items-center justify-center border border-border">
+        <Loader2 className="animate-spin text-accent mb-4" size={32} />
+        <p className="text-xs font-black opacity-40 uppercase tracking-widest text-foreground">Loading Schedule...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-white/5 rounded-[40px] p-8 border border-gray-100 dark:border-white/10 shadow-xl shadow-black/5">
+    <div className="bg-card rounded-[40px] p-8 border border-border shadow-xl shadow-black/5">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 px-2">
         <div>
-          <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">Your Schedule</h3>
-          <p className="text-[10px] font-bold text-[#00E5FF] uppercase tracking-widest mt-1">Next 3 Events</p>
+          <h3 className="text-2xl font-black text-foreground uppercase tracking-tighter">Your Schedule</h3>
+          <p className="text-[10px] font-bold text-accent uppercase tracking-widest mt-1">Next 3 Events</p>
         </div>
-        <div className="w-10 h-10 bg-[#00E5FF]/10 rounded-xl flex items-center justify-center">
-          <CalendarDays className="text-[#00E5FF]" size={20} />
+        <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+          <CalendarDays className="text-accent" size={20} />
         </div>
       </div>
 
@@ -130,14 +130,14 @@ export function PlayerSchedule() {
         {schedule.map((item) => (
           <div 
             key={item.id} 
-            className="group flex items-center gap-5 p-5 rounded-[24px] bg-gray-50 dark:bg-black/20 border border-transparent hover:border-[#00E5FF]/30 hover:bg-white dark:hover:bg-white/5 transition-all duration-300 cursor-pointer"
+            className="group flex items-center gap-5 p-5 rounded-[24px] bg-muted border border-transparent hover:border-accent/30 hover:bg-card-hover transition-all duration-300 cursor-pointer"
           >
             {/* Date Identity Block */}
-            <div className="flex flex-col items-center justify-center min-w-[64px] h-[64px] bg-[#0A0E1A] dark:bg-white rounded-[18px] shadow-lg group-hover:scale-105 transition-transform">
-              <span className="text-[10px] font-black text-white/40 dark:text-black/40 uppercase tracking-tighter">
+            <div className="flex flex-col items-center justify-center min-w-[64px] h-[64px] bg-foreground text-background rounded-[18px] shadow-lg group-hover:scale-105 transition-transform">
+              <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter">
                 {new Date(item.date).toLocaleDateString('en-US', { month: 'short' })}
               </span>
-              <span className="text-2xl font-black text-white dark:text-black leading-none">
+              <span className="text-2xl font-black leading-none text-background">
                 {new Date(item.date).getDate()}
               </span>
             </div>
@@ -145,38 +145,38 @@ export function PlayerSchedule() {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-[#00E5FF]' : 'bg-blue-400'}`} />
-                <h4 className="font-black text-[15px] dark:text-white truncate uppercase tracking-tight group-hover:text-[#00E5FF] transition-colors">
+                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-accent' : 'bg-red-500'}`} />
+                <h4 className="font-black text-[15px] text-foreground truncate uppercase tracking-tight group-hover:text-accent transition-colors">
                   {item.title}
                 </h4>
               </div>
               
               <div className="flex items-center gap-4 opacity-50">
                 <div className="flex items-center gap-1.5 text-[11px] font-bold">
-                  <Clock size={13} className="text-[#39FF14]" />
+                  <Clock size={13} className="text-accent" />
                   <span>{item.time}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[11px] font-bold">
-                  {item.type === 'coach' ? <User size={13} className="text-[#39FF14]" /> : <MapPin size={13} className="text-[#39FF14]" />}
+                  {item.type === 'coach' ? <User size={13} className="text-accent" /> : <MapPin size={13} className="text-accent" />}
                   <span className="truncate max-w-[100px]">{item.subtitle}</span>
                 </div>
               </div>
             </div>
 
-            <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
-              <ChevronRight size={16} className="text-[#39FF14]" />
+            <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
+              <ChevronRight size={16} className="text-accent" />
             </div>
           </div>
         ))}
 
         {schedule.length === 0 && (
-          <div className="text-center py-10 px-4 border-2 border-dashed border-gray-100 dark:border-white/5 rounded-[32px]">
-            <p className="text-sm font-bold opacity-30 italic">No training or matches scheduled yet.</p>
+          <div className="text-center py-10 px-4 border-2 border-dashed border-border rounded-[32px]">
+            <p className="text-sm font-bold opacity-30 italic text-foreground">No training or matches scheduled yet.</p>
           </div>
         )}
       </div>
 
-      <button className="w-full mt-6 py-4 rounded-2xl bg-gray-100 dark:bg-white/5 text-[11px] font-black uppercase tracking-[2px] dark:text-white/60 hover:text-[#00E5FF] transition-colors">
+      <button className="w-full mt-6 py-4 rounded-2xl bg-muted text-[11px] font-black uppercase tracking-[2px] text-muted-foreground hover:text-accent transition-colors">
         View Full Calendar
       </button>
     </div>

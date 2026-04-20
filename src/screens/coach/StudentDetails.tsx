@@ -91,8 +91,8 @@ export function StudentDetails() {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-64 gap-4">
-      <Loader2 className="animate-spin text-[#39FF14]" size={40} />
-      <p className="text-gray-500">Loading student profile...</p>
+      <Loader2 className="animate-spin text-accent" size={40} />
+      <p className="text-muted-foreground">Loading student profile...</p>
     </div>
   );
 
@@ -138,13 +138,13 @@ export function StudentDetails() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="p-3 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-[#00E5FF]/10 transition-colors"
+          className="p-3 rounded-full bg-muted hover:bg-accent/10 transition-colors"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={20} className="text-foreground" />
         </button>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold dark:text-white truncate max-w-[200px] sm:max-w-none">{student?.full_name}</h1>
-          <p className="text-xs sm:text-sm text-gray-500 italic">Student Performance Management</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate max-w-[200px] sm:max-w-none font-['Playfair_Display']">{student?.full_name}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground italic font-['Poppins']">Student Performance Management</p>
         </div>
       </div>
 
@@ -152,27 +152,27 @@ export function StudentDetails() {
         
         {/* COLONNE GAUCHE : FORMULAIRE FEEDBACK */}
         <div className="lg:col-span-2 space-y-6">
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Star className="text-[#39FF14]" size={22} />
+          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground font-['Playfair_Display']">
+              <Star className="text-accent" size={22} />
               Technical Evaluation
             </h3>
             
-            <div className="space-y-4">
-              <label className="text-sm font-bold opacity-60 uppercase tracking-widest">Training Notes</label>
+            <div className="space-y-4 font-['Poppins']">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Training Notes</label>
               <textarea 
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Analyze the student's progress, strengths, and weaknesses..."
-                className="w-full h-40 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#00E5FF] outline-none transition-all resize-none text-sm"
+                className="w-full h-40 p-4 rounded-2xl bg-muted border border-transparent focus:border-accent outline-none transition-all resize-none text-sm text-foreground shadow-inner"
               />
               
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pt-6 border-t border-gray-100 dark:border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pt-6 border-t border-border font-['Poppins']">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium mr-2">Session Rating:</span>
+                   <span className="text-sm font-medium mr-2 text-foreground">Session Rating:</span>
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} onClick={() => setRating(s)}>
-                      <Star size={24} fill={s <= rating ? "#FFD700" : "none"} className={s <= rating ? "text-[#FFD700]" : "text-gray-300"} />
+                    <button key={s} onClick={() => setRating(s)} className="hover:scale-110 transition-transform">
+                       <Star size={24} fill={s <= rating ? "var(--theme-accent)" : "none"} className={s <= rating ? "text-accent" : "text-muted-foreground/30"} />
                     </button>
                   ))}
                 </div>
@@ -180,7 +180,7 @@ export function StudentDetails() {
                 <button 
                   onClick={handleSubmitEvaluation}
                   disabled={submitting}
-                  className="w-full sm:w-auto bg-[#00E5FF] text-black px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[#00E5FF]/20"
+                  className="w-full sm:w-auto bg-accent text-accent-foreground px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
                 >
                   {submitting ? "Saving..." : "Save Evaluation"}
                   <Send size={18} />
@@ -190,9 +190,9 @@ export function StudentDetails() {
           </section>
 
           {/* PERFORMANCE CHART */}
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Activity className="text-blue-400" size={22} />
+          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground font-['Playfair_Display']">
+              <Activity className="text-accent" size={22} />
               Progress Over Time
             </h3>
             <div className="h-[300px] w-full">
@@ -200,43 +200,43 @@ export function StudentDetails() {
                 <AreaChart data={trend}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00E5FF" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#00E5FF" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="var(--theme-accent)" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="var(--theme-accent)" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#888888" vertical={false} opacity={0.1} />
-                  <XAxis dataKey="created_at" tickFormatter={(str) => new Date(str).toLocaleDateString()} />
-                  <YAxis domain={[0, 100]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" vertical={false} opacity={0.1} className="text-muted-foreground" />
+                  <XAxis dataKey="created_at" tickFormatter={(str) => new Date(str).toLocaleDateString()} stroke="currentColor" className="text-muted-foreground/50" />
+                  <YAxis domain={[0, 100]} stroke="currentColor" className="text-muted-foreground/50" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#1a1a1a', border: 'none', borderRadius: '12px' }}
+                    contentStyle={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-border)', borderRadius: '12px', color: 'var(--theme-foreground)' }}
                     labelFormatter={(str) => new Date(str).toLocaleDateString()}
                   />
-                  <Area type="monotone" dataKey="technique" stroke="#00E5FF" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
-                  <Area type="monotone" dataKey="power" stroke="#FFD700" fillOpacity={0} strokeWidth={2} />
+                  <Area type="monotone" dataKey="technique" stroke="var(--theme-accent)" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="power" stroke="var(--theme-muted-foreground)" fillOpacity={0} strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </section>
 
           {/* MATCH HISTORY */}
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8">
-            <h3 className="text-xl font-bold mb-6">Recent Matches</h3>
+          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-foreground font-['Playfair_Display']">Recent Matches</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-white/10">
-                    <th className="pb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
-                    <th className="pb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Score</th>
-                    <th className="pb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Result</th>
+                  <tr className="border-b border-border font-['Poppins']">
+                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Date</th>
+                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Score</th>
+                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Result</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-white/5">
+                <tbody className="divide-y divide-border/50 font-['Poppins']">
                   {matches.map((m: any, i: number) => (
-                    <tr key={i}>
-                      <td className="py-4 text-sm dark:text-gray-300">{new Date(m.created_at).toLocaleDateString()}</td>
-                      <td className="py-4 font-mono font-bold dark:text-white">{m.score || "6-4, 3-6, 7-5"}</td>
+                    <tr key={i} className="group hover:bg-muted/50 transition-colors">
+                      <td className="py-4 text-sm text-foreground/80">{new Date(m.created_at).toLocaleDateString()}</td>
+                      <td className="py-4 font-mono font-bold text-foreground">{m.score || "6-4, 3-6, 7-5"}</td>
                       <td className="py-4">
-                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${m.winner_id === id ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${m.winner_id === id ? 'bg-accent/20 text-accent' : 'bg-red-500/10 text-red-500'}`}>
                           {m.winner_id === id ? 'Victory' : 'Defeat'}
                         </span>
                       </td>
@@ -250,17 +250,16 @@ export function StudentDetails() {
 
         {/* COLONNE DROITE : MISE À JOUR DES SCORES (SKILLS) */}
         <div className="space-y-6">
-          {/* PRIVATE NOTES SECTION */}
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-foreground font-['Playfair_Display']">
               📝 Private Notes
             </h3>
-            <p className="text-[11px] opacity-40 mb-3">Only visible to you. Not shared with the student.</p>
+            <p className="text-[11px] text-muted-foreground mb-3 font-['Poppins']">Only visible to you. Not shared with the student.</p>
             <textarea
               value={privateNotes}
               onChange={(e) => setPrivateNotes(e.target.value)}
               placeholder="Write private observations about this student..."
-              className="w-full h-32 p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-transparent focus:border-[#FFD700] outline-none transition-all resize-none text-sm"
+              className="w-full h-32 p-4 rounded-2xl bg-muted border border-transparent focus:border-accent outline-none transition-all resize-none text-sm text-foreground font-['Poppins'] shadow-inner"
             />
             <button
               onClick={async () => {
@@ -276,37 +275,37 @@ export function StudentDetails() {
                 finally { setSavingNotes(false); }
               }}
               disabled={savingNotes}
-              className="mt-3 w-full py-2.5 bg-[#FFD700]/10 text-[#FFD700] font-bold rounded-xl text-sm hover:bg-[#FFD700]/20 transition-colors disabled:opacity-50"
+              className="mt-3 w-full py-2.5 bg-accent/10 text-accent font-bold rounded-xl text-sm hover:bg-accent/20 transition-colors disabled:opacity-50"
             >
               {savingNotes ? 'Saving...' : 'Save Notes'}
             </button>
           </section>
-          <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm transition-colors duration-300">
-            <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
-              <Activity className="text-[#39FF14]" size={20} />
+          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm transition-colors duration-300">
+            <h3 className="text-lg font-bold mb-8 flex items-center gap-2 text-foreground font-['Playfair_Display']">
+              <Activity className="text-accent" size={20} />
               Update Skills
             </h3>
             
-            <div className="space-y-8">
+            <div className="space-y-8 font-['Poppins']">
               {Object.entries(skills).map(([skill, value]) => (
                 <div key={skill} className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-tighter text-slate-500 dark:text-white/70">{skill}</span>
-                    <span className="text-[#00E5FF] font-mono font-bold">{value}%</span>
+                    <span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">{skill}</span>
+                    <span className="text-accent font-mono font-bold">{value}%</span>
                   </div>
                   <input 
                     type="range" 
                     min="0" max="100" 
                     value={value}
                     onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value)})}
-                    className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#00E5FF] transition-all"
+                    className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-accent transition-all"
                   />
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-[#00E5FF]/10 rounded-2xl border border-[#00E5FF]/20">
-              <p className="text-[11px] text-[#00E5FF] dark:text-[#00E5FF] font-medium leading-relaxed">
+            <div className="mt-8 p-4 bg-accent/5 rounded-2xl border border-accent/10 font-['Poppins']">
+              <p className="text-[11px] text-accent/80 font-medium leading-relaxed italic">
                 Updating these values will immediately refresh the histogram on the student's analytics dashboard.
               </p>
             </div>

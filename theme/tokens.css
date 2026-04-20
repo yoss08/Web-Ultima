@@ -1,0 +1,67 @@
+/* /theme/tokens.css */
+
+:root {
+  /* Light Theme - Original Styles */
+  --theme-background: #F6F6F6;
+  --theme-foreground: oklch(0.145 0 0); /* Gray-900 equivalent */
+  --theme-card: #ffffff;
+  --theme-card-foreground: oklch(0.145 0 0);
+  --theme-popover: oklch(1 0 0);
+  --theme-popover-foreground: oklch(0.145 0 0);
+  --theme-primary: #030213;
+  --theme-primary-foreground: oklch(1 0 0);
+  --theme-secondary: oklch(0.95 0.0058 264.53);
+  --theme-secondary-foreground: #030213;
+  --theme-muted: #ececf0;
+  --theme-muted-foreground: #717182;
+  --theme-accent: #E6E600; /* light mode */
+  --theme-accent-foreground: #0a0a0a;
+  --theme-destructive: #d4183d;
+  --theme-destructive-foreground: #ffffff;
+  --theme-border: rgba(0, 0, 0, 0.1);
+  --theme-input: transparent;
+  --theme-ring: oklch(0.708 0 0);
+  
+  /* Sidebar */
+  --theme-sidebar: oklch(0.985 0 0);
+  --theme-sidebar-foreground: oklch(0.145 0 0);
+  --theme-sidebar-primary: #030213;
+  --theme-sidebar-primary-foreground: oklch(0.985 0 0);
+  --theme-sidebar-accent: oklch(0.97 0 0);
+  --theme-sidebar-accent-foreground: oklch(0.205 0 0);
+  --theme-sidebar-border: oklch(0.922 0 0);
+  --theme-sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  /* Dark Theme - Neon Yellow Rebrand */
+  --theme-background: #121212;
+  --theme-foreground: #ffffff;
+  --theme-card: #121212;
+  --theme-card-foreground: #ffffff;
+  --theme-popover: #121212;
+  --theme-popover-foreground: #ffffff;
+  --theme-primary: #ffffff;
+  --theme-primary-foreground: #121212;
+  --theme-secondary: #27272a;
+  --theme-secondary-foreground: #ffffff;
+  --theme-muted: #27272a;
+  --theme-muted-foreground: #a1a1aa;
+  --theme-accent: #CCFF00; /* Neon Yellow Accent */
+  --theme-accent-foreground: #000000;
+  --theme-destructive: #7f1d1d;
+  --theme-destructive-foreground: #fecaca;
+  --theme-border: #27272a;
+  --theme-input: #27272a;
+  --theme-ring: #CCFF00;
+  
+  /* Sidebar */
+  --theme-sidebar: #121212;
+  --theme-sidebar-foreground: #ffffff;
+  --theme-sidebar-primary: #CCFF00;
+  --theme-sidebar-primary-foreground: #121212;
+  --theme-sidebar-accent: #27272a;
+  --theme-sidebar-accent-foreground: #ffffff;
+  --theme-sidebar-border: #27272a;
+  --theme-sidebar-ring: #CCFF00;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Users,
+  Dumbbell,
   Search,
   Mail,
   Calendar,
@@ -13,28 +13,29 @@ import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
 
-interface Player {
+interface Coach {
   id: string;
   full_name: string;
   email: string;
   created_at: string;
+  specialization?: string;
   avatar_url?: string;
 }
 
-export function AdminPlayersPage() {
+export function AdminCoachesPage() {
   const { user } = useAuth();
   const clubId = user?.club_id;
 
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchPlayers = async () => {
+  const fetchCoaches = async () => {
     if (!clubId) return;
     try {
       setLoading(true);
-      const data = await adminService.getClubPlayers(clubId);
-      setPlayers(data ?? []);
+      const data = await adminService.getClubCoaches(clubId);
+      setCoaches(data ?? []);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -43,13 +44,13 @@ export function AdminPlayersPage() {
   };
 
   useEffect(() => {
-    fetchPlayers();
+    fetchCoaches();
   }, [clubId]);
 
-  const filteredPlayers = players.filter(
-    (p) =>
-      p.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCoaches = coaches.filter(
+    (c) =>
+      c.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (!clubId) {
@@ -71,19 +72,18 @@ export function AdminPlayersPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground font-['Playfair_Display']">
-              Players
+              Coaches
             </h1>
-            {/* Read-only badge */}
             <span className="flex items-center gap-1.5 px-3 py-1 bg-muted border border-border rounded-full text-xs font-bold text-muted-foreground font-['Poppins']">
               <Lock size={11} /> Read-only
             </span>
           </div>
           <p className="text-muted-foreground text-sm font-['Poppins'] mt-1">
-            Members registered at your club.
+            Coaching staff registered at your club.
           </p>
         </div>
         <button
-          onClick={fetchPlayers}
+          onClick={fetchCoaches}
           className="p-3 bg-card border border-border rounded-xl text-foreground hover:bg-muted/80 transition-all self-start"
         >
           <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
@@ -110,19 +110,19 @@ export function AdminPlayersPage() {
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center font-['Poppins']">
             <Loader2 className="animate-spin text-accent w-10 h-10 mb-4" />
-            <p className="text-muted-foreground">Loading players...</p>
+            <p className="text-muted-foreground">Loading coaches...</p>
           </div>
-        ) : filteredPlayers.length === 0 ? (
+        ) : filteredCoaches.length === 0 ? (
           <div className="p-20 text-center font-['Poppins']">
-            <Users size={44} className="text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground italic">No players found for your club.</p>
+            <Dumbbell size={44} className="text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground italic">No coaches found for your club.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {["Player", "Contact", "Joined"].map((h) => (
+                  {["Coach", "Contact", "Specialization", "Joined"].map((h) => (
                     <th
                       key={h}
                       className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']"
@@ -133,33 +133,41 @@ export function AdminPlayersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {filteredPlayers.map((player) => (
-                  <tr key={player.id} className="hover:bg-muted/20 transition-colors">
+                {filteredCoaches.map((coach) => (
+                  <tr key={coach.id} className="hover:bg-muted/20 transition-colors">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-bold text-base border border-accent/20">
-                          {player.full_name?.[0]?.toUpperCase()}
+                        <div className="w-11 h-11 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 font-bold text-base border border-indigo-400/20">
+                          {coach.full_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
                           <p className="font-bold text-foreground font-['Poppins']">
-                            {player.full_name}
+                            {coach.full_name}
                           </p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5 uppercase font-bold tracking-tight font-['Poppins']">
-                            Member
-                          </p>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Dumbbell size={11} className="text-indigo-400" />
+                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-tight font-['Poppins']">
+                              Coach
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
                         <Mail size={14} className="text-muted-foreground/60" />
-                        {player.email}
+                        {coach.email}
                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className="text-sm text-muted-foreground font-['Poppins']">
+                        {coach.specialization ?? "General"}
+                      </span>
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
                         <Calendar size={14} />
-                        {new Date(player.created_at).toLocaleDateString()}
+                        {new Date(coach.created_at).toLocaleDateString()}
                       </div>
                     </td>
                   </tr>
