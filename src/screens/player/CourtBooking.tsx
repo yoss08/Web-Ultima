@@ -159,29 +159,29 @@ export function CourtBooking() {
   useEffect(() => {
     async function fetchInitialData() {
       try {
-        const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
-        
         const [clubsRes, courtsRes] = await Promise.all([
-          fetch(`${apiUrl}/api/public/clubs`),
-          fetch(`${apiUrl}/api/public/courts`)
+          supabase.from('clubs').select('*'),
+          supabase.from('courts').select('*')
         ]);
 
-        if (!clubsRes.ok) throw new Error('Failed to fetch clubs');
-        const clubsData = await clubsRes.json();
-        const formattedClubs = (clubsData || []).map((c: any) => ({
+        if (clubsRes.error) throw clubsRes.error;
+        const clubsData = clubsRes.data || [];
+        
+        if (courtsRes.error) throw courtsRes.error;
+        const courtsData = courtsRes.data || [];
+        
+        // Map courts count manually to avoid complex join issues
+        const formattedClubs = clubsData.map((c: any) => ({
           ...c,
           image: c.photo_url || padelArena,
-          courts_count: c.courts?.[0]?.count || 0,
+          courts_count: courtsData.filter((court: any) => court.club_id === c.id).length,
         }));
+        
         setClubs(formattedClubs);
-
-        if (!courtsRes.ok) throw new Error('Failed to fetch courts');
-        const courtsData = await courtsRes.json();
-        setCourts(courtsData || []);
+        setCourts(courtsData);
       } catch (err) {
-        console.error(err);
-        setCourts([]);
-        toast.error("Failed to load courts");
+        console.error("CourtBooking init error:", err);
+        toast.error("Failed to load clubs and courts");
       } finally {
         setLoading(false);
       }
@@ -545,7 +545,7 @@ export function CourtBooking() {
                   >
                     <SectionHeading step={2} title="Select Surface" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {courts.filter(c => c.club_id === selectedClub.id || !c.club_id).map((court, index) => (
+                      {courts.filter(c => String(c.club_id) === String(selectedClub.id)).map((court, index) => (
                         <CourtCard
                           key={court.id}
                           court={{

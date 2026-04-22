@@ -7,12 +7,14 @@ import {
   MapPin,
   Search,
   Filter,
+  Zap,
   CheckCircle2,
   XCircle,
   Loader2,
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
+import { supabase } from "../../config/supabase";
 import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
@@ -66,11 +68,39 @@ export function AdminBookingsPage() {
     if (!clubId) return;
     try {
       setLoading(true);
-      const data = await adminService.getClubBookings(clubId);
-      setBookings(data ?? []);
-      // Fetch matches and link to bookings
-      const matchesData = await adminService.getClubMatches(clubId);
-      setMatches(matchesData ?? []);
+      
+      // Fetch bookings from Supabase
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*, profiles(full_name), courts(name)')
+        .eq('club_id', clubId);
+      
+      if (error) throw error;
+
+      // Transform data (same as backend does)
+      const transformedData = (data || []).map(booking => {
+        if (booking.booking_date && booking.time_slot) {
+          const [start, end] = booking.time_slot.split(' - ');
+          return {
+            ...booking,
+            start_time: `${booking.booking_date}T${start}:00`,
+            end_time: `${booking.booking_date}T${end}:00`
+          };
+        }
+        return booking;
+      });
+
+      setBookings(transformedData);
+
+      // Fetch matches from Supabase
+      const { data: matchesData, error: matchesError } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('club_id', clubId);
+
+      if (matchesError) throw matchesError;
+      setMatches(matchesData || []);
+
     } catch (error: any) {
       toast.error("Error: " + error.message);
     } finally {

@@ -11,7 +11,12 @@ import {
   Palette,
   CreditCard,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Check,
+  Clock as ClockIcon,
+  FileText,
+  ExternalLink,
+  ShieldCheck
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -19,6 +24,7 @@ import { useTheme } from "../../styles/useTheme";
 import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
+import { notificationService } from "../../services/NotificationService";
 
 type TabType = 'account' | 'appearance' | 'notifications' | 'security';
 
@@ -52,11 +58,15 @@ export function SettingsPage() {
     lowWaterAlerts: true,
     push: true,
   });
+  const [notificationHistory, setNotificationHistory] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [language, setLanguage] = useState("en");
   const [privacy, setPrivacy] = useState("public");
 
   // Security states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -72,6 +82,24 @@ export function SettingsPage() {
       });
     }
   }, [user]);
+
+  // Load notification history
+  useEffect(() => {
+    if (activeTab === 'notifications' && user) {
+      const loadHistory = async () => {
+        setHistoryLoading(true);
+        try {
+          const data = await notificationService.getMyNotifications();
+          setNotificationHistory(data);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setHistoryLoading(false);
+        }
+      };
+      loadHistory();
+    }
+  }, [activeTab, user]);
 
   const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -159,7 +187,7 @@ export function SettingsPage() {
   const tabs = [
     { id: 'account', label: 'Account', icon: User, color: 'text-[#39ff14]', bg: 'bg-[#39ff14]/10' },
     { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-accent', bg: 'bg-accent/10' },
-    { id: 'notifications', label: 'Alerts', icon: Bell, color: 'text-[#14e9ff]', bg: 'bg-[#14e9ff]/10' },
+    { id: 'notifications', label: 'Notifications', icon: Bell, color: 'text-[#14e9ff]', bg: 'bg-[#14e9ff]/10' },
     { id: 'security', label: 'Security', icon: Shield, color: 'text-[#ff3d14]', bg: 'bg-[#ff3d14]/10' },
   ];
 
@@ -415,6 +443,85 @@ export function SettingsPage() {
                       </div>
                     ))}
                   </div>
+
+                  <div className="pt-10 border-t border-border">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold text-foreground">Notification History</h3>
+                      <button 
+                        onClick={async () => {
+                          setHistoryLoading(true);
+                          const data = await notificationService.getMyNotifications();
+                          setNotificationHistory(data);
+                          setHistoryLoading(false);
+                        }}
+                        className="text-xs font-bold text-accent uppercase tracking-widest hover:underline"
+                      >
+                        Refresh
+                      </button>
+                    </div>
+
+                    {historyLoading ? (
+                      <div className="flex justify-center py-12">
+                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                      </div>
+                    ) : notificationHistory.length > 0 ? (
+                      <div className="space-y-3">
+                        {notificationHistory.map((n) => (
+                          <div 
+                            key={n.id} 
+                            className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${
+                              n.read 
+                                ? "bg-muted/30 border-border/50 opacity-70" 
+                                : "bg-accent/5 border-accent/20"
+                            }`}
+                          >
+                            <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${n.read ? "bg-muted-foreground/30" : "bg-accent shadow-[0_0_8px_var(--theme-accent)]"}`} />
+                            <div className="flex-1">
+                              <p className={`text-sm font-['Poppins'] ${n.read ? "text-muted-foreground" : "text-foreground font-semibold"}`}>
+                                {n.message}
+                              </p>
+                              <div className="flex items-center gap-3 mt-2">
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest flex items-center gap-1">
+                                  <ClockIcon size={10} />
+                                  {new Date(n.created_at).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                            {!n.read && (
+                              <button 
+                                onClick={async () => {
+                                  await notificationService.markAsRead(n.id);
+                                  const updated = notificationHistory.map(item => item.id === n.id ? {...item, read: true} : item);
+                                  setNotificationHistory(updated);
+                                  toast.success("Marked as read");
+                                }}
+                                className="p-2 rounded-xl bg-accent/10 text-accent hover:bg-accent hover:text-accent-foreground transition-all"
+                                title="Mark as read"
+                              >
+                                <Check size={16} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-20 text-center bg-muted/20 rounded-[24px] border border-dashed border-border">
+                        <Bell className="mx-auto text-muted-foreground/20 mb-3" size={40} />
+                        <p className="text-muted-foreground text-sm font-['Poppins']">Your history is empty</p>
+                        <button 
+                          onClick={async () => {
+                            setHistoryLoading(true);
+                            const data = await notificationService.getMyNotifications();
+                            setNotificationHistory(data);
+                            setHistoryLoading(false);
+                          }}
+                          className="mt-4 px-6 h-10 bg-muted hover:bg-muted/80 text-foreground font-bold text-xs rounded-xl border border-border transition-all"
+                        >
+                          Check for activity
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -451,6 +558,32 @@ export function SettingsPage() {
                       Two-Factor Authentication
                     </h3>
                     <p className="text-sm text-muted-foreground px-7">Enhanced security is coming soon to the platform to help you protect your sensitive data.</p>
+                  </div>
+
+                  {/* Legal & Privacy Section */}
+                  <div className="pt-10 border-t border-gray-100 dark:border-white/5 space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">Legal & Privacy</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Review our terms of service and how we handle your data to ensure transparency.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      <button 
+                        onClick={() => setShowTermsModal(true)}
+                        className="px-8 h-12 bg-muted/50 dark:bg-white/5 text-foreground font-bold rounded-xl border border-border hover:bg-muted transition-all flex items-center gap-2"
+                      >
+                        <FileText size={18} className="text-accent" />
+                        Terms of Use
+                      </button>
+                      <button 
+                        onClick={() => setShowPrivacyModal(true)}
+                        className="px-8 h-12 bg-muted/50 dark:bg-white/5 text-foreground font-bold rounded-xl border border-border hover:bg-muted transition-all flex items-center gap-2"
+                      >
+                        <ShieldCheck size={18} className="text-accent" />
+                        Privacy Policy
+                      </button>
+                    </div>
                   </div>
 
                   {/* Account Removal Section */}
@@ -540,6 +673,101 @@ export function SettingsPage() {
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin text-accent-foreground" />}
                   Update
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Terms of Use Modal */}
+      <AnimatePresence>
+        {showTermsModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowTermsModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-card border border-border rounded-[40px] p-10 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-black text-foreground font-['Playfair_Display']">Terms of Use</h2>
+                <button onClick={() => setShowTermsModal(false)} className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-foreground hover:opacity-80">
+                  <ExternalLink size={18} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto pr-4 space-y-6 text-muted-foreground font-['Poppins'] text-sm leading-relaxed">
+                <p className="font-bold text-foreground">Last Updated: April 2024</p>
+                <p>Welcome to our platform. By accessing or using our services, you agree to be bound by these terms. If you do not agree to these terms, please do not use our services.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">1. Acceptance of Terms</h4>
+                <p>By using the app, you confirm that you are at least 18 years old or have parental consent. You are responsible for maintaining the confidentiality of your account information.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">2. User Conduct</h4>
+                <p>You agree not to use the service for any unlawful purposes or to interfere with the operation of the platform. Any abuse of other users or system vulnerabilities will result in immediate termination.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">3. Intellectual Property</h4>
+                <p>All content provided through our services is the property of the platform or its licensors and is protected by copyright and other intellectual property laws.</p>
+                <p>We reserve the right to modify these terms at any time. Continued use of the platform constitutes acceptance of the new terms.</p>
+              </div>
+              <div className="mt-8 pt-8 border-t border-border">
+                <button 
+                  onClick={() => setShowTermsModal(false)}
+                  className="w-full h-14 bg-accent text-accent-foreground font-black rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+                >
+                  I Understand
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Privacy Policy Modal */}
+      <AnimatePresence>
+        {showPrivacyModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPrivacyModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-card border border-border rounded-[40px] p-10 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-black text-foreground font-['Playfair_Display']">Privacy Policy</h2>
+                <button onClick={() => setShowPrivacyModal(false)} className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-foreground hover:opacity-80">
+                  <ShieldCheck size={18} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto pr-4 space-y-6 text-muted-foreground font-['Poppins'] text-sm leading-relaxed">
+                <p className="font-bold text-foreground">Last Updated: April 2024</p>
+                <p>Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">1. Data Collection</h4>
+                <p>We collect information that you provide directly to us when creating an account, such as your name, email address, and payment information.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">2. Use of Information</h4>
+                <p>We use your information to provide and improve our services, communicate with you about your account, and personalize your experience.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">3. Data Protection</h4>
+                <p>We implement a variety of security measures to maintain the safety of your personal information. Your data is stored on secure servers and encrypted using industry-standard protocols.</p>
+                <h4 className="text-foreground font-bold uppercase tracking-widest text-[10px]">4. Third-Party Disclosure</h4>
+                <p>We do not sell, trade, or otherwise transfer your personal information to outside parties without your consent, except as required by law.</p>
+              </div>
+              <div className="mt-8 pt-8 border-t border-border">
+                <button 
+                  onClick={() => setShowPrivacyModal(false)}
+                  className="w-full h-14 bg-accent text-accent-foreground font-black rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+                >
+                  Acknowledge
                 </button>
               </div>
             </motion.div>

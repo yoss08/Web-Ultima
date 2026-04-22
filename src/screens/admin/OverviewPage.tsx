@@ -11,7 +11,13 @@ import {
   Clock,
   Users,
   ClipboardCheck,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  MapPin,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { supabase } from "../../config/supabase";
 import {
   LineChart,
   Line,
@@ -53,6 +59,8 @@ export function OverviewPage() {
     maintenanceCourts: 0,
   });
   const [courts, setCourts] = useState<CourtStatus[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [actionLoading, setActionLoading] = useState<string | number | null>(null);
   const [peakHoursData] = useState([
     { hour: "08:00", usage: 20 },
     { hour: "10:00", usage: 45 },
@@ -64,25 +72,50 @@ export function OverviewPage() {
   ]);
 
   const fetchDashboardData = async () => {
+    if (!clubId) return;
     setLoading(true);
     try {
-      const [clubStats, clubCourts] = await Promise.all([
-        clubId ? adminService.getClubStats(clubId) : Promise.resolve(null),
-        clubId ? adminService.getClubCourts(clubId) : Promise.resolve([]),
-      ]);
+      // 1. Fetch Courts
+      const { data: clubCourts, error: courtsError } = await supabase
+        .from('courts')
+        .select('*')
+        .eq('club_id', clubId);
+      
+      if (courtsError) throw courtsError;
+      setCourts(clubCourts || []);
 
-      if (clubStats) {
-        setStats({
-          pendingBookings: clubStats.pendingBookings ?? 0,
-          confirmedToday: clubStats.confirmedToday ?? 0,
-          totalCourts: clubStats.totalCourts ?? 0,
-          availableCourts: clubStats.availableCourts ?? 0,
-          maintenanceCourts: clubStats.maintenanceCourts ?? 0,
-        });
-      }
-      setCourts(clubCourts ?? []);
-    } catch {
-      // Silently fail — show zeroes
+      // 2. Fetch Bookings (for pending list and stats)
+      const { data: clubBookings, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('*, profiles(full_name), courts(name)')
+        .eq('club_id', clubId);
+
+      if (bookingsError) throw bookingsError;
+
+      const pending = (clubBookings || []).filter(b => b.status === 'pending');
+      setPendingRequests(pending);
+
+      // 3. Calculate Stats
+      const confirmedToday = (clubBookings || []).filter(b => {
+        if (b.status !== 'confirmed' && b.status !== 'accepted') return false;
+        const today = new Date().toISOString().split('T')[0];
+        return b.booking_date === today;
+      }).length;
+
+      const available = (clubCourts || []).filter(c => c.status === 'available').length;
+      const maintenance = (clubCourts || []).filter(c => c.status === 'maintenance').length;
+
+      setStats({
+        pendingBookings: pending.length,
+        confirmedToday,
+        totalCourts: clubCourts?.length || 0,
+        availableCourts: available,
+        maintenanceCourts: maintenance,
+      });
+
+    } catch (err: any) {
+      console.error("Dashboard data error:", err);
+      toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -91,6 +124,32 @@ export function OverviewPage() {
   useEffect(() => {
     fetchDashboardData();
   }, [clubId]);
+
+  const handleAccept = async (id: string | number) => {
+    setActionLoading(id);
+    try {
+      await adminService.acceptBooking(id);
+      toast.success("Booking accepted ✓");
+      fetchDashboardData();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (id: string | number) => {
+    setActionLoading(id);
+    try {
+      await adminService.rejectBooking(id);
+      toast.success("Booking rejected");
+      fetchDashboardData();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   if (!clubId) {
     return (
@@ -361,6 +420,97 @@ export function OverviewPage() {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      {/* Pending Actions Section */}
+      <div className="bg-card border border-border rounded-[32px] overflow-hidden shadow-sm">
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground font-['Playfair_Display'] flex items-center gap-2">
+            <ClipboardCheck size={24} className="text-yellow-500" />
+            Pending Booking Requests
+          </h2>
+          <Link 
+            to="/dashboard/admin/bookings" 
+            className="text-xs font-bold text-accent uppercase tracking-widest hover:underline"
+          >
+            Manage All
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="p-20 flex flex-col items-center justify-center">
+            <Loader2 className="animate-spin text-accent w-10 h-10 mb-4" />
+            <p className="text-muted-foreground font-medium font-['Poppins']">Loading requests...</p>
+          </div>
+        ) : pendingRequests.length === 0 ? (
+          <div className="p-20 text-center">
+            <div className="w-16 h-16 bg-emerald-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 size={32} className="text-emerald-400" />
+            </div>
+            <p className="text-muted-foreground font-medium font-['Poppins']">All caught up! No pending requests.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Player</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Court</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Time</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {pendingRequests.slice(0, 5).map((req) => (
+                  <tr key={req.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
+                          {req.profiles?.full_name?.[0] || 'U'}
+                        </div>
+                        <span className="font-bold text-foreground font-['Poppins']">{req.profiles?.full_name || 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-sm text-muted-foreground font-['Poppins']">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-accent" />
+                        {req.courts?.name || '—'}
+                      </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="text-sm text-foreground font-semibold font-['Poppins']">
+                        {req.booking_date}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-['Poppins']">
+                        {req.time_slot}
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <div className="flex justify-end gap-3">
+                        <button 
+                          onClick={() => handleAccept(req.id)}
+                          disabled={actionLoading === req.id}
+                          className="flex items-center gap-2 px-4 py-2 bg-emerald-400/10 text-emerald-400 rounded-xl hover:bg-emerald-400 hover:text-white transition-all text-xs font-bold font-['Poppins'] disabled:opacity-50"
+                        >
+                          {actionLoading === req.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                          Accept
+                        </button>
+                        <button 
+                          onClick={() => handleReject(req.id)}
+                          disabled={actionLoading === req.id}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold font-['Poppins'] disabled:opacity-50"
+                        >
+                          <XCircle size={16} />
+                          Decline
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -134,10 +134,8 @@ export default function BookingPage() {
     async function fetchClubs() {
       setLoading(true);
       try {
-        const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/public/clubs`);
-        if (!response.ok) throw new Error('Failed to fetch clubs from server');
-        const data = await response.json();
+        const { data, error } = await supabase.from('clubs').select('*, courts(count)');
+        if (error) throw error;
         
         const formattedClubs: Club[] = (data || []).map((c: any) => ({
           id: c.id,

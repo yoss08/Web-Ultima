@@ -66,10 +66,12 @@ export function ClubDetailsPage() {
     async function fetchClubDetails() {
       setLoading(true);
       try {
-        const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/public/clubs/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch club details');
-        const data = await response.json();
+        const { data, error } = await supabase
+          .from('clubs')
+          .select('*, courts(*)')
+          .eq('id', id)
+          .single();
+        if (error) throw error;
         setDisplayClub({
           ...data,
           rating: 4.8, // Mock rating

@@ -90,96 +90,148 @@ export const adminService = {
 
   // ─── BOOKINGS ───────────────────────────────────────────────
   async getClubBookings(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/bookings?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club bookings');
-    return response.json();
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*, profiles(full_name), courts(name)')
+      .eq('club_id', clubId);
+    
+    if (error) throw error;
+
+    // Transform data to include start_time and end_time for the Admin UI
+    return (data || []).map(booking => {
+      if (booking.booking_date && booking.time_slot) {
+        const [start, end] = booking.time_slot.split(' - ');
+        return {
+          ...booking,
+          start_time: `${booking.booking_date}T${start}:00`,
+          end_time: `${booking.booking_date}T${end}:00`
+        };
+      }
+      return booking;
+    });
   },
 
   async acceptBooking(bookingId: string | number) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/bookings/${bookingId}/accept`, {
-      method: 'PUT',
-      headers,
-    });
-    if (!response.ok) throw new Error('Failed to accept booking');
-    return response.json();
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ status: 'confirmed' })
+      .eq('id', bookingId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Send notification
+    await supabase.from('notifications').insert([{
+      user_id: data.user_id,
+      type: 'booking_update',
+      message: `Your booking for ${data.booking_date} at ${data.time_slot} has been ACCEPTED.`,
+      read: false
+    }]);
+
+    return data;
   },
 
   async rejectBooking(bookingId: string | number) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/bookings/${bookingId}/reject`, {
-      method: 'PUT',
-      headers,
-    });
-    if (!response.ok) throw new Error('Failed to reject booking');
-    return response.json();
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ status: 'cancelled' })
+      .eq('id', bookingId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Send notification
+    await supabase.from('notifications').insert([{
+      user_id: data.user_id,
+      type: 'booking_update',
+      message: `Your booking for ${data.booking_date} at ${data.time_slot} has been DECLINED.`,
+      read: false
+    }]);
+
+    return data;
   },
 
   // ─── COURTS ─────────────────────────────────────────────────
   async getAllCourts() {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts`, { headers });
-    if (!response.ok) throw new Error(`Failed to fetch courts: ${response.status}`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('courts')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return data;
   },
 
   async getClubCourts(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club courts');
-    return response.json();
+    const { data, error } = await supabase
+      .from('courts')
+      .select('*')
+      .eq('club_id', clubId)
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return data;
   },
 
   async addCourt(courtData: { name: string; type: string; status: string; club_id?: string }) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(courtData),
-    });
-    if (!response.ok) throw new Error('Failed to add court');
-    return response.json();
+    const { data, error } = await supabase
+      .from('courts')
+      .insert([{
+        ...courtData,
+        type: courtData.type ? courtData.type.toLowerCase() : null
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async deleteCourt(courtId: string | number) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts/${courtId}`, {
-      method: 'DELETE',
-      headers,
-    });
-    if (!response.ok) throw new Error('Failed to delete court');
-    return response.json();
+    const { error } = await supabase
+      .from('courts')
+      .delete()
+      .eq('id', courtId);
+    
+    if (error) throw error;
+    return { success: true };
   },
 
   async updateCourt(courtId: string | number, updates: Record<string, any>) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts/${courtId}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(updates),
-    });
-    if (!response.ok) throw new Error('Failed to update court');
-    return response.json();
+    const { data, error } = await supabase
+      .from('courts')
+      .update(updates)
+      .eq('id', courtId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async updateCourtStatus(courtId: string | number, status: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/courts/${courtId}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({ status }),
-    });
-    if (!response.ok) throw new Error(`Failed to update court status: ${response.status}`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('courts')
+      .update({ status })
+      .eq('id', courtId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   // ─── MATCHES ────────────────────────────────────────────────
   async getClubMatches(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/matches?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club matches');
-    return response.json();
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(booking_date, time_slot, courts(name, club_id))')
+      .eq('club_id', clubId);
+    
+    if (error) throw error;
+    return data;
   },
 
   async createMatch(matchData: {
@@ -190,41 +242,64 @@ export const adminService = {
     status: 'live' | 'completed';
     start_time?: string;
     end_time?: string;
+    club_id?: string;
   }) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/matches`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(matchData),
-    });
-    if (!response.ok) throw new Error('Failed to create match');
-    return response.json();
+    const { data, error } = await supabase
+      .from('matches')
+      .insert([matchData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async updateScore(matchId: string | number, score: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/matches/${matchId}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({ current_score: score }),
-    });
-    if (!response.ok) throw new Error('Failed to update score');
-    return response.json();
+    const { data, error } = await supabase
+      .from('matches')
+      .update({ current_score: score })
+      .eq('id', matchId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   // ─── ANALYTICS ──────────────────────────────────────────────
   async getGlobalStats() {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/reports/overview`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch stats');
-    return response.json();
+    // Basic implementation using Supabase
+    const [players, bookings, matches] = await Promise.all([
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+      supabase.from('bookings').select('id', { count: 'exact', head: true }),
+      supabase.from('matches').select('id', { count: 'exact', head: true }),
+    ]);
+
+    return {
+      totalPlayers: players.count || 0,
+      totalBookings: bookings.count || 0,
+      totalMatches: matches.count || 0,
+    };
   },
 
   async getClubStats(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/reports/overview?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club stats');
-    return response.json();
+    const today = new Date().toISOString().split('T')[0];
+    
+    const [bookings, courts] = await Promise.all([
+      supabase.from('bookings').select('*').eq('club_id', clubId),
+      supabase.from('courts').select('*').eq('club_id', clubId),
+    ]);
+
+    const clubBookings = bookings.data || [];
+    const clubCourts = courts.data || [];
+
+    return {
+      pendingBookings: clubBookings.filter(b => b.status === 'pending').length,
+      confirmedToday: clubBookings.filter(b => (b.status === 'confirmed' || b.status === 'accepted') && b.booking_date === today).length,
+      totalCourts: clubCourts.length,
+      availableCourts: clubCourts.filter(c => c.status === 'available').length,
+      maintenanceCourts: clubCourts.filter(c => c.status === 'maintenance').length,
+    };
   },
 
   // ─── CLUB INFO ──────────────────────────────────────────────
@@ -263,21 +338,17 @@ export const adminService = {
   },
 
   /**
-   * Updates the club via the Express PUT /api/admin/club endpoint.
-   * The backend reads club_id from req.user (JWT middleware) — safe and scoped.
-   * Changes are immediately reflected in the super_admin's ClubManagement view.
+   * Updates the club info directly via Supabase.
    */
-  async updateClubInfo(_clubId: string, updates: Record<string, any>) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/club`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(updates),
-    });
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || `Failed to update club: ${response.status}`);
-    }
-    return response.json();
+  async updateClubInfo(clubId: string, updates: Record<string, any>) {
+    const { data, error } = await supabase
+      .from('clubs')
+      .update(updates)
+      .eq('id', clubId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 };

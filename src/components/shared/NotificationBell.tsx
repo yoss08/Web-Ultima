@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Bell, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router';
 import { notificationService } from '../../services/NotificationService';
 import { useAuth } from '../../services/AuthContext';
 import { supabase } from '../../config/supabase';
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -121,7 +123,13 @@ export function NotificationBell() {
               </div>
               
               <div className="p-4 bg-muted/30 text-center">
-                <button className="text-[10px] font-black uppercase tracking-[2px] text-accent hover:opacity-80">
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate('/dashboard/settings?tab=notifications');
+                  }}
+                  className="text-[10px] font-black uppercase tracking-[2px] text-accent hover:opacity-80"
+                >
                   View All Activity
                 </button>
               </div>
