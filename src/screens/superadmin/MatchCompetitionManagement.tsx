@@ -15,6 +15,8 @@ import {
   UserPlus,
 } from "lucide-react";
 import { adminService } from "../../services/adminService";
+import { superAdminService } from "../../services/superAdminService";
+import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
 
 interface Competition {
@@ -37,7 +39,16 @@ export function MatchCompetitionManagement() {
   const [matchLoading, setMatchLoading] = useState(false);
   const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
   const [availableCourts, setAvailableCourts] = useState<any[]>([]);
-  const [matchForm, setMatchForm] = useState({ player1_id: "", player2_id: "", court_id: "" });
+  const [matchForm, setMatchForm] = useState({ 
+    player1_id: "", 
+    player2_id: "", 
+    player3_id: "", 
+    player4_id: "", 
+    court_id: "", 
+    club_id: "",
+    match_type: "singles" 
+  });
+  const [clubs, setClubs] = useState<any[]>([]);
 
   // Competition modal
   const [showCompModal, setShowCompModal] = useState(false);
@@ -46,13 +57,19 @@ export function MatchCompetitionManagement() {
     type: "Elimination",
     start_date: "",
     end_date: "",
+    club_id: "",
   });
   const [compSaving, setCompSaving] = useState(false);
 
   const fetchCompetitions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/competitions");
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch("/api/admin/competitions", {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`
+        }
+      });
       if (!response.ok) throw new Error("Failed to fetch competitions");
       const data = await response.json();
       setCompetitions(data ?? []);
@@ -65,7 +82,36 @@ export function MatchCompetitionManagement() {
 
   useEffect(() => {
     fetchCompetitions();
+    fetchClubs();
   }, []);
+
+  const fetchClubs = async () => {
+    try {
+      const data = await superAdminService.getAllClubs();
+      setClubs(data || []);
+    } catch (err: any) {
+      toast.error("Failed to load clubs");
+    }
+  };
+
+  const handleClubChangeForMatch = async (clubId: string) => {
+    setMatchForm({ ...matchForm, club_id: clubId, player1_id: "", player2_id: "", player3_id: "", player4_id: "", court_id: "" });
+    if (!clubId) return;
+    
+    setMatchLoading(true);
+    try {
+      const [players, courts] = await Promise.all([
+        adminService.getClubPlayers(clubId),
+        adminService.getClubCourts(clubId),
+      ]);
+      setAvailablePlayers(players ?? []);
+      setAvailableCourts(courts?.filter((c: any) => c.status === "available") ?? []);
+    } catch {
+      toast.error("Failed to load club data");
+    } finally {
+      setMatchLoading(false);
+    }
+  };
 
   const openMatchModal = async () => {
     setMatchLoading(true);
@@ -94,33 +140,35 @@ export function MatchCompetitionManagement() {
     }
     setMatchLoading(true);
     try {
-      await adminService.createMatch({ ...matchForm, status: "live" });
+      await superAdminService.createMatch({ ...matchForm, status: "live" });
       toast.success("Match started!");
       setShowMatchModal(false);
-      setMatchForm({ player1_id: "", player2_id: "", court_id: "" });
+      setMatchForm({ 
+        player1_id: "", 
+        player2_id: "", 
+        player3_id: "", 
+        player4_id: "", 
+        court_id: "", 
+        club_id: "",
+        match_type: "singles"
+      });
     } catch {
       toast.error("Could not start match");
     } finally {
       setMatchLoading(false);
     }
   };
-
   const handleCreateCompetition = async () => {
-    if (!compForm.name || !compForm.start_date || !compForm.end_date) {
-      toast.error("Name and dates are required.");
+    if (!compForm.name || !compForm.start_date || !compForm.end_date || !compForm.club_id) {
+      toast.error("Name, dates, and club are required.");
       return;
     }
     setCompSaving(true);
     try {
-      const response = await fetch("/api/admin/competitions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...compForm, status: "upcoming" }),
-      });
-      if (!response.ok) throw new Error("Failed to create competition");
+      await superAdminService.createCompetition({ ...compForm, status: "upcoming" });
       toast.success("Competition created!");
       setShowCompModal(false);
-      setCompForm({ name: "", type: "Elimination", start_date: "", end_date: "" });
+      setCompForm({ name: "", type: "Elimination", start_date: "", end_date: "", club_id: "" });
       fetchCompetitions();
     } catch (err: any) {
       toast.error(err.message);
@@ -297,26 +345,84 @@ export function MatchCompetitionManagement() {
                 </button>
               </div>
               <div className="space-y-5 font-['Poppins']">
-                {[
-                  { label: "Player 1", key: "player1_id" },
-                  { label: "Player 2", key: "player2_id" },
-                ].map(({ label, key }) => (
-                  <div key={key}>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
+                    Assign to Club *
+                  </label>
+                  <select
+                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                    value={matchForm.club_id}
+                    onChange={(e) => handleClubChangeForMatch(e.target.value)}
+                  >
+                    <option value="">Select club...</option>
+                    {clubs.map((club) => (
+                      <option key={club.id} value={club.id}>{club.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                      {label}
+                      Match Type
                     </label>
                     <select
                       className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                      value={(matchForm as any)[key]}
-                      onChange={(e) => setMatchForm({ ...matchForm, [key]: e.target.value })}
+                      value={matchForm.match_type}
+                      onChange={(e) => setMatchForm({ ...matchForm, match_type: e.target.value })}
                     >
-                      <option value="">Select player...</option>
-                      {availablePlayers.map((p) => (
-                        <option key={p.id} value={p.id}>{p.full_name}</option>
-                      ))}
+                      <option value="singles">Singles (1v1)</option>
+                      <option value="doubles">Doubles (2v2)</option>
                     </select>
                   </div>
-                ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: "Player 1 (Team A)", key: "player1_id" },
+                    { label: "Player 2 (Team B)", key: "player2_id" },
+                  ].map(({ label, key }) => (
+                    <div key={key}>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
+                        {label}
+                      </label>
+                      <select
+                        className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                        value={(matchForm as any)[key]}
+                        onChange={(e) => setMatchForm({ ...matchForm, [key]: e.target.value })}
+                      >
+                        <option value="">Select player...</option>
+                        {availablePlayers.map((p) => (
+                          <option key={p.id} value={p.id}>{p.full_name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+
+                {matchForm.match_type === "doubles" && (
+                  <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                    {[
+                      { label: "Player 3 (Team A)", key: "player3_id" },
+                      { label: "Player 4 (Team B)", key: "player4_id" },
+                    ].map(({ label, key }) => (
+                      <div key={key}>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
+                          {label}
+                        </label>
+                        <select
+                          className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                          value={(matchForm as any)[key]}
+                          onChange={(e) => setMatchForm({ ...matchForm, [key]: e.target.value })}
+                        >
+                          <option value="">Select player...</option>
+                          {availablePlayers.map((p) => (
+                            <option key={p.id} value={p.id}>{p.full_name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
                     Court
@@ -376,6 +482,21 @@ export function MatchCompetitionManagement() {
                 </button>
               </div>
               <div className="space-y-4 font-['Poppins']">
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
+                    Assign to Club *
+                  </label>
+                  <select
+                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                    value={compForm.club_id}
+                    onChange={(e) => setCompForm({ ...compForm, club_id: e.target.value })}
+                  >
+                    <option value="">Select club...</option>
+                    {clubs.map((club) => (
+                      <option key={club.id} value={club.id}>{club.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
                     Competition Name *

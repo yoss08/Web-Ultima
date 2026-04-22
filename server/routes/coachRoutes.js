@@ -163,4 +163,65 @@ router.get('/recommendations', async (req, res) => {
   }
 });
 
+// GET /api/coach/unassigned-players - list unassigned players in a club
+router.get('/unassigned-players', async (req, res) => {
+  try {
+    const { clubId } = req.query;
+    if (!clubId) return res.status(400).json({ error: "clubId is required" });
+
+    // Find players in this club who are NOT in coach_students
+    // First get all players in club
+    const { data: players, error: playersError } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, account_type')
+      .eq('club_id', clubId)
+      .eq('role', 'player');
+
+    if (playersError) throw playersError;
+
+    // Get all assigned student IDs
+    const { data: assigned, error: assignedError } = await supabase
+      .from('coach_students')
+      .select('student_id');
+
+    if (assignedError) throw assignedError;
+
+    const assignedIds = new Set(assigned.map(a => a.student_id));
+    const unassigned = players.filter(p => !assignedIds.has(p.id));
+
+    res.json(unassigned);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/coach/students - assign a student to a coach
+router.post('/students', async (req, res) => {
+  try {
+    const { coachId, studentId } = req.body;
+    if (!coachId || !studentId) return res.status(400).json({ error: "coachId and studentId are required" });
+
+    const { data, error } = await supabase
+      .from('coach_students')
+      .insert([{ coach_id: coachId, student_id: studentId }])
+      .select();
+
+    if (error) throw error;
+
+    // Create notification for student
+    const { data: coachProfile } = await supabase.from('profiles').select('full_name').eq('id', coachId).single();
+    
+    await supabase.from('notifications').insert([{
+      user_id: studentId,
+      type: 'student_added',
+      message: `You have been added to coach ${coachProfile?.full_name || 'a coach'}'s roster`,
+      read: false
+    }]);
+
+    res.status(201).json(data[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

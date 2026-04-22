@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
+const API_URL = (import.meta as any).env?.VITE_API_URL || '/api';
 // All Express routes are mounted at /api/admin — always include that prefix.
 const ADMIN_API = `${API_URL}/api/admin`;
 
@@ -47,6 +47,33 @@ export const adminService = {
     const headers = await authHeaders();
     const response = await fetch(`${ADMIN_API}/coaches?club_id=${clubId}`, { headers });
     if (!response.ok) throw new Error('Failed to fetch club coaches');
+    return response.json();
+  },
+
+  async getUnassignedCoaches() {
+    const headers = await authHeaders();
+    const response = await fetch(`${ADMIN_API}/unassigned-coaches`, { headers });
+    if (!response.ok) throw new Error('Failed to fetch unassigned coaches');
+    return response.json();
+  },
+
+  async assignCoachToClub(coachId: string) {
+    const headers = await authHeaders();
+    const response = await fetch(`${ADMIN_API}/coaches/${coachId}/assign`, {
+      method: 'PUT',
+      headers,
+    });
+    if (!response.ok) throw new Error('Failed to assign coach to club');
+    return response.json();
+  },
+
+  async unassignCoachFromClub(coachId: string) {
+    const headers = await authHeaders();
+    const response = await fetch(`${ADMIN_API}/coaches/${coachId}/unassign`, {
+      method: 'PUT',
+      headers,
+    });
+    if (!response.ok) throw new Error('Failed to unassign coach from club');
     return response.json();
   },
 

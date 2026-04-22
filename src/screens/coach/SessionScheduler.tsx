@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar as CalendarIcon, Clock, Users, MapPin, ChevronRight, Save, Zap } from "lucide-react";
 import { coachService } from "../../services/CoachService";
+import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
 
@@ -25,7 +26,17 @@ export function SessionScheduler() {
   useEffect(() => {
     if (user?.id) {
        coachService.getMyStudents(user.id).then(setStudents);
-       fetch('/api/admin/courts').then(res => res.json()).then(setCourts);
+       adminService.getAllCourts().then(data => {
+         if (Array.isArray(data)) {
+           setCourts(data);
+         } else {
+           console.error("Courts data is not an array:", data);
+           setCourts([]);
+         }
+       }).catch(err => {
+         console.error("Failed to fetch courts:", err);
+         setCourts([]);
+       });
     }
   }, [user]);
 

@@ -206,4 +206,41 @@ export const superAdminService = {
       pendingBookings: pending.count ?? 0,
     };
   },
+
+  // ─── COMPETITIONS & MATCHES ────────────────────────────────
+  async createCompetition(data: {
+    name: string;
+    type: string;
+    start_date: string;
+    end_date: string;
+    club_id: string;
+    status: string;
+  }) {
+    const { data: result, error } = await supabase
+      .from('tournaments')
+      .insert([data])
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return result;
+  },
+
+  async createMatch(data: {
+    player1_id: string;
+    player2_id: string;
+    player3_id?: string;
+    player4_id?: string;
+    court_id: string;
+    club_id: string;
+    status: string;
+    match_type: string;
+  }) {
+    const { data: result, error } = await supabase
+      .from('matches')
+      .insert([data])
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return result;
+  },
 };

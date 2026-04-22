@@ -29,28 +29,31 @@ export const authHelpers = {
     userData: {
       fullName: string;
       phoneNumber?: string;
+      role?: ProfileRole;
     }
   ) {
-    // 1) Create auth user (no authorization role here)
+    // 1) Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: userData.fullName,
-          phone: userData.phoneNumber ?? null, // (optional) keep auth metadata non-sensitive
+          phone: userData.phoneNumber ?? null,
+          role: userData.role || "player",
         },
       },
     });
 
     if (authError || !authData.user) return { data: authData, error: authError };
 
-    // 2) Persist profile with default role = player
+    // 2) Persist profile with selected role
     const { error: profileError } = await supabase.from("profiles").upsert({
       id: authData.user.id,
       full_name: userData.fullName,
       phone: userData.phoneNumber ?? null,
-      role: "player", // ✅ always default
+      role: userData.role || "player",
+      email: email, // Add email to profile for easy searching
     });
 
     if (profileError) console.error("Error syncing profile:", profileError);

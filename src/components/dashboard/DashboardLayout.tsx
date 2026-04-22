@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
+import { NotificationBell } from "../shared/NotificationBell";
 
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
@@ -34,8 +35,6 @@ export function DashboardLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const notificationRef = useRef<HTMLDivElement>(null);
 
   // Resolve role — profile DB takes priority over metadata
   const role = (
@@ -154,14 +153,8 @@ export function DashboardLayout() {
   ];
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setNotificationsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    setMobileMenuOpen(false);
+  }, [location]);
 
   // ─── Role badge config ───────────────────────────────────────
   const getRoleBadge = () => {
@@ -268,36 +261,7 @@ export function DashboardLayout() {
 
           {/* Right */}
           <div className="flex items-center gap-3">
-            {/* Notifications */}
-            <div className="relative" ref={notificationRef}>
-              <button
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className={`flex items-center justify-center w-10 h-10 rounded-[12px] transition-colors relative ${
-                  notificationsOpen ? "bg-accent/10" : "hover:bg-black/5 dark:hover:bg-white/10"
-                }`}
-              >
-                <Bell className="w-5 h-5 text-foreground" />
-              </button>
-              {notificationsOpen && (
-                <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-80 max-w-xs sm:max-w-none rounded-[24px] shadow-2xl border backdrop-blur-xl z-[100] animate-in fade-in zoom-in duration-200 bg-background/95 border-border overflow-hidden">
-                  <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-border">
-                    <h3 className="font-bold text-sm text-foreground">Notifications</h3>
-                    <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">Feed</span>
-                  </div>
-                  <div className="py-8 px-6 flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
-                      <Bell className="w-8 h-8 text-accent/40" />
-                    </div>
-                    <div className="space-y-1 mt-4">
-                      <p className="font-semibold text-sm text-foreground">All caught up!</p>
-                      <p className="text-xs text-muted-foreground max-w-[180px] mx-auto leading-relaxed">
-                        Activity will appear here as it happens.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <NotificationBell />
 
             {/* User Profile */}
             <Link

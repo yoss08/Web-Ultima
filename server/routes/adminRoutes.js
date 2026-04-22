@@ -6,7 +6,6 @@ const router = express.Router();
 /**
  * COURTS ENDPOINTS
  */
-
 // GET /api/admin/courts - all courts
 router.get('/courts', async (req, res) => {
   try {
@@ -134,12 +133,29 @@ router.put('/bookings/:id', async (req, res) => {
   try {
     const clubId = req.user?.club_id;
     if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    const { status } = req.body;
     const { data, error } = await supabase.from('bookings')
       .update(req.body)
       .eq('id', req.params.id)
       .eq('club_id', clubId)
       .select();
     if (error) throw error;
+
+    const booking = data[0];
+    if (status === 'accepted' || status === 'confirmed' || status === 'declined' || status === 'cancelled') {
+      const message = status === 'accepted' || status === 'confirmed' 
+        ? `Your booking for ${booking.booking_date} at ${booking.time_slot} has been ACCEPTED.`
+        : `Your booking for ${booking.booking_date} at ${booking.time_slot} has been DECLINED.`;
+      
+      await supabase.from('notifications').insert([{
+        user_id: booking.user_id,
+        type: 'booking_update',
+        message,
+        read: false
+      }]);
+    }
+
     res.json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -194,6 +210,75 @@ router.get('/players', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// GET /api/admin/unassigned-coaches - list coaches without a club
+router.get('/unassigned-coaches', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, created_at')
+      .eq('role', 'coach')
+      .is('club_id', null)
+      .order('full_name', { ascending: true });
+    if (error) throw error;
+    res.json(data);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// GET /api/admin/coaches - list coaches for the club (backwards compatibility)
+router.get('/coaches', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned' });
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'coach')
+      .eq('club_id', clubId);
+    if (error) throw error;
+    res.json(data);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// PUT /api/admin/coaches/:id/assign - assign coach to admin's club
+router.put('/coaches/:id/assign', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    const { id } = req.params;
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ club_id: clubId })
+      .eq('id', id)
+      .eq('role', 'coach')
+      .select()
+      .single();
+    
+    if (error) throw error;
+    res.json(data);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// PUT /api/admin/coaches/:id/unassign - remove coach from admin's club
+router.put('/coaches/:id/unassign', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    const { id } = req.params;
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ club_id: null })
+      .eq('id', id)
+      .eq('club_id', clubId) // Ensure they are unassigning from THEIR club
+      .select()
+      .single();
+    
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 router.post('/players', async (req, res) => {
   try {
     const { email, password, full_name, role } = req.body;
@@ -216,8 +301,19 @@ router.put('/players/:id', async (req, res) => {
 router.get('/competitions', async (req, res) => {
   try {
     const clubId = req.user?.club_id;
-    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
-    const { data, error } = await supabase.from('tournaments').select('*').eq('club_id', clubId);
+    const isSuperAdmin = ['superadmin', 'super admin', 'super_admin'].includes(req.user?.role?.toLowerCase());
+
+    let query = supabase.from('tournaments').select('*');
+    
+    if (isSuperAdmin) {
+      // Super admins see all
+    } else if (clubId) {
+      query = query.eq('club_id', clubId);
+    } else {
+      return res.status(403).json({ error: 'Access denied: No club assigned' });
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     res.json(data);
   } catch (error) { res.status(500).json({ error: error.message }); }

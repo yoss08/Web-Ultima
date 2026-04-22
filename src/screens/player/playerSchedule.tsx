@@ -25,6 +25,7 @@ interface CombinedEvent {
   time: string;
   subtitle: string;
   type: 'coach' | 'match';
+  status: string;
 }
 
 export function PlayerSchedule() {
@@ -59,15 +60,15 @@ export function PlayerSchedule() {
             id, 
             booking_date, 
             time_slot, 
+            status,
             courts(name)
           `)
           .eq('user_id', user.id)
-          .eq('status', 'confirmed')
           .gte('booking_date', new Date().toISOString().split('T')[0]);
 
         // Cast the data to our interfaces to resolve the "red error"
         const trainings = (trainingsData as unknown as TrainingSession[]) || [];
-        const matches = (matchesData as unknown as BookingMatch[]) || [];
+        const matches = (matchesData as unknown as any[]) || [];
 
         // 3. Merge and Normalize for the UI
         const combined: CombinedEvent[] = [
@@ -77,7 +78,8 @@ export function PlayerSchedule() {
             title: `Pro Training: ${t.session_type}`,
             time: new Date(t.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             subtitle: t.profiles?.full_name ? `Coach ${t.profiles.full_name}` : "Assigned Coach",
-            type: 'coach' as const
+            type: 'coach' as const,
+            status: 'scheduled'
           })),
           ...matches.map(m => ({
             id: m.id,
@@ -85,7 +87,8 @@ export function PlayerSchedule() {
             title: `Match @ ${m.courts?.name || 'Main Court'}`,
             time: m.time_slot,
             subtitle: "Court Reservation",
-            type: 'match' as const
+            type: 'match' as const,
+            status: m.status
           }))
         ];
 
@@ -145,7 +148,15 @@ export function PlayerSchedule() {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${item.type === 'coach' ? 'bg-accent' : 'bg-red-500'}`} />
+                {item.type === 'match' ? (
+                  <div className={`w-2.5 h-2.5 rounded-full ${
+                    item.status === 'pending' ? 'bg-yellow-500' :
+                    item.status === 'confirmed' || item.status === 'accepted' ? 'bg-emerald-500' :
+                    'bg-red-500'
+                  } ring-2 ring-background`} />
+                ) : (
+                  <div className="w-2.5 h-2.5 rounded-full bg-accent ring-2 ring-background" />
+                )}
                 <h4 className="font-black text-[15px] text-foreground truncate uppercase tracking-tight group-hover:text-accent transition-colors">
                   {item.title}
                 </h4>

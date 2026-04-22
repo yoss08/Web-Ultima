@@ -9,8 +9,11 @@ import {
   Loader2,
   RefreshCw,
   Zap,
-  Layout
+  Layout,
+  X,
+  Check
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { toast } from "react-hot-toast";
 
 interface Competition {
@@ -27,6 +30,14 @@ export function AdminCompetitionsPage() {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    type: "Elimination",
+    start_date: "",
+    end_date: "",
+  });
 
   const fetchCompetitions = async () => {
     try {
@@ -39,6 +50,33 @@ export function AdminCompetitionsPage() {
       toast.error(error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.start_date || !form.end_date) {
+      return toast.error("Please fill all required fields");
+    }
+
+    try {
+      setIsSaving(true);
+      const response = await fetch('/api/admin/competitions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, status: 'Upcoming' })
+      });
+
+      if (!response.ok) throw new Error("Failed to create competition");
+      
+      toast.success("Competition created successfully!");
+      setShowModal(false);
+      setForm({ name: "", type: "Elimination", start_date: "", end_date: "" });
+      fetchCompetitions();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -60,9 +98,72 @@ export function AdminCompetitionsPage() {
           >
             <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
           </button>
-          <button className="flex items-center gap-2 px-6 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20">
-            <Plus size={20} /> Create New
-          </button>
+          <Dialog open={showModal} onOpenChange={setShowModal}>
+            <DialogTrigger asChild>
+              <button className="flex items-center gap-2 px-6 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20">
+                <Plus size={20} /> Create New
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] bg-card border-border">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold font-['Playfair_Display']">New Competition</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4 mt-4 font-['Poppins']">
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Name *</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Format</label>
+                  <select
+                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  >
+                    <option value="Elimination">Single Elimination</option>
+                    <option value="Double Elimination">Double Elimination</option>
+                    <option value="Round Robin">Round Robin</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Start Date *</label>
+                    <input
+                      type="date"
+                      required
+                      className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                      value={form.start_date}
+                      onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">End Date *</label>
+                    <input
+                      type="date"
+                      required
+                      className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
+                      value={form.end_date}
+                      onChange={(e) => setForm({ ...form, end_date: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="w-full h-14 bg-accent text-accent-foreground font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-60"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" /> : <Check size={20} />}
+                  Create Tournament
+                </button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

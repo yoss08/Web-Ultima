@@ -42,7 +42,7 @@ export function SignUpPage() {
       {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
-        accountType: formData.accountType,
+        role: formData.accountType.toLowerCase() as any,
       }
     );
 

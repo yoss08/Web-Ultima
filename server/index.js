@@ -13,12 +13,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
 
 const httpServer = createServer(app);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('RELOADING SERVER AT ' + new Date().toISOString());
 });
 // Flexible CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URL 
@@ -95,6 +96,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'ULTIMA API is running' });
 });
 
+
 // Public Clubs Data
 app.get('/api/public/clubs', async (req, res) => {
   try {
@@ -136,7 +138,7 @@ app.get('/api/public/clubs/:id', async (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Protected Routes — require authentication + role
-app.use('/api/admin', requireAuth, requireRole('admin'), adminRoutes);
+app.use('/api/admin', requireAuth, requireRole('admin', 'superadmin', 'super admin', 'super_admin', 'coach'), adminRoutes);
 app.use('/api/coach', requireAuth, requireRole('coach', 'admin'), coachRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/competitions', requireAuth, competitionRoutes);

@@ -32,7 +32,7 @@ interface Booking {
   user_id: string;
   booking_date: string;
   time_slot: string;
-  status: "confirmed" | "cancelled" | "completed";
+  status: "pending" | "accepted" | "declined" | "confirmed" | "cancelled" | "completed";
   duration: number;
   player_count: number;
   notes: string;
@@ -306,9 +306,10 @@ export function CourtBooking() {
         {
           court_id: selectedCourt.id,
           user_id: user.id,
+          club_id: selectedClub.id,
           booking_date: selectedDate,
           time_slot: selectedSlot,
-          status: "confirmed",
+          status: "pending",
           duration,
           notes,
           total_price: totalPrice,
@@ -331,7 +332,7 @@ export function CourtBooking() {
         });
       }
 
-      toast.success("Spot secured! See you on the court. 🎾");
+      toast.success("Request sent! Waiting for club approval. 🎾");
       setSelectedSlot(null);
       setNotes("");
       setDiscountCode("");
@@ -379,10 +380,10 @@ export function CourtBooking() {
 
   const today = new Date().toISOString().split("T")[0];
   const upcomingBookings = myBookings.filter(
-    (b) => b.booking_date >= today && b.status === "confirmed"
+    (b) => b.booking_date >= today && (b.status === "confirmed" || b.status === "pending" || b.status === "accepted")
   );
   const pastBookings = myBookings.filter(
-    (b) => b.booking_date < today || b.status !== "confirmed"
+    (b) => b.booking_date < today || (b.status !== "confirmed" && b.status !== "pending" && b.status !== "accepted")
   );
 
 
@@ -881,12 +882,15 @@ export function CourtBooking() {
                         <p className="font-black text-foreground text-sm">{booking.time_slot}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Starts in</p>
-                        {countdown ? (
-                          <p className="font-black text-accent text-sm">{countdown}</p>
-                        ) : (
-                          <p className="font-black text-orange-400 text-sm">Starting soon</p>
-                        )}
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Status</p>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${
+                            booking.status === 'pending' ? 'bg-yellow-500' :
+                            booking.status === 'accepted' || booking.status === 'confirmed' ? 'bg-emerald-500' :
+                            'bg-red-500'
+                          }`} />
+                          <p className="font-black text-foreground text-[10px] uppercase">{booking.status}</p>
+                        </div>
                       </div>
                     </div>
 
@@ -971,11 +975,17 @@ export function CourtBooking() {
                     </div>
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-1">Status</p>
-                      <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                        booking.status === "cancelled"
+                      <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-2 ${
+                        booking.status === "cancelled" || booking.status === "declined"
                           ? "bg-red-500/10 text-red-400"
+                          : booking.status === "pending"
+                          ? "bg-yellow-500/10 text-yellow-500"
                           : "bg-accent/10 text-accent"
                       }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${
+                          booking.status === "cancelled" || booking.status === "declined" ? "bg-red-500" :
+                          booking.status === "pending" ? "bg-yellow-500" : "bg-accent"
+                        }`} />
                         {booking.status}
                       </span>
                     </div>

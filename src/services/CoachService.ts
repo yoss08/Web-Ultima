@@ -52,5 +52,23 @@ export const coachService = {
     });
     if (!response.ok) throw new Error('Failed to schedule session');
     return response.json();
+  },
+
+  // Récupérer les joueurs non assignés dans le même club
+  async getUnassignedPlayers(clubId: string) {
+    const response = await fetch(`${API_URL}/coach/unassigned-players?clubId=${clubId}`);
+    if (!response.ok) throw new Error('Failed to fetch unassigned players');
+    return response.json();
+  },
+
+  // Assigner un élève au coach
+  async addStudent(coachId: string, studentId: string) {
+    const response = await fetch(`${API_URL}/coach/students`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ coachId, studentId })
+    });
+    if (!response.ok) throw new Error('Failed to add student');
+    return response.json();
   }
 };

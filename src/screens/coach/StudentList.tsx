@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Search, User as UserIcon, Loader2, UserPlus, ArrowRight } from "lucide-react";
+import { Search, User as UserIcon, Loader2, UserPlus, ArrowRight, Plus } from "lucide-react";
 import { coachService } from "../../services/CoachService";
 import { useAuth } from "../../services/AuthContext";
 import { Link } from "react-router";
 import { useTheme } from "../../styles/useTheme";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
+import { toast } from "react-hot-toast";
 
 export function StudentList() {
   const { user } = useAuth();
@@ -11,23 +13,52 @@ export function StudentList() {
   const [students, setStudents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [unassignedPlayers, setUnassignedPlayers] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadStudents() {
-      if (user) {
-        try {
-          setIsLoading(true);
-          const data = await coachService.getMyStudents(user.id);
-          setStudents(data || []);
-        } catch (error) {
-          console.error("Error loading students:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    }
     loadStudents();
   }, [user]);
+
+  async function loadStudents() {
+    if (user) {
+      try {
+        setIsLoading(true);
+        const data = await coachService.getMyStudents(user.id);
+        setStudents(data || []);
+      } catch (error) {
+        console.error("Error loading students:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }
+
+  const loadUnassignedPlayers = async () => {
+    if (!user?.club_id) return;
+    try {
+      const data = await coachService.getUnassignedPlayers(user.club_id);
+      setUnassignedPlayers(data || []);
+    } catch (error) {
+      console.error("Error loading unassigned players:", error);
+    }
+  };
+
+  const handleAddStudent = async (studentId: string) => {
+    if (!user) return;
+    try {
+      setIsAdding(studentId);
+      await coachService.addStudent(user.id, studentId);
+      toast.success("Student added successfully!");
+      await loadStudents();
+      await loadUnassignedPlayers();
+    } catch (error) {
+      toast.error("Failed to add student");
+    } finally {
+      setIsAdding(null);
+    }
+  };
 
   // Filtrage dynamique des étudiants
   const filteredStudents = students.filter(s => 
@@ -59,6 +90,52 @@ export function StudentList() {
             <option value="intermediate">Intermediate</option>
             <option value="pro">Pro</option>
           </select>
+          <Dialog open={isModalOpen} onOpenChange={(open: boolean) => {
+            setIsModalOpen(open);
+            if (open) loadUnassignedPlayers();
+          }}>
+            <DialogTrigger asChild>
+              <button className="h-12 px-6 bg-accent text-accent-foreground font-bold rounded-[16px] hover:scale-105 transition-transform shadow-lg shadow-accent/20 flex items-center gap-2">
+                <UserPlus size={20} /> <span className="hidden sm:inline">Add Student</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] bg-card border-border">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold font-['Playfair_Display']">Add Student</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 mt-4 max-h-[400px] overflow-y-auto pr-2">
+                {unassignedPlayers.length > 0 ? (
+                  unassignedPlayers.map((player) => (
+                    <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                          {player.avatar_url ? (
+                            <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
+                          ) : (
+                            <UserIcon size={20} className="text-accent" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-foreground">{player.full_name}</p>
+                          <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleAddStudent(player.id)}
+                        disabled={isAdding === player.id}
+                        className="px-4 py-2 bg-accent text-accent-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2"
+                      >
+                        {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                        Add
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center py-10 text-muted-foreground italic">No unassigned players found in your club.</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -76,11 +153,54 @@ export function StudentList() {
           </div>
           <h2 className="text-2xl font-bold text-foreground">No Students Assigned</h2>
           <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-            You don't have any students linked to your profile yet. Please contact the administrator to assign players to your coaching dashboard.
+            You don't have any students linked to your profile yet. Add players to your coaching roster to start tracking their performance.
           </p>
-          <button className="mt-8 px-8 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20">
-            Contact Admin
-          </button>
+          <Dialog open={isModalOpen} onOpenChange={(open: boolean) => {
+            setIsModalOpen(open);
+            if (open) loadUnassignedPlayers();
+          }}>
+            <DialogTrigger asChild>
+              <button className="mt-8 px-8 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20 flex items-center gap-2 mx-auto">
+                <UserPlus size={20} /> Add Student
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] bg-card border-border">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold font-['Playfair_Display']">Add Student</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 mt-4 max-h-[400px] overflow-y-auto pr-2">
+                {unassignedPlayers.length > 0 ? (
+                  unassignedPlayers.map((player) => (
+                    <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                          {player.avatar_url ? (
+                            <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
+                          ) : (
+                            <UserIcon size={20} className="text-accent" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-foreground">{player.full_name}</p>
+                          <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleAddStudent(player.id)}
+                        disabled={isAdding === player.id}
+                        className="px-4 py-2 bg-accent text-accent-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2"
+                      >
+                        {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                        Add
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center py-10 text-muted-foreground italic">No unassigned players found in your club.</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       ) : (
         /* Grille des étudiants réels */

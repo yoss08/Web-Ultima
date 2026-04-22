@@ -23,7 +23,7 @@ interface Booking {
   court_id: string | number;
   start_time: string;
   end_time: string;
-  status: "pending" | "confirmed" | "cancelled";
+  status: "pending" | "accepted" | "declined" | "confirmed" | "cancelled";
   profiles?: { full_name: string };
   courts?: { name: string };
   match?: Match | null;
@@ -33,6 +33,19 @@ interface Match {
   id: string | number;
   booking_id: string | number;
   status: string;
+}
+
+function StatusDot({ status }: { status: string }) {
+  const colors: Record<string, string> = {
+    pending: "bg-yellow-500",
+    accepted: "bg-emerald-500",
+    confirmed: "bg-emerald-500",
+    declined: "bg-red-500",
+    cancelled: "bg-red-500",
+  };
+  return (
+    <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-gray-400"} ring-2 ring-background`} />
+  );
 }
 
 const STATUS_TABS = ["all", "pending", "confirmed", "cancelled"] as const;
@@ -46,7 +59,8 @@ export function AdminBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("pending");
+  const [activeTab, setActiveTab] = useState<string>("pending");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   const fetchBookings = async () => {
     if (!clubId) return;
@@ -273,7 +287,7 @@ export function AdminBookingsPage() {
                           <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
                             {booking.profiles?.full_name?.[0] ?? <User size={16} />}
                           </div>
-                          <span className="font-bold text-foreground text-sm font-['Poppins']">
+                           <span className="font-bold text-foreground text-sm font-['Poppins'] hover:text-accent cursor-pointer" onClick={() => setSelectedBooking(booking)}>
                             {booking.profiles?.full_name ?? "Unknown"}
                           </span>
                         </div>
@@ -304,18 +318,21 @@ export function AdminBookingsPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
-                            booking.status === "confirmed"
-                              ? "bg-emerald-400/10 text-emerald-400"
-                              : booking.status === "cancelled"
-                              ? "bg-red-500/10 text-red-500"
-                              : "bg-yellow-500/10 text-yellow-500"
-                          }`}
-                        >
-                          {booking.status}
-                        </span>
+                       <td className="px-6 py-5">
+                        <div className="flex items-center gap-2">
+                          <StatusDot status={booking.status} />
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
+                              booking.status === "confirmed" || booking.status === "accepted"
+                                ? "bg-emerald-400/10 text-emerald-400"
+                                : booking.status === "cancelled" || booking.status === "declined"
+                                ? "bg-red-500/10 text-red-500"
+                                : "bg-yellow-500/10 text-yellow-500"
+                            }`}
+                          >
+                            {booking.status === "confirmed" ? "Accepted" : booking.status === "cancelled" ? "Declined" : booking.status}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-5 text-right">
                         {isPending && (
@@ -367,6 +384,100 @@ export function AdminBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Booking Summary Modal */}
+      <AnimatePresence>
+        {selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-card border border-border w-full max-w-md rounded-[32px] p-8 shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-accent" />
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-foreground font-['Playfair_Display']">Booking Summary</h2>
+                <button onClick={() => setSelectedBooking(null)} className="text-muted-foreground hover:text-foreground">
+                  <XCircle size={24} />
+                </button>
+              </div>
+              
+              <div className="space-y-6 font-['Poppins']">
+                <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-2xl border border-border">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
+                    {selectedBooking.profiles?.full_name?.[0] || 'U'}
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Player</p>
+                    <p className="font-bold text-foreground">{selectedBooking.profiles?.full_name || 'Unknown'}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-muted/30 rounded-2xl border border-border">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Court</p>
+                    <div className="flex items-center gap-2 text-foreground font-bold">
+                      <MapPin size={14} className="text-accent" />
+                      {selectedBooking.courts?.name}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-2xl border border-border">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Status</p>
+                    <div className="flex items-center gap-2 text-foreground font-bold capitalize">
+                      <StatusDot status={selectedBooking.status} />
+                      {selectedBooking.status}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-2xl border border-border space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CalendarIcon size={14} /> Date
+                    </div>
+                    <p className="font-bold text-foreground">{new Date(selectedBooking.start_time).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock size={14} /> Time Slot
+                    </div>
+                    <p className="font-bold text-foreground">
+                      {new Date(selectedBooking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(selectedBooking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  {selectedBooking.status === 'pending' ? (
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => { handleAccept(selectedBooking.id); setSelectedBooking(null); }}
+                        className="flex-1 py-4 bg-accent text-accent-foreground rounded-2xl font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle2 size={18} /> Accept
+                      </button>
+                      <button 
+                        onClick={() => { handleReject(selectedBooking.id); setSelectedBooking(null); }}
+                        className="flex-1 py-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <XCircle size={18} /> Decline
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => setSelectedBooking(null)}
+                      className="w-full py-4 bg-muted text-foreground rounded-2xl font-bold hover:bg-muted/80 transition-all"
+                    >
+                      Close Summary
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
