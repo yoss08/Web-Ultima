@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase';
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || '/api';
-// All Express routes are mounted at /api/admin — always include that prefix.
+const API_URL = (import.meta as any).env?.VITE_API_URL || '';
+// All Express routes are mounted at /api — always include that prefix.
 const ADMIN_API = `${API_URL}/api/admin`;
 
 /**

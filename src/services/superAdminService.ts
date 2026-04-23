@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || '/api';
+const API_URL = (import.meta as any).env?.VITE_API_URL || '';
 
 /**
  * Returns the Authorization header for the current Supabase session.

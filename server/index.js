@@ -12,15 +12,19 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const app = express();
-const PORT = 3002;
+export const app = express();
+const PORT = process.env.PORT || 3002;
 
 const httpServer = createServer(app);
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('RELOADING SERVER AT ' + new Date().toISOString());
-});
+// Only listen if this file is run directly (not imported as a module)
+if (process.env.NODE_ENV !== 'production' || process.argv[1]?.includes('server/index.js')) {
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log('RELOADING SERVER AT ' + new Date().toISOString());
+  });
+}
+
 // Flexible CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URL 
   ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) 
