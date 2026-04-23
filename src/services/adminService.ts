@@ -1,8 +1,5 @@
 import { supabase } from '../config/supabase';
-
-const API_URL = (import.meta as any).env?.VITE_API_URL || '';
-// All Express routes are mounted at /api — always include that prefix.
-const ADMIN_API = `${API_URL}/api/admin`;
+import { ADMIN_API } from '../config/apiConfig';
 
 /**
  * Attaches the current Supabase session token to every fetch request.

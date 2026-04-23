@@ -1,17 +1,24 @@
 import { io, Socket } from 'socket.io-client';
 
+import { API_URL } from '../config/apiConfig';
+
 const getSocketURL = () => {
-  if ((import.meta as any).env?.VITE_API_URL) return (import.meta as any).env.VITE_API_URL;
+  // If API_URL is set (even if empty string for relative paths), use it.
+  // But for WebSockets, we need a full URL. If it's empty, we assume current host.
+  if (API_URL) return API_URL;
   
-  // Smart fallback: If on frontend.com, assume backend is at frontend.com:3001 or use current domain
   if (typeof window !== 'undefined') {
     const { protocol, hostname } = window.location;
-    // Common pattern: if on local, use 3001. If on production/vercel, you should set VITE_API_URL.
-    // For now, let's keep it robust for local dev without env vars.
+    // For Vercel, if API_URL is empty, we assume the backend is on the same host but maybe different port for local dev
+    // If hostname is not localhost, it's production - use current domain with ws/wss
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return `${protocol}//${hostname}`;
+    }
     return `${protocol}//${hostname}:3001`;
   }
   return 'http://localhost:3001';
 };
+
 
 const URL = getSocketURL();
 

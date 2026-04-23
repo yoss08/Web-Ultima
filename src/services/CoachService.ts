@@ -1,4 +1,4 @@
-const API_URL = (import.meta as any).env?.VITE_API_URL || '/api';
+import { COACH_API as API_URL } from '../config/apiConfig';
 
 export const coachService = {
   // Récupérer les statistiques du dashboard
