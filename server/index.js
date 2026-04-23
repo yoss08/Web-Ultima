@@ -2,7 +2,6 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,7 +9,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Load .env only in local development (Vercel injects env vars automatically)
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    const { default: dotenv } = await import('dotenv');
+    dotenv.config({ path: path.join(__dirname, '../.env') });
+  } catch {}
+}
 
 export const app = express();
 const PORT = process.env.PORT || 3002;
