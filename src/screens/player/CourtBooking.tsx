@@ -148,6 +148,14 @@ export function CourtBooking() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [qrBooking, setQrBooking] = useState<Booking | null>(null);
 
+  // ── Email OTP Verification ──
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [otpCountdown, setOtpCountdown] = useState(0);
+
   // ── Computed ──
   const basePricePerSlot = selectedClub?.price_per_court || PRICE_PER_SLOT;
   const basePrice = basePricePerSlot * duration;
@@ -293,15 +301,62 @@ export function CourtBooking() {
     }
   };
 
-  const handleConfirmBooking = async () => {
+  // ─── Step 1: validate form & send OTP ──────────────────────────────────
+  const handleRequestOtp = async () => {
     if (!user || !selectedCourt || !selectedSlot)
       return toast.error("Please select a court and time slot");
-
     if (selectedCourt.status === "maintenance")
       return toast.error("This court is under maintenance");
 
-    setBookingLoading(true);
+    setShowOtpModal(true);
+    setOtpSent(false);
+    setOtpCode("");
+    setOtpError("");
+
+    // Send OTP to the user's email via Supabase Auth
+    setOtpLoading(true);
     try {
+      const email = user.email!;
+      const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+      if (error) throw error;
+      setOtpSent(true);
+      // 60-second cooldown before allowing resend
+      setOtpCountdown(60);
+      const interval = setInterval(() => {
+        setOtpCountdown((c) => {
+          if (c <= 1) { clearInterval(interval); return 0; }
+          return c - 1;
+        });
+      }, 1000);
+      toast.success(`Verification code sent to ${email}`);
+    } catch (err: any) {
+      setOtpError(err.message || "Failed to send verification code");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // ─── Step 2: verify OTP & create booking ───────────────────────────────
+  const handleConfirmBooking = async () => {
+    if (!user || !selectedCourt || !selectedSlot) return;
+    if (!otpCode.trim() || otpCode.length < 6)
+      return setOtpError("Please enter the 6-digit code from your email");
+
+    setBookingLoading(true);
+    setOtpError("");
+    try {
+      // Verify the OTP
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: user.email!,
+        token: otpCode.trim(),
+        type: "email",
+      });
+      if (verifyError) {
+        setOtpError("Invalid or expired code. Please try again.");
+        setBookingLoading(false);
+        return;
+      }
+
       const { data: bookingData, error: bookingError } = await supabase.from("bookings").insert([
         {
           court_id: selectedCourt.id,
@@ -333,13 +388,16 @@ export function CourtBooking() {
       }
 
       toast.success("Request sent! Waiting for club approval. 🎾");
+      setShowOtpModal(false);
+      setOtpCode("");
+      setOtpSent(false);
       setSelectedSlot(null);
       setNotes("");
       setDiscountCode("");
       setAppliedDiscount(0);
       setActiveTab("upcoming");
     } catch (err: any) {
-      toast.error(err.message || "Booking failed");
+      setOtpError(err.message || "Booking failed. Please try again.");
     } finally {
       setBookingLoading(false);
     }
@@ -799,7 +857,7 @@ export function CourtBooking() {
                       </div>
 
                       <button
-                        onClick={handleConfirmBooking}
+                        onClick={handleRequestOtp}
                         disabled={!selectedSlot || !selectedCourt || bookingLoading}
                         className="w-full h-16 bg-accent text-accent-foreground font-black rounded-2xl shadow-xl shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
                       >
@@ -807,7 +865,8 @@ export function CourtBooking() {
                           <Loader2 className="animate-spin" size={20} />
                         ) : (
                           <>
-                            <span>CONFIRM BOOKING</span>
+                            <ShieldCheck size={20} />
+                            <span>VERIFY &amp; CONFIRM</span>
                             <ChevronRight size={20} />
                           </>
                         )}
@@ -1043,6 +1102,105 @@ export function CourtBooking() {
                 className="w-full h-12 bg-accent text-accent-foreground font-black rounded-2xl text-sm hover:scale-[1.02] active:scale-95 transition-all"
               >
                 Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ════ EMAIL OTP VERIFICATION MODAL ════ */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <motion.div
+            key="otp-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) { setShowOtpModal(false); setOtpError(""); } }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 20 }}
+              transition={{ type: "spring", bounce: 0.25, duration: 0.4 }}
+              className="relative bg-card border border-border rounded-[32px] p-8 w-full max-w-md shadow-2xl overflow-hidden"
+            >
+              {/* accent bar */}
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-accent" />
+
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck className="text-accent" size={32} />
+                </div>
+                <h2 className="text-2xl font-black text-foreground font-['Playfair_Display'] mb-2">
+                  Verify Your Email
+                </h2>
+                <p className="text-sm text-muted-foreground font-['Poppins']">
+                  {otpSent
+                    ? <>We sent a 6-digit code to <span className="text-accent font-bold">{user?.email}</span></>
+                    : "Sending verification code…"}
+                </p>
+              </div>
+
+              {otpLoading && !otpSent && (
+                <div className="flex justify-center mb-6">
+                  <Loader2 className="animate-spin text-accent" size={32} />
+                </div>
+              )}
+
+              {otpSent && (
+                <div className="space-y-5">
+                  {/* 6-digit input */}
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 font-['Poppins']">
+                      Enter 6-digit code
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, "")); setOtpError(""); }}
+                      placeholder="000000"
+                      className="w-full h-16 px-6 bg-muted rounded-2xl text-center text-3xl font-black tracking-[0.5em] outline-none focus:ring-2 ring-accent/50 transition-all text-foreground border border-border"
+                      autoFocus
+                    />
+                    {otpError && (
+                      <p className="mt-2 text-xs text-red-500 font-bold font-['Poppins'] flex items-center gap-1">
+                        <XCircle size={12} /> {otpError}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Confirm button */}
+                  <button
+                    onClick={handleConfirmBooking}
+                    disabled={bookingLoading || otpCode.length < 6}
+                    className="w-full h-14 bg-accent text-accent-foreground font-black rounded-2xl shadow-lg shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 font-['Poppins']"
+                  >
+                    {bookingLoading ? <Loader2 className="animate-spin" size={20} /> : <><CheckCircle2 size={18} /> Confirm Booking</>}
+                  </button>
+
+                  {/* Resend */}
+                  <div className="text-center">
+                    <button
+                      onClick={handleRequestOtp}
+                      disabled={otpCountdown > 0 || otpLoading}
+                      className="text-xs font-bold text-accent hover:underline disabled:text-muted-foreground disabled:no-underline disabled:cursor-not-allowed font-['Poppins'] transition-colors"
+                    >
+                      {otpCountdown > 0 ? `Resend code in ${otpCountdown}s` : "Resend code"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Cancel */}
+              <button
+                onClick={() => { setShowOtpModal(false); setOtpError(""); setOtpCode(""); }}
+                className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <XCircle size={20} />
               </button>
             </motion.div>
           </motion.div>

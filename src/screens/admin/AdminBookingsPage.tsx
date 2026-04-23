@@ -50,7 +50,14 @@ function StatusDot({ status }: { status: string }) {
   );
 }
 
-const STATUS_TABS = ["all", "pending", "confirmed", "cancelled"] as const;
+const STATUS_TABS = ["all", "pending", "confirmed", "declined", "cancelled"] as const;
+
+// 'confirmed' and 'accepted' are the same — normalize for display
+function normalizeStatus(status: string) {
+  if (status === "accepted") return "confirmed";
+  if (status === "declined") return "declined";
+  return status;
+}
 
 export function AdminBookingsPage() {
   const { user } = useAuth();
@@ -174,11 +181,16 @@ export function AdminBookingsPage() {
     const matchesSearch =
       b.profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.courts?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === "all" || b.status === activeTab;
+    const normalized = normalizeStatus(b.status);
+    const matchesTab = activeTab === "all" || normalized === activeTab;
     return matchesSearch && matchesTab;
   });
 
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
+  const tabCount = (tab: string) =>
+    tab === "all"
+      ? bookings.length
+      : bookings.filter((b) => normalizeStatus(b.status) === tab).length;
 
   if (!clubId) {
     return (
@@ -229,7 +241,7 @@ export function AdminBookingsPage() {
         {/* Status Tabs */}
         <div className="flex gap-1 p-1 bg-muted rounded-xl">
           {STATUS_TABS.map((tab) => {
-            const count = tab === "all" ? bookings.length : bookings.filter((b) => b.status === tab).length;
+            const count = tabCount(tab);
             return (
               <button
                 key={tab}
@@ -353,14 +365,14 @@ export function AdminBookingsPage() {
                           <StatusDot status={booking.status} />
                           <span
                             className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
-                              booking.status === "confirmed" || booking.status === "accepted"
+                              normalizeStatus(booking.status) === "confirmed"
                                 ? "bg-emerald-400/10 text-emerald-400"
-                                : booking.status === "cancelled" || booking.status === "declined"
+                                : normalizeStatus(booking.status) === "cancelled" || normalizeStatus(booking.status) === "declined"
                                 ? "bg-red-500/10 text-red-500"
                                 : "bg-yellow-500/10 text-yellow-500"
                             }`}
                           >
-                            {booking.status === "confirmed" ? "Accepted" : booking.status === "cancelled" ? "Declined" : booking.status}
+                             {normalizeStatus(booking.status) === "confirmed" ? "Accepted" : normalizeStatus(booking.status) === "cancelled" ? "Declined" : booking.status}
                           </span>
                         </div>
                       </td>
@@ -389,7 +401,7 @@ export function AdminBookingsPage() {
                             </button>
                           </div>
                         )}
-                        {booking.status === "confirmed" && (
+                        {(booking.status === "confirmed" || booking.status === "accepted") && (
                           <div className="flex justify-end gap-2">
                             {booking.match ? (
                               <span className="px-3 py-2 bg-blue-400/10 text-blue-400 rounded-xl text-xs font-bold font-['Poppins']">Match started</span>
