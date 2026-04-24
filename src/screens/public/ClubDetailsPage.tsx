@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
  import {Phone, Calendar, Clock, MapPin, Star, Users, CheckCircle2, ChevronLeft, Shield, Sun, Moon, Trophy,
   Loader2, CalendarDays, XCircle, Grid3X3, Layers, ChevronRight, Info
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useTheme } from "../../styles/useTheme";
 import { supabase } from "../../config/supabase";
 import { CourtCard } from "../../components/dashboard/CourtCard";
@@ -55,6 +56,13 @@ export function ClubDetailsPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const otpInterval = useRef<number | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -92,6 +100,14 @@ export function ClubDetailsPage() {
     }
   }, [id]);
 
+  useEffect(() => {
+    return () => {
+      if (otpInterval.current) {
+        window.clearInterval(otpInterval.current);
+      }
+    };
+  }, []);
+
   if (loading || !displayClub) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -106,42 +122,114 @@ export function ClubDetailsPage() {
   const basePricePerSession = displayClub.price;
   const totalPrice = basePricePerSession * selectedDuration;
 
-  const handleBook = async () => {
+  const startOtpTimer = () => {
+    setOtpCountdown(60);
+    if (otpInterval.current) {
+      window.clearInterval(otpInterval.current);
+    }
+    otpInterval.current = window.setInterval(() => {
+      setOtpCountdown((current) => {
+        if (current <= 1) {
+          if (otpInterval.current) {
+            window.clearInterval(otpInterval.current);
+            otpInterval.current = null;
+          }
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+  };
+
+  const handleSendOtp = async () => {
     if (!formData.name || !formData.email || !formData.phone) {
-      alert("Please fill in your contact information first.");
+      toast.error("Please fill in your contact information first.");
       return;
     }
-    
-    setIsSubmitting(true);
-    
+    if (!selectedCourt || !selectedTime) {
+      toast.error("Please choose a court and a time slot.");
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError("");
+
     try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: formData.email,
+        options: { shouldCreateUser: true },
+      });
+      if (error) throw error;
+
+      setOtpSent(true);
+      setShowOtpModal(true);
+      startOtpTimer();
+      toast.success(`Verification code sent to ${formData.email}`);
+    } catch (err: any) {
+      setOtpError(err.message || "Failed to send verification code.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!otpCode.trim() || otpCode.length < 6) {
+      setOtpError("Please enter the 6-digit code sent to your email.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setOtpError("");
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: formData.email,
+        token: otpCode.trim(),
+        type: 'email',
+      });
+      if (verifyError) {
+        setOtpError("Invalid or expired code. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.warn('Unable to resolve user after OTP verification', userError);
+      }
+
       const { error } = await supabase.from('bookings').insert([
         {
           full_name: formData.name,
           email: formData.email,
           phone: formData.phone,
+          user_id: userData?.user?.id || null,
           club_id: displayClub.id,
           court_id: selectedCourt,
           booking_date: selectedDate,
           time_slot: selectedTimeObj?.time || '',
           duration: selectedDurObj?.value || 1,
           total_price: totalPrice,
-          status: 'pending'
+          status: 'pending',
         }
       ]);
 
       if (error) {
         console.error('Supabase error:', error);
-        alert("Failed to confirm booking. Please try again.");
+        setOtpError("Failed to create booking. Please try again.");
         return;
       }
 
-      alert("Booking Confirmed!");
+      toast.success("Booking confirmed — awaiting club approval.");
+      setShowOtpModal(false);
+      setOtpCode("");
+      setOtpSent(false);
+      setSelectedTime(null);
+      setSelectedDuration(1);
+      setIsSubmitting(false);
       navigate('/booking');
-    } catch (err) {
-      console.error('Error creating booking:', err);
-      alert("Failed to confirm booking. Please try again.");
-    } finally {
+    } catch (err: any) {
+      setOtpError(err.message || "Booking failed. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -535,7 +623,7 @@ export function ClubDetailsPage() {
 
                         <div className="mt-8 border-t border-accent/20 pt-6">
                           <button
-                            onClick={handleBook}
+                            onClick={handleSendOtp}
                             disabled={!selectedCourt || !selectedTime || isSubmitting}
                             className={`w-full py-4 rounded-xl font-semibold text-[17px] transition-all flex items-center justify-center gap-2 ${
                               selectedCourt && selectedTime && !isSubmitting
@@ -544,13 +632,14 @@ export function ClubDetailsPage() {
                             }`}
                           >
                             {isSubmitting ? (
-                              <span className="flex items-center gap-2">
-                                 <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                                 Processing...
-                              </span>
-                            ) : (
-                              `CONFIRM BOOKING`
-                            )}
+                              <Loader2 className="animate-spin" size={20} />
+                        ) : (
+                          <>
+                            <CheckCircle2 size={20} />
+                            <span>VERIFY & BOOK</span>
+                            <ChevronRight size={20} />
+                          </>
+                        )}
                           </button>
                           <p className="text-center text-xs text-muted-foreground mt-4 leading-relaxed">
                             Cancellations must be made at least 24 hours in advance.
@@ -570,6 +659,103 @@ export function ClubDetailsPage() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showOtpModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowOtpModal(false);
+                setOtpError('');
+              }
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.96, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.96, y: 20, opacity: 0 }}
+              transition={{ type: 'spring', bounce: 0.25, duration: 0.35 }}
+              className="relative w-full max-w-md rounded-[32px] bg-card border border-border p-8 shadow-2xl"
+            >
+              <div className="absolute top-0 left-0 h-1.5 w-full bg-accent rounded-t-[32px]" />
+              <div className="text-center mb-8">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-accent/10 text-accent">
+                  <Shield size={32} />
+                </div>
+                <h2 className="text-2xl font-black text-foreground mb-2">Verify Your Email</h2>
+                <p className="text-sm text-muted-foreground">
+                  {otpSent ? (
+                    <>Enter the 6-digit code sent to <span className="font-bold text-accent">{formData.email}</span></>
+                  ) : (
+                    'Sending your verification code...'
+                  )}
+                </p>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
+                    Verification Code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => {
+                      setOtpCode(e.target.value.replace(/\D/g, '')); 
+                      setOtpError('');
+                    }}
+                    className="w-full h-16 rounded-3xl border border-border bg-muted px-6 text-center text-3xl font-black tracking-[0.4em] outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+                    placeholder="000000"
+                    autoFocus
+                  />
+                  {otpError && (
+                    <p className="mt-3 text-xs text-red-500 font-bold flex items-center gap-2">
+                      <XCircle size={14} /> {otpError}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleConfirmBooking}
+                  disabled={isSubmitting || otpCode.length !== 6}
+                  className="w-full h-14 rounded-3xl bg-accent text-accent-foreground font-black shadow-lg shadow-accent/20 transition-all hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Confirming...' : 'Confirm Booking'}
+                </button>
+
+                <div className="flex flex-col gap-3 text-center">
+                  <button
+                    onClick={handleSendOtp}
+                    disabled={otpCountdown > 0 || otpLoading}
+                    className="text-xs font-bold text-accent hover:underline disabled:text-muted-foreground disabled:no-underline disabled:cursor-not-allowed"
+                  >
+                    {otpCountdown > 0 ? `Resend code in ${otpCountdown}s` : 'Resend code'}
+                  </button>
+                  {otpLoading && (
+                    <span className="text-xs text-muted-foreground">Sending verification code…</span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowOtpModal(false);
+                  setOtpError('');
+                }}
+                className="absolute right-5 top-5 text-muted-foreground hover:text-foreground"
+              >
+                <XCircle size={20} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

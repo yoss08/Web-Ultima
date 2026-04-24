@@ -122,35 +122,34 @@ export function AlmusPage() {
   ];
 
   const handleContactClick = () => {
-  toast.custom((t) => (
-    <div className="bg-white dark:bg-[#0F1425] border border-gray-200 dark:border-white/10 p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 dark:text-white font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
-        <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
-      </div>
-      
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[#00E5FF]/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-blue-500 dark:text-[#00E5FF]" />
-          </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-card border border-gray-200 dark:border-border p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-foreground font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
+          <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          <span className="text-gray-700 dark:text-white/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
-        </div>
-      </div>
-    </div>
-  ), {
-    duration: 5000,
-    position: 'bottom-right',
-  });
-};
 
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-accent" />
+            </div>
+            <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 text-accent" />
+            </div>
+            <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      position: 'bottom-right',
+    });
+  };
   const { user } = useAuth();
   return (
     <div className="min-h-screen overflow-x-hidden bg-background transition-colors duration-300">
@@ -247,11 +246,10 @@ export function AlmusPage() {
   </div>
 </section>
       {/* Hydration Solution Section */}
-      <section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Background Blurs matching the new aesthetic */}
-        <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
-
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-[1096px] mx-auto px-4 sm:px-10 lg:px-20 relative">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -307,10 +305,10 @@ export function AlmusPage() {
       </section>
 
 {/* Why Choose ALMUS Section */}
-      <section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Background Blurs matching the new aesthetic */}
-        <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
-        <div className="absolute bg-emerald-400/10 dark:bg-[rgba(57,255,20,0.03)] blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
 
         <div className="max-w-[1096px] mx-auto px-4 sm:px-10 lg:px-14 relative">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
@@ -369,8 +367,8 @@ export function AlmusPage() {
       </section>
 
       {/* Flavored Hydration Options  */}
-<section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
-<div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
+<section className="relative min-h-[70vh] py-24 bg-gray-50 dark:bg-background transition-colors duration-300">
+<div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[365.33px] rounded-full w-[500px] h-[500px] top-[181.02px]" />
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-16">
       <motion.h2
@@ -420,8 +418,8 @@ export function AlmusPage() {
 </section>
 
       {/* How It Works Section */}
-<section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 bg-white dark:bg-[#060910] transition-colors duration-300">
-      <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[298px] rounded-full w-[500px] h-[500px] top-[145.39px]" />
+<section className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 bg-white dark:bg-background transition-colors duration-300">
+      <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[298px] rounded-full w-[500px] h-[500px] top-[145.39px]" />
   <div className="max-w-[936px] mx-auto px-6 relative text-center">
     <motion.h2
       initial={{ opacity: 0, y: 20 }}
@@ -487,9 +485,10 @@ export function AlmusPage() {
 
 
       {/* Bring ALMUS to Your Facility Section */}
-      <section id="almus-cta" className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section id="almus-cta" className="relative min-h-[70vh] pt-20 md:pt-32 pb-16 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Background Blurs matching the new aesthetic */}
-        <div className="absolute bg-blue-400/10 dark:bg-[rgba(0,229,255,0.05)] blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
+        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
 
         <div className="max-w-[798px] mx-auto px-6 relative text-center">
           <motion.h2

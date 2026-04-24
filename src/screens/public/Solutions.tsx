@@ -111,7 +111,7 @@ export function Solutions() {
     <div className="min-h-screen bg-gray-50 dark:bg-background transition-colors duration-300">
       <Navigation />
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] pt-24 pb-12 sm:pt-32 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative min-h-[70vh] pt-24 pb-12 sm:pt-32 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Background Blurs matching the new aesthetic */}
         <div className="absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] top-[10%]" />
         <div className="absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] top-[20%]" />
@@ -229,7 +229,7 @@ export function Solutions() {
       </section>
 
       {/* Industries Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Refined Center Glow */}
         <div className="absolute bg-accent/10 blur-[120px] left-1/2 -translate-x-1/2 rounded-full w-[600px] h-[600px] top-0" />
 
@@ -271,7 +271,7 @@ export function Solutions() {
       </section>
 
       {/* CTA Section */}
-      <section id="solution-cta" className="relative py-20 sm:py-24 md:py-32 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section id="solution-cta" className="relative py-20 sm:py-24 md:py-32 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         {/* Subtle Glow to lift the CTA */}
         <div className="absolute bg-accent/10 blur-[150px] left-1/2 -translate-x-1/2 rounded-full w-[500px] h-[500px] -top-20" />
 

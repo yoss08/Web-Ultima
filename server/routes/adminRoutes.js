@@ -301,13 +301,19 @@ router.put('/players/:id', async (req, res) => {
 router.get('/competitions', async (req, res) => {
   try {
     const clubId = req.user?.club_id;
+    const requestedClubId = req.query.club_id || req.query.clubId;
     const isSuperAdmin = ['superadmin', 'super admin', 'super_admin'].includes(req.user?.role?.toLowerCase());
 
     let query = supabase.from('tournaments').select('*');
-    
+
     if (isSuperAdmin) {
-      // Super admins see all
+      if (requestedClubId) {
+        query = query.eq('club_id', requestedClubId);
+      }
     } else if (clubId) {
+      if (requestedClubId && String(requestedClubId) !== String(clubId)) {
+        return res.status(403).json({ error: 'Access denied: club_id mismatch' });
+      }
       query = query.eq('club_id', clubId);
     } else {
       return res.status(403).json({ error: 'Access denied: No club assigned' });

@@ -159,36 +159,35 @@ export function SummaPage() {
     },
   ];
 
-  const handleContactClick = () => {
-  toast.custom((t) => (
-    <div className="bg-white dark:bg-card border border-gray-200 dark:border-border p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 dark:text-foreground font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
-        <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
-      </div>
-      
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-            <Phone className="w-4 h-4 text-accent" />
-          </div>
-          <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
+ const handleContactClick = () => {
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-card border border-gray-200 dark:border-border p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-foreground font-['Poppins'] text-[16px] sm:text-[18px]">Contact Details</h3>
+          <button onClick={() => toast.dismiss(t)} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-accent" />
-          </div>
-          <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
-        </div>
-      </div>
-    </div>
-  ), {
-    duration: 5000,
-    position: 'bottom-right',
-  });
-};
 
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+              <Phone className="w-4 h-4 text-accent" />
+            </div>
+            <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">+216 99 799 368</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 text-accent" />
+            </div>
+            <span className="text-gray-700 dark:text-foreground/80 font-medium text-sm sm:text-base break-all">Ultima.contacus@gmail.com</span>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      position: 'bottom-right',
+    });
+  };
   const { user } = useAuth();
   return (
     <div className="min-h-screen bg-white dark:bg-background transition-colors duration-300">
@@ -196,7 +195,7 @@ export function SummaPage() {
       <Navigation />
       
 {/* Hero Section */}
-      <section className="relative min-h-[70vh] pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative min-h-[70vh] pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
        <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
        <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-[1200px] mx-auto w-full px-4 sm:px-6 md:px-8 lg:px-12 pb-12 sm:pb-16 relative z-10">
@@ -261,7 +260,7 @@ export function SummaPage() {
       </section>
 
       {/* Key Metrics Section */}
-      <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-4 sm:px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-4 sm:px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
@@ -292,7 +291,7 @@ export function SummaPage() {
 
 
       {/* What Is Summa Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
@@ -357,7 +356,7 @@ export function SummaPage() {
       </section>
 
       {/* Core Features Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
@@ -408,7 +407,7 @@ export function SummaPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-6xl mx-auto relative z-10">
@@ -461,7 +460,7 @@ export function SummaPage() {
         </div>
       </section>
        {/* Interfaces & Platforms Section */}
-<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
   <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
   <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
@@ -519,7 +518,7 @@ export function SummaPage() {
 </section>
      
       {/* Why Choose Summa Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-7xl mx-auto relative z-10">
@@ -602,7 +601,7 @@ export function SummaPage() {
         </div>
       </section>
       {/* Where Summa Fits Section */}
-<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+<section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
   <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
   <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
   <div className="max-w-7xl mx-auto relative z-10">
@@ -650,7 +649,7 @@ export function SummaPage() {
   </div>
 </section>
       {/* Ultima Ecosystem Section */}
-      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300">
+      <section className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300">
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />
         <div className="max-w-5xl mx-auto relative z-10">
@@ -737,7 +736,7 @@ export function SummaPage() {
       {/* Final CTA Section */}
       <section
         id="summa-cta"
-        className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-[#060910] transition-colors duration-300"
+        className="relative py-16 sm:py-20 md:py-24 px-6 lg:px-20 overflow-hidden bg-gray-50 dark:bg-background transition-colors duration-300"
       >
         <div className="hidden md:block absolute bg-accent/10 blur-[120px] left-[15%] rounded-full w-[500px] h-[500px] top-[10%]" />
         <div className="hidden md:block absolute bg-accent/5 blur-[120px] right-[15%] rounded-full w-[500px] h-[500px] top-[20%]" />

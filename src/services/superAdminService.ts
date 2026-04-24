@@ -121,10 +121,17 @@ export const superAdminService = {
 
   // ─── USERS ──────────────────────────────────────────────────
 
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+  const { error } = await supabase
+    .from("profiles")        // replace with your actual table name
+    .update({ is_banned: isBanned })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
+},
   async getAllUsers() {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, email, role, club_id, created_at, phone')
+      .select('id, full_name, email, role, club_id, created_at, phone, is_banned')
       .order('created_at', { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];

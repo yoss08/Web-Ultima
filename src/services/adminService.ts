@@ -118,13 +118,27 @@ export const adminService = {
 
     if (error) throw error;
 
-    // Send notification
-    await supabase.from('notifications').insert([{
-      user_id: data.user_id,
-      type: 'booking_update',
+    const notificationPayload = {
+      email: data.email,
+      booking_date: data.booking_date,
+      time_slot: data.time_slot,
+      status: 'ACCEPTED',
       message: `Your booking for ${data.booking_date} at ${data.time_slot} has been ACCEPTED.`,
-      read: false
-    }]);
+    };
+
+    if (data.user_id) {
+      await supabase.from('notifications').insert([{
+        user_id: data.user_id,
+        type: 'booking_update',
+        message: notificationPayload.message,
+        read: false,
+      }]);
+    } else if (data.email) {
+      const { error: emailError } = await supabase.functions.invoke('send-booking-status-email', {
+        body: JSON.stringify(notificationPayload),
+      });
+      if (emailError) console.warn('Booking acceptance email failed:', emailError);
+    }
 
     return data;
   },
@@ -132,20 +146,34 @@ export const adminService = {
   async rejectBooking(bookingId: string | number) {
     const { data, error } = await supabase
       .from('bookings')
-      .update({ status: 'cancelled' })
+      .update({ status: 'declined' })
       .eq('id', bookingId)
       .select()
       .single();
 
     if (error) throw error;
 
-    // Send notification
-    await supabase.from('notifications').insert([{
-      user_id: data.user_id,
-      type: 'booking_update',
+    const notificationPayload = {
+      email: data.email,
+      booking_date: data.booking_date,
+      time_slot: data.time_slot,
+      status: 'DECLINED',
       message: `Your booking for ${data.booking_date} at ${data.time_slot} has been DECLINED.`,
-      read: false
-    }]);
+    };
+
+    if (data.user_id) {
+      await supabase.from('notifications').insert([{
+        user_id: data.user_id,
+        type: 'booking_update',
+        message: notificationPayload.message,
+        read: false,
+      }]);
+    } else if (data.email) {
+      const { error: emailError } = await supabase.functions.invoke('send-booking-status-email', {
+        body: JSON.stringify(notificationPayload),
+      });
+      if (emailError) console.warn('Booking decline email failed:', emailError);
+    }
 
     return data;
   },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Clock, Loader2, Activity, Zap, ChevronRight, X, Calendar, Search, Filter, ArrowUpDown } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, Activity, Zap, ChevronRight, X, Calendar, Search, Filter, ArrowUpDown, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
@@ -98,7 +98,11 @@ export function Matches() {
       <div className="grid gap-4">
         <AnimatePresence mode="popLayout">
           {filteredMatches.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-20 text-center opacity-30 italic">No matches match your filters.</motion.div>
+            <div className="text-center py-32 bg-card rounded-[40px] border-2 border-dashed border-border">
+          <AlertCircle className="mx-auto mb-6 opacity-10" size={64} />
+          <h3 className="text-2xl font-black opacity-40 tracking-tighter uppercase text-foreground">No Matches Found</h3>
+          <p className="text-sm font-medium opacity-30 mt-2 text-foreground">Book court or check back later.</p>
+        </div>
           ) : filteredMatches.map((match) => (
             <motion.div 
               layout

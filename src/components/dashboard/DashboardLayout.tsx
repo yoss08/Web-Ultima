@@ -81,7 +81,7 @@ export function DashboardLayout() {
           },
           {
             icon: Trophy,
-            label: "Matches & Competitions",
+            label: "Matches ",
             path: "/dashboard/superadmin/matches",
           },
           {
@@ -109,6 +109,11 @@ export function DashboardLayout() {
             icon: Grid3X3,
             label: "Court Management",
             path: "/dashboard/courts",
+          },
+           {
+            icon: Trophy,
+            label: "Competitions ",
+            path: "/dashboard/admin/competitions",
           },
           {
             icon: Users,

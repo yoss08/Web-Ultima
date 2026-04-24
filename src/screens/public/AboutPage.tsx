@@ -1,10 +1,11 @@
 import {
-  Mail, Phone, MapPin, Instagram, Linkedin,
+  Mail, Phone, MapPin, Linkedin,
   Users, Target, Eye, Heart, Award, Globe, ChevronRight,
-  Facebook
+  Facebook,
+  Instagram
 } from "lucide-react";
+
 import { motion, AnimatePresence } from "motion/react";
-import { Moon, Sun, ArrowRight, Brain, Menu, X, LayoutDashboard} from "lucide-react";
 import { Link } from "react-router";
 import { useTheme } from "../../styles/useTheme";
 import { useAuth } from "../../services/AuthContext";
@@ -153,14 +154,14 @@ export function AboutPage() {
                 </div>
                 <div>
                   <p className="font-bold">Visit Us</p>
-                  <p className="text-sm opacity-50">la Soukra, Tunisia</p>
+                  <p className="text-sm opacity-50">la Marsa, Tunisia</p>
                 </div>
               </div>
 
               {/* Social Links */}
 <div className="flex gap-3 pt-4">
   {[
-    { icon: Facebook, href: "", color: "#305fe1ff" },
+    { icon: Instagram, href: "", color: "rgb(225, 48, 122)" },
     { icon: Linkedin, href: "", color: "#0A66C2" },
   ].map(({ icon: Icon, href, color }) => (
     <a

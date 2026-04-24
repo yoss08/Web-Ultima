@@ -149,7 +149,7 @@ export function AllBookingsPage() {
           <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins']">
             <Filter size={15} className="text-muted-foreground" />
             <select
-              className="bg-transparent text-foreground outline-none text-sm font-semibold"
+              className="bg-background text-foreground outline-none text-sm font-semibold"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -163,7 +163,7 @@ export function AllBookingsPage() {
           <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins']">
             <Building2 size={15} className="text-muted-foreground" />
             <select
-              className="bg-transparent text-foreground outline-none text-sm font-semibold max-w-[120px]"
+              className="bg-background text-foreground outline-none text-sm font-semibold max-w-[120px]"
               value={clubFilter}
               onChange={(e) => setClubFilter(e.target.value)}
             >

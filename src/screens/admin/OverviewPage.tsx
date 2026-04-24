@@ -11,10 +11,9 @@ import {
   Clock,
   Users,
   ClipboardCheck,
-  CheckCircle2,
-  XCircle,
-  Loader2,
   MapPin,
+  CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { supabase } from "../../config/supabase";
@@ -60,7 +59,6 @@ export function OverviewPage() {
   });
   const [courts, setCourts] = useState<CourtStatus[]>([]);
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
-  const [actionLoading, setActionLoading] = useState<string | number | null>(null);
   const [peakHoursData] = useState([
     { hour: "08:00", usage: 20 },
     { hour: "10:00", usage: 45 },
@@ -108,12 +106,7 @@ export function OverviewPage() {
       setPendingRequests(pending);
 
       // 3. Calculate Stats
-      const confirmedToday = (clubBookings || []).filter(b => {
-        if (b.status !== 'confirmed' && b.status !== 'accepted') return false;
-        const today = new Date().toISOString().split('T')[0];
-        return b.booking_date === today;
-      }).length;
-
+      const confirmedToday = (clubBookings || []).filter(b => b.status === 'confirmed' || b.status === 'accepted').length;
       const available = (clubCourts || []).filter(c => c.status === 'available').length;
       const maintenance = (clubCourts || []).filter(c => c.status === 'maintenance').length;
 
@@ -136,32 +129,6 @@ export function OverviewPage() {
   useEffect(() => {
     fetchDashboardData();
   }, [clubId]);
-
-  const handleAccept = async (id: string | number) => {
-    setActionLoading(id);
-    try {
-      await adminService.acceptBooking(id);
-      toast.success("Booking accepted ✓");
-      fetchDashboardData();
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleReject = async (id: string | number) => {
-    setActionLoading(id);
-    try {
-      await adminService.rejectBooking(id);
-      toast.success("Booking rejected");
-      fetchDashboardData();
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setActionLoading(null);
-    }
-  };
 
   if (!clubId) {
     return (
@@ -469,7 +436,7 @@ export function OverviewPage() {
                   <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Player</th>
                   <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Court</th>
                   <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">Time</th>
-                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] text-right">Actions</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -498,24 +465,14 @@ export function OverviewPage() {
                       </div>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button 
-                          onClick={() => handleAccept(req.id)}
-                          disabled={actionLoading === req.id}
-                          className="flex items-center gap-2 px-4 py-2 bg-emerald-400/10 text-emerald-400 rounded-xl hover:bg-emerald-400 hover:text-white transition-all text-xs font-bold font-['Poppins'] disabled:opacity-50"
-                        >
-                          {actionLoading === req.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                          Accept
-                        </button>
-                        <button 
-                          onClick={() => handleReject(req.id)}
-                          disabled={actionLoading === req.id}
-                          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold font-['Poppins'] disabled:opacity-50"
-                        >
-                          <XCircle size={16} />
-                          Decline
-                        </button>
-                      </div>
+                      <span className={`text-xs font-bold uppercase tracking-widest ${
+                        req.status === 'pending' ? 'text-yellow-500' :
+                        req.status === 'confirmed' || req.status === 'accepted' ? 'text-emerald-500' :
+                        req.status === 'declined' || req.status === 'cancelled' ? 'text-red-500' :
+                        'text-muted-foreground'
+                      }`}>
+                        {req.status}
+                      </span>
                     </td>
                   </tr>
                 ))}

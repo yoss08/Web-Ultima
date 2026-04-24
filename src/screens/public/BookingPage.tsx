@@ -135,14 +135,24 @@ export default function BookingPage() {
     async function fetchClubs() {
       setLoading(true);
       try {
-        const { data, error } = await supabase.from('clubs').select('*, courts(count)');
-        if (error) throw error;
-        
-        const formattedClubs: Club[] = (data || []).map((c: any) => ({
+        // Fetch clubs and courts in parallel — avoid courts(count) which
+        // is not a real column and silently returns [] in PostgREST
+        const [clubsRes, courtsRes] = await Promise.all([
+          supabase.from('clubs').select('*'),
+          supabase.from('courts').select('id, club_id'),
+        ]);
+
+        if (clubsRes.error) throw clubsRes.error;
+        if (courtsRes.error) throw courtsRes.error;
+
+        const courtsData = courtsRes.data || [];
+
+        const formattedClubs: Club[] = (clubsRes.data || []).map((c: any) => ({
           id: c.id,
           name: c.name,
           image: c.photo_url || PadelArena,
-          courts: c.courts?.[0]?.count || 0,
+          // Count courts that belong to this club client-side — reliable & no FK hint needed
+          courts: courtsData.filter((court: any) => court.club_id === c.id).length,
           distance: Math.floor(Math.random() * 8) + 1, // Mock distance
           available: true,
           price: c.price_per_court || 0,
@@ -403,6 +413,20 @@ export default function BookingPage() {
               <Map className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
               <p className="text-gray-500 dark:text-gray-400 font-medium">Map view coming soon</p>
             </div>
+          </div>
+        ) : loading ? (
+          /* Loading skeleton — prevents "No centers match" flashing before data arrives */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm animate-pulse">
+                <div className="h-48 bg-muted" />
+                <div className="p-4 space-y-3">
+                  <div className="h-5 bg-muted rounded w-2/3" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

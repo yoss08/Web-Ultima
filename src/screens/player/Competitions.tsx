@@ -15,26 +15,20 @@ import {
   ChevronRight,
   X,
   Clock,
-  DollarSign
+  DollarSign,
+  Info,
+  BookOpen
 } from "lucide-react";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
-
-interface Tournament {
-  id: string;
-  title: string;
-  description: string;
-  start_date: string;
-  registration_deadline?: string;
-  max_players: number;
-  current_players: number;
-  prize_pool: string;
-  status: 'Open' | 'Closed' | 'Ongoing' | 'Completed';
-  skill_level: string;
-  competition_type: string;
-  entry_fee: number;
-}
+import { 
+  getTournaments, 
+  getUserTournamentRegistrations, 
+  registerForTournament,
+  getTournamentDetails,
+  type Tournament 
+} from "../../services/tournamentService";
 
 export function Competitions() {
   const { user } = useAuth();
@@ -50,14 +44,14 @@ export function Competitions() {
   useEffect(() => {
     fetchData();
 
-    // Listen to real-time updates for brackets and capacities
+    // Subscribe to real-time updates
     const tourneySub = supabase
       .channel('tournaments_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
-         fetchData(false); // Background refresh
+        fetchData(false); // Background refresh
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tournament_registrations' }, () => {
-         fetchData(false); // Background refresh
+        fetchData(false); // Background refresh
       })
       .subscribe();
 
@@ -69,24 +63,19 @@ export function Competitions() {
   async function fetchData(showLoader = true) {
     try {
       if (showLoader) setLoading(true);
-      const { data: tourneys, error: tError } = await supabase
-        .from('tournaments')
-        .select('*')
-        .order('start_date', { ascending: true });
+      
+      // Fetch all tournaments using the service
+      const tourneys = await getTournaments();
+      setTournaments(tourneys);
 
-      if (tError) throw tError;
-
+      // Fetch user registrations if logged in
       if (user) {
-        const { data: regs } = await supabase
-          .from('tournament_registrations')
-          .select('tournament_id')
-          .eq('player_id', user.id);
-        if (regs) setUserRegistrations(regs.map(r => r.tournament_id));
+        const registeredTournamentIds = await getUserTournamentRegistrations(user.id);
+        setUserRegistrations(registeredTournamentIds);
       }
-
-      setTournaments(tourneys || []);
     } catch (err) {
       toast.error("Could not load competitions");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -95,14 +84,11 @@ export function Competitions() {
   const handleRegister = async (tournament: Tournament) => {
     if (!user) return toast.error("Please log in to register");
     if (tournament.status !== 'Open') return toast.error("Registration is closed");
+    if (tournament.current_players >= tournament.max_players) return toast.error("Tournament is full");
     
     setRegisteringId(tournament.id);
     try {
-      const { error } = await supabase
-        .from('tournament_registrations')
-        .insert([{ tournament_id: tournament.id, player_id: user.id }]);
-
-      if (error) throw error;
+      await registerForTournament(tournament.id, user.id);
 
       setUserRegistrations([...userRegistrations, tournament.id]);
       setTournaments(prev => prev.map(t => 
@@ -110,7 +96,12 @@ export function Competitions() {
       ));
       toast.success("Spot secured!");
     } catch (err: any) {
-      toast.error(err.code === '23505' ? "Already registered" : "Registration failed");
+      if (err.code === '23505') {
+        toast.error("Already registered for this tournament");
+      } else {
+        toast.error("Registration failed: " + (err.message || "Unknown error"));
+      }
+      console.error(err);
     } finally {
       setRegisteringId(null);
     }
@@ -154,15 +145,15 @@ export function Competitions() {
               placeholder="Find a tournament..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 pl-12 pr-6 rounded-2xl bg-muted border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-accent/50 transition-all text-foreground"
+              className="h-12 pl-12 pr-6 rounded-2xl bg-background border-none outline-none text-sm font-medium w-full md:w-64 focus:ring-1 ring-accent/50 transition-all text-foreground"
             />
           </div>
-          <div className="relative flex items-center bg-muted rounded-2xl border border-border hover:border-accent/50 transition-all px-4 group font-['Poppins']">
+          <div className="relative flex items-center bg-background rounded-2xl border border-border hover:border-accent/50 transition-all px-4 group font-['Poppins']">
             <Filter size={16} className="text-accent mr-2" />
             <select 
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="h-12 bg-transparent border-none outline-none text-sm font-bold text-foreground cursor-pointer appearance-none pr-8 font-['Poppins']"
+              className="h-12 bg-background border-none outline-none text-sm font-bold text-foreground cursor-pointer appearance-none pr-8 font-['Poppins']"
             >
               <option value="All">All Levels</option>
               <option value="Beginner">Beginner</option>
@@ -226,10 +217,35 @@ export function Competitions() {
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-                    <CardInfo icon={Calendar} label="Date" value={new Date(t.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                    <CardInfo icon={Calendar} label="Start Date" value={new Date(t.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
                     <CardInfo icon={Users} label="Participants" value={`${t.current_players}/${t.max_players}`} />
-                    <CardInfo icon={Medal} label="Reward" value={t.prize_pool} />
-                    <CardInfo icon={DollarSign} label="Entry Fee" value={t.entry_fee === 0 ? "Free" : `$${t.entry_fee}`} />
+                    <CardInfo icon={Medal} label="Reward" value={t.prize_pool || '$0'} />
+                    <CardInfo icon={DollarSign} label="Entry Fee" value={t.entry_fee === 0 || !t.entry_fee ? "Free" : `$${t.entry_fee}`} />
+                  </div>
+
+                  <div className="space-y-3 mb-6 pb-6 border-b border-border/50">
+                    <div className="flex items-center justify-between text-xs font-medium">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <TrendingUp size={12} /> Skill Level
+                      </span>
+                      <span className="font-bold text-foreground bg-accent/10 px-2 py-1 rounded-full">{t.skill_level}</span>
+                    </div>
+                    {t.registration_deadline && (
+                      <div className="flex items-center justify-between text-xs font-medium">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <Clock size={12} /> Registration Deadline
+                        </span>
+                        <span className="font-bold text-foreground">{new Date(t.registration_deadline).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    {t.rules_text && (
+                      <div className="flex items-center justify-between text-xs font-medium">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <BookOpen size={12} /> Rules Available
+                        </span>
+                        <span className="font-bold text-accent">View</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between gap-4">

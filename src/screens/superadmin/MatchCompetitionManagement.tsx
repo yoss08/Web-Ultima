@@ -195,7 +195,7 @@ export function MatchCompetitionManagement() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground font-['Playfair_Display']">
-            Matches & Competitions
+            Matches
           </h1>
           <p className="text-muted-foreground text-sm font-['Poppins'] mt-1">
             Launch live matches and manage tournaments across all clubs.
@@ -235,24 +235,6 @@ export function MatchCompetitionManagement() {
                 <Zap size={18} /> Create Match
               </>
             )}
-          </button>
-        </div>
-
-        <div className="bg-card border border-border rounded-[28px] p-6 group hover:border-accent/30 transition-all shadow-sm">
-          <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-4">
-            <Trophy className="text-accent" size={24} />
-          </div>
-          <h3 className="text-xl font-bold text-foreground font-['Playfair_Display']">
-            New Competition
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1 mb-5 font-['Poppins']">
-            Create a tournament bracket with a name, type and date range.
-          </p>
-          <button
-            onClick={() => setShowCompModal(true)}
-            className="w-full py-3 bg-muted border border-border text-foreground rounded-xl font-bold hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all flex items-center justify-center gap-2 font-['Poppins']"
-          >
-            <Plus size={18} /> Create Competition
           </button>
         </div>
       </div>
@@ -451,113 +433,6 @@ export function MatchCompetitionManagement() {
                   ) : (
                     <>
                       <Zap size={20} /> Start Match Now
-                    </>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Create Competition Modal */}
-      <AnimatePresence>
-        {showCompModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-card border border-border w-full max-w-lg rounded-[32px] p-8 shadow-2xl"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-foreground font-['Playfair_Display']">
-                  New Competition
-                </h2>
-                <button
-                  onClick={() => setShowCompModal(false)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="space-y-4 font-['Poppins']">
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                    Assign to Club *
-                  </label>
-                  <select
-                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                    value={compForm.club_id}
-                    onChange={(e) => setCompForm({ ...compForm, club_id: e.target.value })}
-                  >
-                    <option value="">Select club...</option>
-                    {clubs.map((club) => (
-                      <option key={club.id} value={club.id}>{club.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                    Competition Name *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Summer Cup 2025"
-                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                    value={compForm.name}
-                    onChange={(e) => setCompForm({ ...compForm, name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                    Format
-                  </label>
-                  <select
-                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                    value={compForm.type}
-                    onChange={(e) => setCompForm({ ...compForm, type: e.target.value })}
-                  >
-                    <option value="Elimination">Single Elimination</option>
-                    <option value="Double Elimination">Double Elimination</option>
-                    <option value="Round Robin">Round Robin</option>
-                    <option value="Swiss">Swiss</option>
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                      Start Date *
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                      value={compForm.start_date}
-                      onChange={(e) => setCompForm({ ...compForm, start_date: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                      End Date *
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                      value={compForm.end_date}
-                      onChange={(e) => setCompForm({ ...compForm, end_date: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={handleCreateCompetition}
-                  disabled={compSaving}
-                  className="w-full h-14 bg-accent text-accent-foreground font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-60 mt-2"
-                >
-                  {compSaving ? (
-                    <Loader2 size={20} className="animate-spin" />
-                  ) : (
-                    <>
-                      <Check size={20} /> Create Competition
                     </>
                   )}
                 </button>

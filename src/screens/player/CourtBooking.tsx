@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock, MapPin, Info, CheckCircle2, ChevronRight,
   Loader2, CalendarDays, ShieldCheck, Zap, QrCode,
-  XCircle, ChevronLeft, Users, FileText, Tag, Layers,
+  XCircle, ChevronLeft, Users, Tag, Layers,
   AlertTriangle, CalendarX, History, LayoutGrid
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
-import padelArena from "../../assets/images/padel_arena.png";
+const padelArena = new URL("../../assets/images/padel_arena.png", import.meta.url).href;
 import { CourtCard } from "../../components/dashboard/CourtCard";
 
 
@@ -34,8 +34,6 @@ interface Booking {
   time_slot: string;
   status: "pending" | "accepted" | "declined" | "confirmed" | "cancelled" | "completed";
   duration: number;
-  player_count: number;
-  notes: string;
   total_price: number;
   created_at: string;
   result?: string;
@@ -139,7 +137,6 @@ export function CourtBooking() {
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [selectedOpponentId, setSelectedOpponentId] = useState<string | null>(null);
   const [duration, setDuration] = useState(1);
-  const [notes, setNotes] = useState("");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [discountError, setDiscountError] = useState("");
@@ -147,14 +144,6 @@ export function CourtBooking() {
   // ── My Bookings UI ──
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [qrBooking, setQrBooking] = useState<Booking | null>(null);
-
-  // ── Email OTP Verification ──
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpError, setOtpError] = useState("");
-  const [otpCountdown, setOtpCountdown] = useState(0);
 
   // ── Computed ──
   const basePricePerSlot = selectedClub?.price_per_court || PRICE_PER_SLOT;
@@ -177,6 +166,12 @@ export function CourtBooking() {
         
         if (courtsRes.error) throw courtsRes.error;
         const courtsData = courtsRes.data || [];
+
+        // Debug: log how many courts were returned (helps diagnose RLS issues)
+        console.log(`[CourtBooking] clubs: ${clubsData.length}, courts: ${courtsData.length}`);
+        if (courtsData.length === 0) {
+          console.warn('[CourtBooking] courts table returned 0 rows — check Supabase RLS policy on "courts" table. Authenticated users need SELECT access.');
+        }
         
         // Map courts count manually to avoid complex join issues
         const formattedClubs = clubsData.map((c: any) => ({
@@ -269,9 +264,10 @@ export function CourtBooking() {
     };
   }, [selectedCourt, selectedDate]);
 
-  // Fetch user's bookings
+  // Fetch user's bookings and subscribe to status updates
   useEffect(() => {
-    if (!user || activeTab === "book") return;
+    if (!user) return;
+
     async function fetchMyBookings() {
       try {
         const { data, error } = await supabase
@@ -285,8 +281,46 @@ export function CourtBooking() {
         toast.error("Failed to load bookings");
       }
     }
+
     fetchMyBookings();
-  }, [user, activeTab]);
+
+    const bookingSub = supabase
+      .channel(`user_bookings_${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings', filter: `user_id=eq.${user.id}` },
+        (payload: any) => {
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+          const eventType = payload.event || payload.type || payload.eventType;
+
+          if (eventType === 'INSERT') {
+            toast.success('Booking request submitted.');
+          }
+
+          if (newRecord && oldRecord && newRecord.status !== oldRecord.status) {
+            const status = newRecord.status;
+            const message =
+              status === 'confirmed' || status === 'accepted'
+                ? `Your booking on ${newRecord.booking_date} at ${newRecord.time_slot} is now confirmed.`
+                : status === 'declined' || status === 'cancelled'
+                ? `Your booking on ${newRecord.booking_date} at ${newRecord.time_slot} was declined.`
+                : `Your booking status changed to ${status}.`;
+
+            toast(status === 'declined' || status === 'cancelled' ? message : message, {
+              icon: status === 'declined' || status === 'cancelled' ? '⚠️' : '✅',
+            });
+          }
+
+          fetchMyBookings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(bookingSub);
+    };
+  }, [user]);
 
 
   const handleApplyDiscount = () => {
@@ -301,62 +335,14 @@ export function CourtBooking() {
     }
   };
 
-  // ─── Step 1: validate form & send OTP ──────────────────────────────────
-  const handleRequestOtp = async () => {
-    if (!user || !selectedCourt || !selectedSlot)
-      return toast.error("Please select a court and time slot");
+  const handleConfirmBooking = async () => {
+    if (!user || !selectedClub || !selectedCourt || !selectedSlot)
+      return toast.error("Please select a club, court, and time slot");
     if (selectedCourt.status === "maintenance")
       return toast.error("This court is under maintenance");
 
-    setShowOtpModal(true);
-    setOtpSent(false);
-    setOtpCode("");
-    setOtpError("");
-
-    // Send OTP to the user's email via Supabase Auth
-    setOtpLoading(true);
-    try {
-      const email = user.email!;
-      const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-      if (error) throw error;
-      setOtpSent(true);
-      // 60-second cooldown before allowing resend
-      setOtpCountdown(60);
-      const interval = setInterval(() => {
-        setOtpCountdown((c) => {
-          if (c <= 1) { clearInterval(interval); return 0; }
-          return c - 1;
-        });
-      }, 1000);
-      toast.success(`Verification code sent to ${email}`);
-    } catch (err: any) {
-      setOtpError(err.message || "Failed to send verification code");
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  // ─── Step 2: verify OTP & create booking ───────────────────────────────
-  const handleConfirmBooking = async () => {
-    if (!user || !selectedCourt || !selectedSlot) return;
-    if (!otpCode.trim() || otpCode.length < 6)
-      return setOtpError("Please enter the 6-digit code from your email");
-
     setBookingLoading(true);
-    setOtpError("");
     try {
-      // Verify the OTP
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: user.email!,
-        token: otpCode.trim(),
-        type: "email",
-      });
-      if (verifyError) {
-        setOtpError("Invalid or expired code. Please try again.");
-        setBookingLoading(false);
-        return;
-      }
-
       const { data: bookingData, error: bookingError } = await supabase.from("bookings").insert([
         {
           court_id: selectedCourt.id,
@@ -366,38 +352,36 @@ export function CourtBooking() {
           time_slot: selectedSlot,
           status: "pending",
           duration,
-          notes,
           total_price: totalPrice,
         },
-      ]).select();
+      ]).select("id");
 
       if (bookingError) {
-        if (bookingError.code === "23505")
+        console.error("Booking insert error:", bookingError);
+        const message = (bookingError as any).message || (bookingError as any).details || JSON.stringify(bookingError);
+        if ((bookingError as any).code === "23505")
           throw new Error("This slot was just taken. Please choose another.");
-        throw bookingError;
+        throw new Error(message);
       }
 
-      // Create the match record if an opponent was selected
-      if (selectedOpponentId && bookingData?.[0]) {
+      const bookingId = bookingData?.[0]?.id;
+      if (selectedOpponentId && bookingId) {
         await createMatch({
-          booking_id: bookingData[0].id,
+          booking_id: bookingId,
           player1_id: user.id,
           player2_id: selectedOpponentId,
-          match_type: 'friendly'
+          match_type: 'friendly',
         });
       }
 
-      toast.success("Request sent! Waiting for club approval. 🎾");
-      setShowOtpModal(false);
-      setOtpCode("");
-      setOtpSent(false);
+      toast.success("Booking successful! Waiting for club approval.");
       setSelectedSlot(null);
-      setNotes("");
       setDiscountCode("");
       setAppliedDiscount(0);
       setActiveTab("upcoming");
     } catch (err: any) {
-      setOtpError(err.message || "Booking failed. Please try again.");
+      console.error("Confirm booking failed:", err);
+      toast.error(err?.message || "Booking failed. Please try again.");
     } finally {
       setBookingLoading(false);
     }
@@ -455,10 +439,10 @@ export function CourtBooking() {
           <Zap size={14} className="fill-accent" />
           <span>Ultima Reservation System</span>
         </div>
-        <h2 className="font-['Playfair_Display',serif] text-3xl md:text-5xl font-black text-foreground leading-none mb-4">
+        <h1 className="font-['Playfair_Display',serif] sm:text-2xl text-2xl md:text-4xl lg:text-4xl font-black text-foreground leading-none mb-4">
           Court Booking
-        </h2>
-        <p className="text-muted-foreground font-['Poppins'] text-lg">
+        </h1>
+        <p className="text-muted-foreground font-['Poppins']">
           Reserve, track, and manage all your court sessions in one place.
         </p>
       </header>
@@ -580,6 +564,11 @@ export function CourtBooking() {
 
                             <div className="flex flex-col justify-center h-full pt-2">
                               <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedClub(club);
+                                  setSelectedCourt(null);
+                                }}
                                 className={`px-4 py-2 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 whitespace-nowrap active:scale-95 text-center ${
                                   selectedClub?.id === club.id
                                     ? 'bg-accent text-accent-foreground'
@@ -603,7 +592,15 @@ export function CourtBooking() {
                   >
                     <SectionHeading step={2} title="Select Surface" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {courts.filter(c => String(c.club_id) === String(selectedClub.id)).map((court, index) => (
+                      {courts.filter(c => String(c.club_id) === String(selectedClub.id)).length === 0 ? (
+                        <div className="col-span-2 py-10 text-center text-muted-foreground">
+                          <p className="font-semibold mb-1">No courts found for this club.</p>
+                          <p className="text-xs opacity-60">
+                            If courts were created by the admin, check that Supabase RLS allows authenticated users to read the <code>courts</code> table.
+                          </p>
+                        </div>
+                      ) : (
+                        courts.filter(c => String(c.club_id) === String(selectedClub.id)).map((court, index) => (
                         <CourtCard
                           key={court.id}
                           court={{
@@ -617,7 +614,8 @@ export function CourtBooking() {
                           isSelected={selectedCourt?.id === court.id}
                           onClick={court.status === "maintenance" ? undefined : () => setSelectedCourt(court)}
                         />
-                      ))}
+                      ))
+                      )}
                     </div>
                   </motion.section>
                 )}
@@ -729,20 +727,6 @@ export function CourtBooking() {
                       <section>
                         <SectionHeading step={4} title="Details & Extras" />
                         <div className="bg-card rounded-[40px] p-8 border border-border space-y-8">
-                          {/* Notes */}
-                          <div>
-                            <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
-                              <FileText size={12} /> Notes / Equipment Requests
-                            </label>
-                            <textarea
-                              rows={3}
-                              value={notes}
-                              onChange={(e) => setNotes(e.target.value)}
-                              placeholder="e.g. Need ball machine, extra rackets..."
-                              className="w-full px-5 py-4 bg-muted rounded-2xl border-none outline-none font-medium text-sm dark:text-white focus:ring-2 ring-accent/50 transition-all resize-none"
-                            />
-                          </div>
-
                           {/* Discount & Opponent */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="min-w-0">
@@ -857,7 +841,8 @@ export function CourtBooking() {
                       </div>
 
                       <button
-                        onClick={handleRequestOtp}
+                        type="button"
+                        onClick={handleConfirmBooking}
                         disabled={!selectedSlot || !selectedCourt || bookingLoading}
                         className="w-full h-16 bg-accent text-accent-foreground font-black rounded-2xl shadow-xl shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:grayscale disabled:scale-100 disabled:cursor-not-allowed"
                       >
@@ -865,8 +850,8 @@ export function CourtBooking() {
                           <Loader2 className="animate-spin" size={20} />
                         ) : (
                           <>
-                            <ShieldCheck size={20} />
-                            <span>VERIFY &amp; CONFIRM</span>
+                            <CheckCircle2 size={20} />
+                            <span>CONFIRM BOOKING</span>
                             <ChevronRight size={20} />
                           </>
                         )}
@@ -971,7 +956,7 @@ export function CourtBooking() {
                         ) : (
                           <XCircle size={14} />
                         )}
-                        Cancel
+                        Cancel booking
                       </button>
                     </div>
                   </div>
@@ -1095,7 +1080,7 @@ export function CourtBooking() {
                 />
               </div>
               <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest mb-6 text-foreground">
-                Present this at the ALMUS kiosk
+                Present this at the club entrance to check in for your booking.
               </p>
               <button
                 onClick={() => setQrBooking(null)}
@@ -1108,104 +1093,6 @@ export function CourtBooking() {
         )}
       </AnimatePresence>
 
-      {/* ════ EMAIL OTP VERIFICATION MODAL ════ */}
-      <AnimatePresence>
-        {showOtpModal && (
-          <motion.div
-            key="otp-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={(e) => { if (e.target === e.currentTarget) { setShowOtpModal(false); setOtpError(""); } }}
-          >
-            <motion.div
-              initial={{ scale: 0.92, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.92, opacity: 0, y: 20 }}
-              transition={{ type: "spring", bounce: 0.25, duration: 0.4 }}
-              className="relative bg-card border border-border rounded-[32px] p-8 w-full max-w-md shadow-2xl overflow-hidden"
-            >
-              {/* accent bar */}
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-accent" />
-
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                  <ShieldCheck className="text-accent" size={32} />
-                </div>
-                <h2 className="text-2xl font-black text-foreground font-['Playfair_Display'] mb-2">
-                  Verify Your Email
-                </h2>
-                <p className="text-sm text-muted-foreground font-['Poppins']">
-                  {otpSent
-                    ? <>We sent a 6-digit code to <span className="text-accent font-bold">{user?.email}</span></>
-                    : "Sending verification code…"}
-                </p>
-              </div>
-
-              {otpLoading && !otpSent && (
-                <div className="flex justify-center mb-6">
-                  <Loader2 className="animate-spin text-accent" size={32} />
-                </div>
-              )}
-
-              {otpSent && (
-                <div className="space-y-5">
-                  {/* 6-digit input */}
-                  <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 font-['Poppins']">
-                      Enter 6-digit code
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, "")); setOtpError(""); }}
-                      placeholder="000000"
-                      className="w-full h-16 px-6 bg-muted rounded-2xl text-center text-3xl font-black tracking-[0.5em] outline-none focus:ring-2 ring-accent/50 transition-all text-foreground border border-border"
-                      autoFocus
-                    />
-                    {otpError && (
-                      <p className="mt-2 text-xs text-red-500 font-bold font-['Poppins'] flex items-center gap-1">
-                        <XCircle size={12} /> {otpError}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Confirm button */}
-                  <button
-                    onClick={handleConfirmBooking}
-                    disabled={bookingLoading || otpCode.length < 6}
-                    className="w-full h-14 bg-accent text-accent-foreground font-black rounded-2xl shadow-lg shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 font-['Poppins']"
-                  >
-                    {bookingLoading ? <Loader2 className="animate-spin" size={20} /> : <><CheckCircle2 size={18} /> Confirm Booking</>}
-                  </button>
-
-                  {/* Resend */}
-                  <div className="text-center">
-                    <button
-                      onClick={handleRequestOtp}
-                      disabled={otpCountdown > 0 || otpLoading}
-                      className="text-xs font-bold text-accent hover:underline disabled:text-muted-foreground disabled:no-underline disabled:cursor-not-allowed font-['Poppins'] transition-colors"
-                    >
-                      {otpCountdown > 0 ? `Resend code in ${otpCountdown}s` : "Resend code"}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Cancel */}
-              <button
-                onClick={() => { setShowOtpModal(false); setOtpError(""); setOtpCode(""); }}
-                className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <XCircle size={20} />
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
