@@ -13,7 +13,8 @@ export function StudentList() {
   const [students, setStudents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [unassignedPlayers, setUnassignedPlayers] = useState<any[]>([]);
+  const [playerAccounts, setPlayerAccounts] = useState<any[]>([]);
+  const [playerSearch, setPlayerSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState<string | null>(null);
 
@@ -35,13 +36,13 @@ export function StudentList() {
     }
   }
 
-  const loadUnassignedPlayers = async () => {
+  const loadPlayerAccounts = async () => {
     if (!user?.club_id) return;
     try {
       const data = await coachService.getUnassignedPlayers(user.club_id);
-      setUnassignedPlayers(data || []);
+      setPlayerAccounts(data || []);
     } catch (error) {
-      console.error("Error loading unassigned players:", error);
+      console.error("Error loading player accounts:", error);
     }
   };
 
@@ -52,7 +53,7 @@ export function StudentList() {
       await coachService.addStudent(user.id, studentId);
       toast.success("Student added successfully!");
       await loadStudents();
-      await loadUnassignedPlayers();
+      await loadPlayerAccounts();
     } catch (error) {
       toast.error("Failed to add student");
     } finally {
@@ -63,6 +64,10 @@ export function StudentList() {
   // Filtrage dynamique des étudiants
   const filteredStudents = students.filter(s => 
     s.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredPlayerAccounts = playerAccounts.filter(player => 
+    player.full_name?.toLowerCase().includes(playerSearch.toLowerCase())
   );
 
   return (
@@ -92,7 +97,7 @@ export function StudentList() {
           </select>
           <Dialog open={isModalOpen} onOpenChange={(open: boolean) => {
             setIsModalOpen(open);
-            if (open) loadUnassignedPlayers();
+            if (open) loadPlayerAccounts();
           }}>
             <DialogTrigger asChild>
               <button className="h-12 px-6 bg-accent text-accent-foreground font-bold rounded-[16px] hover:scale-105 transition-transform shadow-lg shadow-accent/20 flex items-center gap-2">
@@ -103,36 +108,50 @@ export function StudentList() {
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold font-['Playfair_Display']">Add Student</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4 max-h-[400px] overflow-y-auto pr-2">
-                {unassignedPlayers.length > 0 ? (
-                  unassignedPlayers.map((player) => (
-                    <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                          {player.avatar_url ? (
-                            <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
-                          ) : (
-                            <UserIcon size={20} className="text-accent" />
-                          )}
+              <div className="space-y-4 mt-4">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                  <input
+                    type="text"
+                    value={playerSearch}
+                    onChange={(e) => setPlayerSearch(e.target.value)}
+                    placeholder="Search players..."
+                    className="w-full h-12 pl-12 pr-4 bg-card border border-border rounded-[16px] text-foreground focus:border-accent outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-4 max-h-[340px] overflow-y-auto pr-2">
+                  {filteredPlayerAccounts.length > 0 ? (
+                    filteredPlayerAccounts.map((player) => (
+                      <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden">
+                            {player.avatar_url ? (
+                              <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
+                            ) : (
+                              <UserIcon size={20} className="text-accent" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{player.full_name}</p>
+                            <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-foreground">{player.full_name}</p>
-                          <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
-                        </div>
+                        <button
+                          onClick={() => handleAddStudent(player.id)}
+                          disabled={player.assigned_to_current_coach || isAdding === player.id}
+                          className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${player.assigned_to_current_coach ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-accent text-accent-foreground hover:opacity-90'}`}
+                        >
+                          {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                          {player.assigned_to_current_coach ? 'Assigned' : 'Add'}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleAddStudent(player.id)}
-                        disabled={isAdding === player.id}
-                        className="px-4 py-2 bg-accent text-accent-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2"
-                      >
-                        {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                        Add
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center py-10 text-muted-foreground italic">No unassigned players found in your club.</p>
-                )}
+                    ))
+                  ) : playerAccounts.length > 0 ? (
+                    <p className="text-center py-10 text-muted-foreground italic">No players match your search.</p>
+                  ) : (
+                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found in your club.</p>
+                  )}
+                </div>
               </div>
             </DialogContent>
           </Dialog>
@@ -157,7 +176,7 @@ export function StudentList() {
           </p>
           <Dialog open={isModalOpen} onOpenChange={(open: boolean) => {
             setIsModalOpen(open);
-            if (open) loadUnassignedPlayers();
+            if (open) loadPlayerAccounts();
           }}>
             <DialogTrigger asChild>
               <button className="mt-8 px-8 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20 flex items-center gap-2 mx-auto">
@@ -168,36 +187,50 @@ export function StudentList() {
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold font-['Playfair_Display']">Add Student</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4 max-h-[400px] overflow-y-auto pr-2">
-                {unassignedPlayers.length > 0 ? (
-                  unassignedPlayers.map((player) => (
-                    <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                          {player.avatar_url ? (
-                            <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
-                          ) : (
-                            <UserIcon size={20} className="text-accent" />
-                          )}
+              <div className="space-y-4 mt-4">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                  <input
+                    type="text"
+                    value={playerSearch}
+                    onChange={(e) => setPlayerSearch(e.target.value)}
+                    placeholder="Search players..."
+                    className="w-full h-12 pl-12 pr-4 bg-card border border-border rounded-[16px] text-foreground focus:border-accent outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-4 max-h-[340px] overflow-y-auto pr-2">
+                  {filteredPlayerAccounts.length > 0 ? (
+                    filteredPlayerAccounts.map((player) => (
+                      <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden">
+                            {player.avatar_url ? (
+                              <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
+                            ) : (
+                              <UserIcon size={20} className="text-accent" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{player.full_name}</p>
+                            <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-foreground">{player.full_name}</p>
-                          <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
-                        </div>
+                        <button
+                          onClick={() => handleAddStudent(player.id)}
+                          disabled={player.assigned_to_current_coach || isAdding === player.id}
+                          className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${player.assigned_to_current_coach ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-accent text-accent-foreground hover:opacity-90'}`}
+                        >
+                          {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                          {player.assigned_to_current_coach ? 'Assigned' : 'Add'}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleAddStudent(player.id)}
-                        disabled={isAdding === player.id}
-                        className="px-4 py-2 bg-accent text-accent-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2"
-                      >
-                        {isAdding === player.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                        Add
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center py-10 text-muted-foreground italic">No unassigned players found in your club.</p>
-                )}
+                    ))
+                  ) : playerAccounts.length > 0 ? (
+                    <p className="text-center py-10 text-muted-foreground italic">No players match your search.</p>
+                  ) : (
+                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found in your club.</p>
+                  )}
+                </div>
               </div>
             </DialogContent>
           </Dialog>

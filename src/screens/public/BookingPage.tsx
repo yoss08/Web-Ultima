@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -27,9 +27,10 @@ interface Club {
   close_time?: string;
 }
 
-function ClubCard({ club }: { club: Club }) {
+const ClubCard = forwardRef(({ club }: { club: Club }, ref: any) => {
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -113,7 +114,7 @@ function ClubCard({ club }: { club: Club }) {
       </div>
     </motion.div>
   );
-}
+});
 
 export default function BookingPage() {
   const { isDark, setIsDark } = useTheme();

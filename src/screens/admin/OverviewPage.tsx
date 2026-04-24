@@ -85,12 +85,24 @@ export function OverviewPage() {
       setCourts(clubCourts || []);
 
       // 2. Fetch Bookings (for pending list and stats)
-      const { data: clubBookings, error: bookingsError } = await supabase
+      const bookingSelect = '*, profiles(full_name), courts(name)';
+      let clubBookings = null;
+      const { data: clubBookingsData, error: bookingsError } = await supabase
         .from('bookings')
-        .select('*, profiles(full_name), courts(name)')
+        .select(bookingSelect)
         .eq('club_id', clubId);
 
-      if (bookingsError) throw bookingsError;
+      if (bookingsError) {
+        console.warn('Bookings relation select failed, retrying without relations', bookingsError);
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('club_id', clubId);
+        if (fallbackError) throw fallbackError;
+        clubBookings = fallbackData || [];
+      } else {
+        clubBookings = clubBookingsData || [];
+      }
 
       const pending = (clubBookings || []).filter(b => b.status === 'pending');
       setPendingRequests(pending);

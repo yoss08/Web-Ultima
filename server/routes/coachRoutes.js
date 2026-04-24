@@ -116,14 +116,50 @@ router.get('/sessions', async (req, res) => {
 router.post('/sessions', async (req, res) => {
   try {
     const sessionData = req.body;
-    
+    const requiredFields = ['coach_id', 'student_id', 'start_time', 'end_time', 'session_type'];
+    const missingField = requiredFields.find((field) => !sessionData[field]);
+    if (missingField) {
+      return res.status(400).json({ error: `${missingField} is required` });
+    }
+
+    const sessionPayload = {
+      ...sessionData,
+      status: sessionData.status || 'scheduled'
+    };
+
     const { data, error } = await supabase
       .from('training_sessions')
-      .insert([sessionData])
+      .insert([sessionPayload])
       .select();
-      
+
     if (error) throw error;
-    res.status(201).json(data[0]);
+
+    const session = data[0];
+    const { data: coachProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', sessionPayload.coach_id)
+      .single();
+
+    const scheduledAt = new Date(sessionPayload.start_time);
+    const formattedDate = scheduledAt.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    const formattedTime = scheduledAt.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    await supabase.from('notifications').insert([{
+      user_id: sessionPayload.student_id,
+      type: 'training_session',
+      message: `Coach ${coachProfile?.full_name || 'your coach'} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
+      read: false
+    }]);
+
+    res.status(201).json(session);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -163,33 +199,35 @@ router.get('/recommendations', async (req, res) => {
   }
 });
 
-// GET /api/coach/unassigned-players - list unassigned players in a club
+// GET /api/coach/unassigned-players - list all player accounts in the coach's club
 router.get('/unassigned-players', async (req, res) => {
   try {
-    const { clubId } = req.query;
+    const clubId = req.query.clubId || req.user?.club_id;
     if (!clubId) return res.status(400).json({ error: "clubId is required" });
 
-    // Find players in this club who are NOT in coach_students
-    // First get all players in club
     const { data: players, error: playersError } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, account_type')
+      .select('id, full_name, avatar_url, account_type, role')
       .eq('club_id', clubId)
-      .eq('role', 'player');
+      .eq('role', 'player')
+      .order('full_name', { ascending: true });
 
     if (playersError) throw playersError;
 
-    // Get all assigned student IDs
     const { data: assigned, error: assignedError } = await supabase
       .from('coach_students')
-      .select('student_id');
+      .select('student_id')
+      .eq('coach_id', req.user.id);
 
     if (assignedError) throw assignedError;
 
     const assignedIds = new Set(assigned.map(a => a.student_id));
-    const unassigned = players.filter(p => !assignedIds.has(p.id));
+    const normalizedPlayers = (players || []).map(player => ({
+      ...player,
+      assigned_to_current_coach: assignedIds.has(player.id)
+    }));
 
-    res.json(unassigned);
+    res.json(normalizedPlayers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -210,11 +248,12 @@ router.post('/students', async (req, res) => {
 
     // Create notification for student
     const { data: coachProfile } = await supabase.from('profiles').select('full_name').eq('id', coachId).single();
-    
+    const coachName = coachProfile?.full_name || 'Your coach';
+
     await supabase.from('notifications').insert([{
       user_id: studentId,
-      type: 'student_added',
-      message: `You have been added to coach ${coachProfile?.full_name || 'a coach'}'s roster`,
+      type: 'student_assignment',
+      message: `You are assigned to coach ${coachName}.`,
       read: false
     }]);
 

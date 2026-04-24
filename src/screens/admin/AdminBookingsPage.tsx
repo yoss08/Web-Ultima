@@ -187,6 +187,8 @@ export function AdminBookingsPage() {
   });
 
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
+  const nextPendingBooking = bookings.find((b) => b.status === "pending") || null;
+  const nextPendingLoading = nextPendingBooking ? actionLoading === nextPendingBooking.id : false;
   const tabCount = (tab: string) =>
     tab === "all"
       ? bookings.length
@@ -284,6 +286,61 @@ export function AdminBookingsPage() {
           />
         </div>
       </div>
+
+      {pendingCount > 0 && nextPendingBooking && (
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-[32px] p-6 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-yellow-700 font-bold font-['Poppins']">
+                Pending booking summary
+              </p>
+              <h2 className="text-xl font-bold text-foreground mt-2 font-['Playfair_Display']">
+                {pendingCount} request{pendingCount > 1 ? "s" : ""} waiting for review
+              </h2>
+              <p className="text-sm text-muted-foreground mt-2 font-['Poppins']">
+                Review the next pending booking request and decide whether to accept or decline it directly from the requests page.
+              </p>
+            </div>
+            <div className="rounded-3xl bg-card border border-border p-4 w-full lg:w-auto">
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-bold font-['Poppins']">
+                Next Request
+              </p>
+              <div className="mt-4 space-y-3">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold font-['Poppins']">Player</p>
+                  <p className="font-bold text-foreground font-['Poppins']">{nextPendingBooking.profiles?.full_name || "Unknown"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold font-['Poppins']">Court</p>
+                  <p className="font-bold text-foreground font-['Poppins']">{nextPendingBooking.courts?.name || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold font-['Poppins']">Schedule</p>
+                  <p className="font-bold text-foreground font-['Poppins']">
+                    {nextPendingBooking.booking_date || "—"} • {nextPendingBooking.time_slot || "—"}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => handleAccept(nextPendingBooking.id)}
+                  disabled={nextPendingLoading}
+                  className={`flex-1 px-4 py-3 rounded-2xl transition-all font-bold font-['Poppins'] ${nextPendingLoading ? 'opacity-50 cursor-not-allowed bg-emerald-400/10 text-emerald-400' : 'bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400 hover:text-white'}`}
+                >
+                  {nextPendingLoading ? 'Processing…' : 'Accept'}
+                </button>
+                <button
+                  onClick={() => handleReject(nextPendingBooking.id)}
+                  disabled={nextPendingLoading}
+                  className={`flex-1 px-4 py-3 rounded-2xl transition-all font-bold font-['Poppins'] ${nextPendingLoading ? 'opacity-50 cursor-not-allowed bg-red-500/10 text-red-500' : 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white'}`}
+                >
+                  {nextPendingLoading ? 'Processing…' : 'Decline'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bookings List */}
       <div className="bg-card border border-border rounded-[32px] overflow-hidden shadow-sm">

@@ -238,7 +238,7 @@ export function CourtBooking() {
           .select("time_slot")
           .eq("court_id", selectedCourt!.id)
           .eq("booking_date", selectedDate)
-          .eq("status", "confirmed");
+          .in("status", ["pending", "accepted", "confirmed"]);
         if (error) throw error;
         setTakenSlots(new Set((data || []).map((b: any) => b.time_slot)));
         setSelectedSlot(null);

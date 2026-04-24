@@ -124,6 +124,13 @@ export function StudentDetails() {
       coachName: user?.user_metadata?.full_name || 'your coach' 
     });
 
+    await supabase.from('notifications').insert([{
+      user_id: id,
+      type: 'coach_feedback',
+      message: `Coach ${user?.user_metadata?.full_name || 'your coach'} has added new feedback for you.`,
+      read: false
+    }]);
+
     toast.success("Feedback and Skills updated!");
     setNote(""); // On vide le champ texte
   } catch (err) {
