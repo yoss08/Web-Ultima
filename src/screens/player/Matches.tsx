@@ -99,10 +99,10 @@ export function Matches() {
         <AnimatePresence mode="popLayout">
           {filteredMatches.length === 0 ? (
             <div className="text-center py-32 bg-card rounded-[40px] border-2 border-dashed border-border">
-          <AlertCircle className="mx-auto mb-6 opacity-10" size={64} />
-          <h3 className="text-2xl font-black opacity-40 tracking-tighter uppercase text-foreground">No Matches Found</h3>
-          <p className="text-sm font-medium opacity-30 mt-2 text-foreground">Book court or check back later.</p>
-        </div>
+              <AlertCircle className="text-muted-foreground/30 mx-auto mb-4" size={64} />
+              <h3 className="text-xl font-bold text-foreground">No Matches Found</h3>
+              <p className="text-muted-foreground text-sm mt-2">Book court or check back later.</p>
+            </div>
           ) : filteredMatches.map((match) => (
             <motion.div 
               layout

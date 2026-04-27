@@ -282,26 +282,42 @@ export function ClubManagement() {
               </div>
 
               <div className="space-y-4 font-['Poppins']">
-                {/* Photo URL */}
+                {/* Photo Upload */}
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                    Club Photo URL
+                    Club Photo
                   </label>
                   <input
-                    type="text"
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                    value={form.photo_url}
-                    onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setForm({ ...form, photo_url: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full bg-muted border border-border rounded-xl px-4 py-2 text-foreground outline-none focus:border-accent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-accent-foreground hover:file:bg-accent/90 cursor-pointer"
                   />
                   {form.photo_url && (
-                    <div className="mt-2 h-24 rounded-xl overflow-hidden border border-border">
+                    <div className="mt-2 h-32 rounded-xl overflow-hidden border border-border relative group">
                       <img
                         src={form.photo_url}
                         alt="Preview"
                         className="w-full h-full object-cover"
                         onError={(e) => (e.currentTarget.style.display = "none")}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, photo_url: "" })}
+                        className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove photo"
+                      >
+                        <X size={16} />
+                      </button>
                     </div>
                   )}
                 </div>

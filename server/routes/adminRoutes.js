@@ -41,6 +41,31 @@ router.post('/courts', async (req, res) => {
       }])
       .select();
     if (error) throw error;
+
+    const court = data[0];
+    
+    // Notify super admin about new court
+    try {
+      const { data: superAdmins } = await supabase
+        .from('profiles')
+        .select('id')
+        .in('role', ['superadmin', 'super_admin', 'super admin']);
+      
+      if (superAdmins && superAdmins.length > 0) {
+        const notifications = superAdmins.map(sa => ({
+          user_id: sa.id,
+          type: 'admin_added_court',
+          message: `Admin added a new court "${court.name}" to their club.`,
+          related_entity_id: court.id,
+          related_entity_type: 'court',
+          read: false
+        }));
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (notifError) {
+      console.error('Failed to create super admin notification:', notifError);
+    }
+
     res.status(201).json(data[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -148,12 +173,18 @@ router.put('/bookings/:id', async (req, res) => {
         ? `Your booking for ${booking.booking_date} at ${booking.time_slot} has been ACCEPTED.`
         : `Your booking for ${booking.booking_date} at ${booking.time_slot} has been DECLINED.`;
       
-      await supabase.from('notifications').insert([{
-        user_id: booking.user_id,
-        type: 'booking_update',
-        message,
-        read: false
-      }]);
+      try {
+        await supabase.from('notifications').insert([{
+          user_id: booking.user_id,
+          type: 'booking_update',
+          message,
+          related_entity_id: booking.id,
+          related_entity_type: 'booking',
+          read: false
+        }]);
+      } catch (notifError) {
+        console.error('Failed to create booking notification:', notifError);
+      }
     }
 
     res.json(data[0]);
@@ -332,6 +363,55 @@ router.post('/competitions', async (req, res) => {
     const tournamentData = { ...req.body, club_id: clubId };
     const { data, error } = await supabase.from('tournaments').insert([tournamentData]).select();
     if (error) throw error;
+
+    const tournament = data[0];
+    const adminProfile = req.user?.user_metadata?.full_name || req.user?.email || 'An admin';
+
+    // Notify super admin about new competition
+    try {
+      const { data: superAdmins } = await supabase
+        .from('profiles')
+        .select('id')
+        .in('role', ['superadmin', 'super_admin', 'super admin']);
+      
+      if (superAdmins && superAdmins.length > 0) {
+        const notifications = superAdmins.map(sa => ({
+          user_id: sa.id,
+          type: 'admin_published_competition',
+          message: `Admin from club "${tournament.name}" published a new competition.`,
+          related_entity_id: tournament.id,
+          related_entity_type: 'tournament',
+          read: false
+        }));
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (notifError) {
+      console.error('Failed to create super admin notification:', notifError);
+    }
+
+    // Notify players in the club about new competition
+    try {
+      const { data: players } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('club_id', clubId)
+        .eq('role', 'player');
+      
+      if (players && players.length > 0) {
+        const notifications = players.map(player => ({
+          user_id: player.id,
+          type: 'competition_published',
+          message: `A new competition "${tournament.name}" has been published. Register now!`,
+          related_entity_id: tournament.id,
+          related_entity_type: 'tournament',
+          read: false
+        }));
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (notifError) {
+      console.error('Failed to create player notification:', notifError);
+    }
+
     res.status(201).json(data[0]);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });

@@ -98,6 +98,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import coachRoutes from './routes/coachRoutes.js';
 import playerRoutes from './routes/playerRoutes.js';
 import competitionRoutes from './routes/competitionRoutes.js';
+import tournamentRoutes from './routes/tournamentRoutes.js';
 import superAdminRoutes from './routes/superAdminRoutes.js';
 
 // Basic health check (public)
@@ -151,4 +152,5 @@ app.use('/api/admin', requireAuth, requireRole('admin', 'superadmin', 'super adm
 app.use('/api/coach', requireAuth, requireRole('coach', 'admin'), coachRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/competitions', requireAuth, competitionRoutes);
+app.use('/api/tournaments', requireAuth, tournamentRoutes);
 app.use('/api/superadmin', requireAuth, requireRole('admin', 'superadmin', 'super admin', 'super_admin'), superAdminRoutes);

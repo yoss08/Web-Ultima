@@ -118,6 +118,8 @@ export function StudentDetails() {
 
     if (error) throw error;
     
+    const feedback = data[0];
+
     // Send real-time notification via Socket.io
     socket.emit('send-feedback-notification', { 
       studentId: id, 
@@ -128,6 +130,8 @@ export function StudentDetails() {
       user_id: id,
       type: 'coach_feedback',
       message: `Coach ${user?.user_metadata?.full_name || 'your coach'} has added new feedback for you.`,
+      related_entity_id: feedback.id,
+      related_entity_type: 'feedback',
       read: false
     }]);
 

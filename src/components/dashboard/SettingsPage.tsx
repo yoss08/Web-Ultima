@@ -26,13 +26,13 @@ import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
 import { notificationService } from "../../services/NotificationService";
 
-type TabType = 'account' | 'appearance' | 'notifications' | 'security';
+type TabType = 'personalInfo' | 'appearance' | 'notifications' | 'security';
 
 export function SettingsPage() {
   const { user } = useAuth();
   const { isDark, setIsDark } = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = (searchParams.get('tab') as TabType) || 'account';
+  const initialTab = (searchParams.get('tab') as TabType) || 'personalInfo';
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [loading, setLoading] = useState(false);
 
@@ -185,7 +185,7 @@ export function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: User, color: 'text-[#39ff14]', bg: 'bg-[#39ff14]/10' },
+    { id: 'personalInfo', label: 'Personal Info', icon: User, color: 'text-[#39ff14]', bg: 'bg-[#39ff14]/10' },
     { id: 'appearance', label: 'Appearance', icon: Palette, color: 'text-accent', bg: 'bg-accent/10' },
     { id: 'notifications', label: 'Notifications', icon: Bell, color: 'text-[#14e9ff]', bg: 'bg-[#14e9ff]/10' },
     { id: 'security', label: 'Security', icon: Shield, color: 'text-[#ff3d14]', bg: 'bg-[#ff3d14]/10' },
@@ -201,7 +201,7 @@ export function SettingsPage() {
           Settings
         </h1>
         <p className="font-['Poppins',sans-serif] text-[16px] text-muted-foreground">
-          Manage your account profile, appearance, and security preferences.
+          Manage your personal info, appearance, and security preferences.
         </p>
       </div>
 
@@ -249,10 +249,10 @@ export function SettingsPage() {
               className="bg-card backdrop-blur-xl border border-border rounded-[28px] p-6 lg:p-10 shadow-sm"
             >
               {/* ACCOUNT TAB */}
-              {activeTab === 'account' && (
+              {activeTab === 'personalInfo' && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Account Profile</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Personal Info</h2>
                     <p className="text-sm text-muted-foreground">Manage your public information and contact details.</p>
                   </div>
 

@@ -21,15 +21,6 @@ export function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Logique Admin invisible
-  const isAdminEmail = formData.email.toLowerCase().includes(".uadmin@ultima.tn");
-
-  // Sécurité : Reset le rôle si l'email ne correspond plus
-  useEffect(() => {
-    if (!isAdminEmail && formData.accountType === "Admin") {
-      setFormData(prev => ({ ...prev, accountType: "Player" }));
-    }
-  }, [isAdminEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,54 +78,6 @@ export function SignUpPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Account Type Selector - Original Design */}
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, accountType: "Player" })}
-                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
-                  formData.accountType === "Player"
-                    ? "border-accent bg-accent/10 text-accent"
-                    : "border-transparent bg-muted text-muted-foreground"
-                }`}
-              >
-                <Dumbbell size={24} />
-                <span className="font-['Poppins',sans-serif] font-bold text-[14px]">Player</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, accountType: "Coach" })}
-                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
-                  formData.accountType === "Coach"
-                    ? "border-accent bg-accent/10 text-accent"
-                    : "border-transparent bg-muted text-muted-foreground"
-                }`}
-              >
-                <Users size={24} />
-                <span className="font-['Poppins',sans-serif] font-bold text-[14px]">Coach</span>
-              </button>
-
-              {/* Secret Admin Option */}
-              <AnimatePresence>
-                {isAdminEmail && (
-                  <motion.button
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, accountType: "Admin" })}
-                    className={`col-span-2 flex items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
-                      formData.accountType === "Admin"
-                        ? "border-red-500 bg-red-500/5 text-red-500"
-                        : "border-transparent bg-red-500/10 text-red-400"
-                    }`}
-                  >
-                    <ShieldCheck size={20} />
-                    <span className="font-['Poppins',sans-serif] font-bold text-[14px]">Admin Access</span>
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </div>
 
             {/* Form Fields */}
             <div className="space-y-4">
@@ -186,7 +129,35 @@ export function SignUpPage() {
                 />
               </div>
             </div>
+            {/* Account Type Selector - Original Design */}
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, accountType: "Player" })}
+                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
+                  formData.accountType === "Player"
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-transparent bg-muted text-muted-foreground"
+                }`}
+              >
+                <Users size={24} />
+                <span className="font-['Poppins',sans-serif] font-bold text-[14px]">Player</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, accountType: "Coach" })}
+                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[24px] border-2 transition-all duration-300 ${
+                  formData.accountType === "Coach"
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-transparent bg-muted text-muted-foreground"
+                }`}
+              >
+                <Dumbbell size={24} />
+                <span className="font-['Poppins',sans-serif] font-bold text-[14px]">Coach</span>
+              </button>
+            </div>
 
+            {/* submit button*/}
             <button
               type="submit"
               disabled={loading}
@@ -200,7 +171,7 @@ export function SignUpPage() {
           <div className="mt-8 text-center">
             <p className="font-['Poppins',sans-serif] text-[14px] text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-accent font-semibold hover:text-accent/80 transition-colors">
+              <Link to="/login" className="text-foreground font-semibold hover:text-accent/80 transition-colors">
                 Log in
               </Link>
             </p>

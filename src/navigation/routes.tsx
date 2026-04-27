@@ -41,9 +41,9 @@ import { StudentComparison } from "../screens/coach/StudentComparison";
 import { PlayerDashboard } from "../screens/player/PlayerDashboard";
 import { CourtBooking } from "../screens/player/CourtBooking";
 import { Matches } from "../screens/player/Matches";
-import { Competitions } from "../screens/player/Competitions";
 import { PlayerStats } from "../screens/player/PlayerStats";
 import { MatchDetails } from "../screens/player/MatchDetails";
+import PlayerTournamentsPage from "../screens/player/PlayerTournamentsPage";
 
 // ── Shared ──────────────────────────────────────────────────────
 import { HydrationPage } from "../components/dashboard/HydrationPage";
@@ -118,7 +118,6 @@ export const router = createBrowserRouter([
       { path: "superadmin/users", Component: AllUsersPage },
       { path: "superadmin/bookings", Component: AllBookingsPage },
       { path: "superadmin/matches", Component: MatchCompetitionManagement },
-
       // ─ Admin ─────────────────────────────────────────────────
       { path: "admin/overview", Component: OverviewPage },
       { path: "admin/bookings", Component: AdminBookingsPage },
@@ -141,6 +140,7 @@ export const router = createBrowserRouter([
       { path: "player/home", Component: PlayerDashboard },
       { path: "player/stats", Component: PlayerStats },
       { path: "player/matches/:id", Component: MatchDetails },
+      { path: "player/tournaments", Component: PlayerTournamentsPage },
       { path: "matches", Component: Matches },
 
       // ─ Role-based shared routes ───────────────────────────────
@@ -157,7 +157,7 @@ export const router = createBrowserRouter([
         path: "competitions",
         element: (
           <RoleBasedRoute
-            playerComponent={<Competitions />}
+            playerComponent={<PlayerTournamentsPage />}
             adminComponent={<Navigate to="/dashboard" replace />}
           />
         ),

@@ -23,6 +23,7 @@ import {
   BookOpen,
   UserPlus,
   Lock,
+  User,
 } from "lucide-react";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
@@ -33,6 +34,7 @@ export function DashboardLayout() {
   const { isDark, setIsDark } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -47,6 +49,21 @@ export function DashboardLayout() {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutAlert(true);
+    setMobileMenuOpen(false);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutAlert(false);
+    await signOut();
+    navigate("/");
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutAlert(false);
   };
 
   // ─── Navigation by role ──────────────────────────────────────
@@ -81,7 +98,7 @@ export function DashboardLayout() {
           },
           {
             icon: Trophy,
-            label: "Matches ",
+            label: "Matches & Competitions",
             path: "/dashboard/superadmin/matches",
           },
           {
@@ -154,6 +171,7 @@ export function DashboardLayout() {
 
     // ── SHARED (all roles) ────────────────────────────────────
     { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
+    { icon: User, label: "Profile", path: "/dashboard/profile" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 
@@ -298,17 +316,6 @@ export function DashboardLayout() {
         }`}
       >
         <nav className="p-4 space-y-1 h-full overflow-y-auto pb-8">
-          {/* Super Admin Crown indicator */}
-          {role === "super_admin" && sidebarOpen && (
-            <div className="mb-4 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-              <div className="flex items-center gap-2">
-                <Crown size={14} className="text-yellow-500" />
-                <span className="text-[11px] font-bold text-yellow-500 font-['Poppins'] uppercase tracking-wider">
-                  Super Admin
-                </span>
-              </div>
-            </div>
-          )}
 
           {navItems.map((item) => (
             <SidebarNavLink key={item.path} item={item} />
@@ -316,10 +323,9 @@ export function DashboardLayout() {
 
           {/* Logout */}
           <div className="pt-4">
-            <Link
-              to="/"
-              onClick={handleSignOut}
-              className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all"
+            <button
+              onClick={handleLogoutClick}
+              className="w-full flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all"
             >
               <LogOut className="w-5 h-5 text-red-500 flex-shrink-0" />
               <span
@@ -329,7 +335,7 @@ export function DashboardLayout() {
               >
                 Logout
               </span>
-            </Link>
+            </button>
           </div>
         </nav>
       </aside>
@@ -382,17 +388,56 @@ export function DashboardLayout() {
                 );
               })}
             </div>
-            <Link
-              to="/"
-              onClick={handleSignOut}
-              className="flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-4"
+            <button
+              onClick={handleLogoutClick}
+              className="w-full flex items-center gap-3 px-4 h-12 rounded-[12px] hover:bg-red-500/10 hover:border hover:border-red-500 transition-all mt-4"
             >
               <LogOut className="w-5 h-5 text-red-500" />
               <span className="font-['Poppins',sans-serif] text-[14px] font-medium text-red-500">
                 Logout
               </span>
-            </Link>
+            </button>
           </nav>
+        </div>
+      )}
+
+      {/* Logout Confirmation Alert */}
+      {showLogoutAlert && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={handleLogoutCancel}
+          />
+          {/* Dialog */}
+          <div className="relative bg-background border border-border rounded-2xl shadow-2xl p-6 w-[340px] mx-4 animate-in fade-in zoom-in-95 duration-200">
+            {/* Icon */}
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 mx-auto mb-4">
+              <LogOut className="w-6 h-6 text-red-500" />
+            </div>
+            {/* Text */}
+            <h2 className="font-['Poppins',sans-serif] text-[18px] font-bold text-foreground text-center mb-1">
+              Logout
+            </h2>
+            <p className="font-['Poppins',sans-serif] text-[13px] text-foreground/60 text-center mb-6">
+              Are you sure you want to log out of your account?
+            </p>
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleLogoutCancel}
+                className="flex-1 h-11 rounded-[12px] border border-border text-foreground/80 font-['Poppins'] text-[14px] font-medium hover:bg-accent/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="flex-1 h-11 rounded-[12px] bg-red-500 hover:bg-red-600 text-white font-['Poppins'] text-[14px] font-semibold transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

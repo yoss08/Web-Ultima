@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bell, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router';
@@ -13,38 +13,70 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Prevent state updates after unmount
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!user || !mountedRef.current) return;
     try {
       const data = await notificationService.getMyNotifications();
-      setNotifications(data);
-      const unread = data.filter((n: any) => !n.read).length;
-      setUnreadCount(unread);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
+      if (!mountedRef.current) return;
+      setNotifications(data ?? []);
+      setUnreadCount((data ?? []).filter((n: any) => !n.read).length);
+    } catch (error: any) {
+      // 500 = table missing or RLS blocks access — fail silently, don't crash the bell
+      if (mountedRef.current) {
+        setNotifications([]);
+        setUnreadCount(0);
+      }
     }
   };
 
   useEffect(() => {
+    if (!user) return;
+
     fetchNotifications();
 
-    // Real-time subscription
-    if (user) {
-      const channel = supabase
-        .channel(`user-notifications-${user.id}`)
-        .on('postgres_changes', 
-          { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
-          () => {
-            fetchNotifications();
-          }
-        )
-        .subscribe();
+    // Track subscription status to avoid removing a channel
+    // that was never fully established (causes the WS "closed before connected" error)
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let subscribed = false;
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user]);
+    channel = supabase
+      .channel(`user-notifications-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          if (mountedRef.current) fetchNotifications();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') subscribed = true;
+      });
+
+    return () => {
+      // Only remove the channel if it finished subscribing;
+      // otherwise Supabase would throw "WebSocket closed before connection"
+      if (channel) {
+        if (subscribed) {
+          supabase.removeChannel(channel);
+        } else {
+          // Channel is still connecting — unsubscribe gracefully then remove
+          channel.unsubscribe().then(() => supabase.removeChannel(channel!));
+        }
+      }
+    };
+  }, [user?.id]); // depend on id only, not the whole user object
 
   const handleMarkAsRead = async (id: string) => {
     try {

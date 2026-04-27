@@ -12,7 +12,6 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { getPlayers, createMatch } from "../../services/playerService";
 import QRCode from "react-qr-code"; 
-const padelArena = new URL("../../assets/images/padel_arena.png", import.meta.url).href;
 import { CourtCard } from "../../components/dashboard/CourtCard";
 
 
@@ -176,7 +175,7 @@ export function CourtBooking() {
         // Map courts count manually to avoid complex join issues
         const formattedClubs = clubsData.map((c: any) => ({
           ...c,
-          image: c.photo_url || padelArena,
+          image: c.photo_url,
           courts_count: courtsData.filter((court: any) => court.club_id === c.id).length,
         }));
         

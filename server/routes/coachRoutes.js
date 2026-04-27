@@ -156,6 +156,8 @@ router.post('/sessions', async (req, res) => {
       user_id: sessionPayload.student_id,
       type: 'training_session',
       message: `Coach ${coachProfile?.full_name || 'your coach'} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
+      related_entity_id: session.id,
+      related_entity_type: 'training_session',
       read: false
     }]);
 
@@ -247,15 +249,26 @@ router.post('/students', async (req, res) => {
     if (error) throw error;
 
     // Create notification for student
-    const { data: coachProfile } = await supabase.from('profiles').select('full_name').eq('id', coachId).single();
-    const coachName = coachProfile?.full_name || 'Your coach';
+    try {
+      const { data: coachProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', coachId)
+        .single();
+      
+      const coachName = coachProfile?.full_name || 'Your coach';
 
-    await supabase.from('notifications').insert([{
-      user_id: studentId,
-      type: 'student_assignment',
-      message: `You are assigned to coach ${coachName}.`,
-      read: false
-    }]);
+      await supabase.from('notifications').insert([{
+        user_id: studentId,
+        type: 'student_assignment',
+        message: `You are now assigned to coach ${coachName}.`,
+        related_entity_id: coachId,
+        related_entity_type: 'coach',
+        read: false
+      }]);
+    } catch (notifError) {
+      console.error('Failed to create assignment notification:', notifError);
+    }
 
     res.status(201).json(data[0]);
   } catch (error) {

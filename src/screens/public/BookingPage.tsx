@@ -9,7 +9,6 @@ import {
 import { useTheme } from "../../styles/useTheme";
 import { useAuth } from "../../services/AuthContext";
 import Navigation from "../../components/Navigation";
-import PadelArena from "../../assets/images/padel_arena.png";
 import { supabase } from "../../config/supabase";
 
 interface Club {
@@ -150,7 +149,7 @@ export default function BookingPage() {
         const formattedClubs: Club[] = (clubsRes.data || []).map((c: any) => ({
           id: c.id,
           name: c.name,
-          image: c.photo_url || PadelArena,
+          image: c.photo_url,
           // Count courts that belong to this club client-side — reliable & no FK hint needed
           courts: courtsData.filter((court: any) => court.club_id === c.id).length,
           distance: Math.floor(Math.random() * 8) + 1, // Mock distance
