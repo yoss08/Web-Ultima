@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 
@@ -28,8 +29,6 @@ interface Tournament {
   id: string;
   title: string;
   description?: string;
-  status: string;
-  skill_level: string;
   start_date: string;
   end_date?: string;
   registration_deadline?: string;
@@ -55,8 +54,6 @@ interface Registration {
 const EMPTY_FORM = {
   title: "",
   description: "",
-  status: "Open",
-  skill_level: "All",
   start_date: "",
   end_date: "",
   registration_deadline: "",
@@ -150,7 +147,7 @@ export function AdminCompetitionsPage() {
 
       const { data, error } = await supabase
         .from("tournament_registrations")
-        .select("*, profiles!player_id(full_name, skill_level, phone), tournaments!tournament_id(title)")
+        .select("*, profiles!player_id(full_name, phone), tournaments!tournament_id(title)")
         .in("tournament_id", ids)
         .order("registered_at", { ascending: false });
 
@@ -203,8 +200,6 @@ export function AdminCompetitionsPage() {
     setForm({
       title: t.title,
       description: t.description ?? "",
-      status: t.status,
-      skill_level: t.skill_level ?? "All",
       start_date: t.start_date,
       end_date: t.end_date ?? "",
       registration_deadline: t.registration_deadline ?? "",
@@ -219,7 +214,8 @@ export function AdminCompetitionsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this tournament? This cannot be undone.")) return;
+    const ok = await confirmDialog({ title: "Delete Tournament", message: "This tournament will be permanently removed. This cannot be undone.", confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     try {
       const { error } = await supabase.from("tournaments").delete().eq("id", id);
       if (error) throw error;
@@ -232,13 +228,14 @@ export function AdminCompetitionsPage() {
 
   // ── Registration Actions ──────────────────────────────────────────────────
 
-  const updateRegistration = async (regId: string, newStatus: string) => {
-    setUpdatingReg(regId);
+  const updateRegistration = async (playerId: string, tournamentId: string, newStatus: string) => {
+    setUpdatingReg(`${playerId}-${tournamentId}`);
     try {
       const { error } = await supabase
         .from("tournament_registrations")
         .update({ status: newStatus })
-        .eq("id", regId);
+        .eq("player_id", playerId)
+        .eq("tournament_id", tournamentId);
       if (error) throw error;
       toast.success(newStatus === "accepté" ? "Player accepted!" : "Player rejected");
       await fetchRegistrations();
@@ -250,10 +247,15 @@ export function AdminCompetitionsPage() {
     }
   };
 
-  const deleteRegistration = async (regId: string) => {
-    if (!confirm("Remove this registration?")) return;
+  const deleteRegistration = async (playerId: string, tournamentId: string) => {
+    const ok = await confirmDialog({ title: "Remove Registration", message: "This player's registration will be permanently removed.", confirmLabel: "Remove", variant: "danger" });
+    if (!ok) return;
     try {
-      const { error } = await supabase.from("tournament_registrations").delete().eq("id", regId);
+      const { error } = await supabase
+        .from("tournament_registrations")
+        .delete()
+        .eq("player_id", playerId)
+        .eq("tournament_id", tournamentId);
       if (error) throw error;
       toast.success("Registration removed");
       await fetchRegistrations();
@@ -351,26 +353,7 @@ export function AdminCompetitionsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block font-['Poppins']">Status</label>
-                      <select className={inputCls} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                        <option value="Open">Open</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Finished">Finished</option>
-                        <option value="Invite Only">Invite Only</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block font-['Poppins']">Skill Level</label>
-                      <select className={inputCls} value={form.skill_level} onChange={(e) => setForm({ ...form, skill_level: e.target.value })}>
-                        <option value="All">All</option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                      </select>
-                    </div>
-                  </div>
+                  {/* Status and Skill Level removed to match database schema */}
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -445,13 +428,7 @@ export function AdminCompetitionsPage() {
                   <div className="p-3 rounded-2xl bg-accent/10">
                     <Trophy size={22} className="text-accent" />
                   </div>
-                  <span className={`text-[10px] font-bold uppercase py-1 px-3 rounded-full font-['Poppins'] ${
-                    t.status === "Open" ? "bg-accent/10 text-accent"
-                    : t.status === "Ongoing" ? "bg-blue-500/10 text-blue-400"
-                    : "bg-muted text-muted-foreground"
-                  }`}>
-                    {t.status}
-                  </span>
+                  {/* Status badge removed to match database schema */}
                 </div>
 
                 <div>
@@ -462,7 +439,7 @@ export function AdminCompetitionsPage() {
                 <div className="space-y-1.5 text-sm text-muted-foreground font-['Poppins']">
                   <div className="flex items-center gap-2"><Calendar size={13} className="text-accent" /> {formatDate(t.start_date)}</div>
                   <div className="flex items-center gap-2"><Users size={13} className="text-accent" /> {t.current_players ?? 0} / {t.max_players} accepted</div>
-                  {t.skill_level && <div className="flex items-center gap-2"><Target size={13} className="text-accent" /> {t.skill_level}</div>}
+                        {/* Removed skill_level display */}
                   {t.registration_deadline && <div className="flex items-center gap-2"><Clock size={13} className="text-amber-400" /><span className="text-amber-400">Deadline {formatDate(t.registration_deadline)}</span></div>}
                 </div>
 
@@ -582,7 +559,7 @@ export function AdminCompetitionsPage() {
                                   {reg.profiles?.full_name ?? "Unknown"}
                                 </p>
                                 <p className="text-[11px] text-muted-foreground font-['Poppins']">
-                                  {reg.profiles?.skill_level ?? "—"} · {new Date(reg.registered_at).toLocaleDateString()}
+                                  {new Date(reg.registered_at).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
@@ -596,18 +573,18 @@ export function AdminCompetitionsPage() {
                               {/* Actions */}
                               {reg.status !== "accepté" && (
                                 <button
-                                  onClick={() => updateRegistration(reg.id, "accepté")}
-                                  disabled={updatingReg === reg.id}
+                                  onClick={() => updateRegistration(reg.player_id, reg.tournament_id, "accepté")}
+                                  disabled={updatingReg === `${reg.player_id}-${reg.tournament_id}`}
                                   title="Accept"
                                   className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-all disabled:opacity-50"
                                 >
-                                  {updatingReg === reg.id ? <Loader2 size={13} className="animate-spin" /> : <UserCheck size={13} />}
+                                  {updatingReg === `${reg.player_id}-${reg.tournament_id}` ? <Loader2 size={13} className="animate-spin" /> : <UserCheck size={13} />}
                                 </button>
                               )}
                               {reg.status !== "refusé" && (
                                 <button
-                                  onClick={() => updateRegistration(reg.id, "refusé")}
-                                  disabled={updatingReg === reg.id}
+                                  onClick={() => updateRegistration(reg.player_id, reg.tournament_id, "refusé")}
+                                  disabled={updatingReg === `${reg.player_id}-${reg.tournament_id}`}
                                   title="Reject"
                                   className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50"
                                 >
@@ -615,7 +592,7 @@ export function AdminCompetitionsPage() {
                                 </button>
                               )}
                               <button
-                                onClick={() => deleteRegistration(reg.id)}
+                                onClick={() => deleteRegistration(reg.player_id, reg.tournament_id)}
                                 title="Remove"
                                 className="p-1.5 rounded-lg hover:bg-muted transition-all text-muted-foreground hover:text-red-400"
                               >

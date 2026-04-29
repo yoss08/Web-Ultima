@@ -131,7 +131,7 @@ export const superAdminService = {
   async getAllUsers() {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, email, role, club_id, created_at, phone, is_banned')
+      .select('id, full_name, role, club_id, created_at, phone, is_banned')
       .order('created_at', { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -161,14 +161,27 @@ export const superAdminService = {
     const { data, error } = await supabase
       .from('bookings')
       .select(`
-        id, player_id, court_id, club_id, start_time, end_time, status,
-        profiles:player_id ( full_name ),
-        courts:court_id ( name ),
-        clubs:club_id ( name )
+        id, user_id, court_id, club_id, booking_date, time_slot, status,
+        profiles ( full_name ),
+        courts ( name ),
+        clubs ( name )
       `)
-      .order('start_time', { ascending: false });
+      .order('booking_date', { ascending: false });
+
     if (error) throw new Error(error.message);
-    return data ?? [];
+
+    // Transform data to include start_time and end_time for the UI
+    return (data || []).map(booking => {
+      if (booking.booking_date && booking.time_slot) {
+        const [start, end] = booking.time_slot.split(' - ');
+        return {
+          ...booking,
+          start_time: `${booking.booking_date}T${start}:00`,
+          end_time: `${booking.booking_date}T${end}:00`
+        };
+      }
+      return booking;
+    }) ?? [];
   },
 
   async cancelBooking(bookingId: string | number) {

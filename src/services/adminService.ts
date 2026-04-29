@@ -282,7 +282,7 @@ export const adminService = {
   async updateScore(matchId: string | number, score: string) {
     const { data, error } = await supabase
       .from('matches')
-      .update({ current_score: score })
+      .update({ score: score })
       .eq('id', matchId)
       .select()
       .single();

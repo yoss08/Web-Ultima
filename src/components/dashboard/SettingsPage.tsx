@@ -24,6 +24,7 @@ import { useTheme } from "../../styles/useTheme";
 import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 import { notificationService } from "../../services/NotificationService";
 
 type TabType = 'personalInfo' | 'appearance' | 'notifications' | 'security';
@@ -177,8 +178,8 @@ export function SettingsPage() {
     toast.error("Account disabling is currently not available in this version.");
   };
 
-  const handleDeleteAccount = () => {
-    const confirmed = window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.");
+  const handleDeleteAccount = async () => {
+    const confirmed = await confirmDialog({ title: "Delete Account", message: "Are you sure you want to permanently delete your account? This action cannot be undone.", confirmLabel: "Delete Forever", variant: "danger" });
     if (confirmed) {
       toast.error("Account deletion requires admin permissions. Please contact support.");
     }

@@ -24,11 +24,9 @@ interface Tournament {
   registration_deadline: string | null;
   entry_fee: number;
   rules_text: string | null;
-  status: string;
   created_by: string;
   club_id: string | null;
   created_at: string;
-  skill_level?: string;
   clubs?: { name?: string; location?: string };
   userRegistration?: {
     id: string;
@@ -172,6 +170,7 @@ const PlayerTournamentsPage: React.FC = () => {
       }
 
       setShowSuccess(true);
+      toast.success('Registration submitted! Awaiting approval.');
       await fetchTournaments();
     } catch (err: any) {
       toast.error(err.message || 'Failed to register');
@@ -190,8 +189,6 @@ const PlayerTournamentsPage: React.FC = () => {
   return (
     !t.userRegistration &&
     t.current_players < t.max_players &&
-    t.status !== 'completed' &&
-    t.status !== 'Finished' &&
     isBeforeDeadline
   );
 };

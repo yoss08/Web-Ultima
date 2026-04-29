@@ -21,7 +21,7 @@ import { toast } from "react-hot-toast";
 
 interface Booking {
   id: string | number;
-  player_id: string;
+  user_id: string;
   court_id: string | number;
   start_time: string;
   end_time: string;
@@ -133,7 +133,7 @@ export function AdminBookingsPage() {
       setActionLoading(booking.id);
       await adminService.createMatch({
         booking_id: booking.id,
-        player1_id: booking.player_id,
+        player1_id: booking.user_id,
         court_id: booking.court_id,
         status: 'live',
         start_time: booking.start_time,

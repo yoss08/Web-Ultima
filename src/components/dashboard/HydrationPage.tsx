@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { useTheme } from "../../styles/useTheme";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 const machines = [
   { id: 1, name: "ALMUS Station 1", location: "Main Court Area", status: "active", waterLevel: 92, dailyUsage: 142, totalDispensed: "1,840L" },
@@ -78,8 +79,9 @@ export function HydrationPage() {
     toast.success(`+${amount}ml logged`, { icon: '💧' });
   };
 
-  const resetProgress = () => {
-    if (confirm("Reset today's progress? (Weekly stats will be updated with 0)")) {
+  const resetProgress = async () => {
+    const ok = await confirmDialog({ title: "Reset Progress", message: "Reset today's progress? Your weekly stats will be updated with 0 for today.", confirmLabel: "Reset", variant: "warning" });
+    if (ok) {
       setConsumed(0);
       setHistory([]);
     }

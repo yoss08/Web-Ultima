@@ -104,19 +104,6 @@ export function AdminCourtConfig() {
           </div>
         </form>
       </div>
-
-      {/* Liste des courts configurés (Simulation) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-['Poppins']">
-        <div className="p-6 bg-card border border-border rounded-[24px] flex justify-between items-center shadow-sm">
-          <div>
-            <h4 className="font-bold text-foreground">Court Central</h4>
-            <p className="text-xs text-muted-foreground">Clay • Available</p>
-          </div>
-          <button className="text-red-500 p-2 hover:bg-red-500/10 rounded-lg transition-all">
-            <Trash2 size={18} />
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

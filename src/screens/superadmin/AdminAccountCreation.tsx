@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { superAdminService } from "../../services/superAdminService";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 interface AdminAccount {
   id: string;
@@ -114,7 +115,8 @@ export function AdminAccountCreation() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete admin account for "${name}"? This cannot be undone.`)) return;
+    const ok = await confirmDialog({ title: "Delete Admin Account", message: `Delete admin account for "${name}"? This cannot be undone.`, confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     try {
       await superAdminService.deleteAdminAccount(id);
       toast.success("Admin account deleted");

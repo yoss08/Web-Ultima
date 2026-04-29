@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { superAdminService } from "../../services/superAdminService";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 interface Club {
   id: string;
@@ -109,7 +110,8 @@ export function ClubManagement() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete club "${name}"? This cannot be undone.`)) return;
+    const ok = await confirmDialog({ title: "Delete Club", message: `Delete club "${name}"? This cannot be undone.`, confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     try {
       await superAdminService.deleteClub(id);
       toast.success("Club deleted");

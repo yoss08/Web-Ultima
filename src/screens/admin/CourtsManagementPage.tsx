@@ -20,6 +20,7 @@ import {
 import { adminService } from "../../services/adminService";
 import { Link } from "react-router";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 type CourtStatus = "available" | "occupied" | "maintenance";
 
@@ -133,7 +134,8 @@ setSaving(false);
   };
 
   const handleDeleteCourt = async (courtId: string | number) => {
-    if (!window.confirm("Are you sure you want to delete this court?")) return;
+    const ok = await confirmDialog({ title: "Delete Court", message: "Are you sure you want to delete this court? This cannot be undone.", confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     try {
       await adminService.deleteCourt(courtId);
       setCourts(courts.filter(c => c.id !== courtId));

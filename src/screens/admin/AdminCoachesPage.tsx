@@ -18,6 +18,7 @@ import {
 import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 
 interface Coach {
@@ -84,7 +85,8 @@ export function AdminCoachesPage() {
   };
 
   const handleUnassignCoach = async (coachId: string) => {
-    if (!window.confirm("Are you sure you want to remove this coach from your club?")) return;
+    const ok = await confirmDialog({ title: "Remove Coach", message: "Are you sure you want to remove this coach from your club?", confirmLabel: "Remove", variant: "danger" });
+    if (!ok) return;
     try {
       await adminService.unassignCoachFromClub(coachId);
       toast.success("Coach removed from club");

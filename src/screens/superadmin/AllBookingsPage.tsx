@@ -15,10 +15,11 @@ import {
 } from "lucide-react";
 import { superAdminService } from "../../services/superAdminService";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 interface Booking {
   id: string | number;
-  player_id: string;
+  user_id: string;
   court_id: string | number;
   club_id?: string;
   start_time: string;
@@ -65,7 +66,8 @@ export function AllBookingsPage() {
   }, []);
 
   const handleCancel = async (id: string | number) => {
-    if (!confirm("Cancel this booking?")) return;
+    const ok = await confirmDialog({ title: "Cancel Booking", message: "Are you sure you want to cancel this booking?", confirmLabel: "Cancel Booking", variant: "warning" });
+    if (!ok) return;
     try {
       await superAdminService.cancelBooking(id);
       toast.success("Booking cancelled");
