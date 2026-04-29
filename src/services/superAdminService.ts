@@ -170,17 +170,24 @@ export const superAdminService = {
 
     if (error) throw new Error(error.message);
 
-    // Transform data to include start_time and end_time for the UI
+    // Transform data to include start_time/end_time and flatten joined arrays
     return (data || []).map(booking => {
-      if (booking.booking_date && booking.time_slot) {
-        const [start, end] = booking.time_slot.split(' - ');
+      const flattened = {
+        ...booking,
+        profiles: Array.isArray(booking.profiles) ? booking.profiles[0] : booking.profiles,
+        courts: Array.isArray(booking.courts) ? booking.courts[0] : booking.courts,
+        clubs: Array.isArray(booking.clubs) ? booking.clubs[0] : booking.clubs,
+      };
+
+      if (flattened.booking_date && flattened.time_slot) {
+        const [start, end] = flattened.time_slot.split(' - ');
         return {
-          ...booking,
-          start_time: `${booking.booking_date}T${start}:00`,
-          end_time: `${booking.booking_date}T${end}:00`
+          ...flattened,
+          start_time: `${flattened.booking_date}T${start}:00`,
+          end_time: `${flattened.booking_date}T${end}:00`
         };
       }
-      return booking;
+      return flattened;
     }) ?? [];
   },
 

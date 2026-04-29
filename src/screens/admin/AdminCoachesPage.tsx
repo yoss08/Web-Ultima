@@ -8,6 +8,7 @@ import {
   RefreshCw,
   AlertCircle,
   Lock,
+  Zap,
   UserPlus,
   Plus,
   X,
@@ -236,72 +237,128 @@ export function AdminCoachesPage() {
             <p className="text-muted-foreground italic">No coaches found for your club.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  {["Coach", "Contact", "Specialization", "Joined", "Actions"].map((h) => (
-                    <th
-                      key={h}
-                      className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filteredCoaches.map((coach) => (
-                  <tr key={coach.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 font-bold text-base border border-indigo-400/20">
-                          {coach.full_name?.[0]?.toUpperCase()}
+          <>
+            {/* Mobile View */}
+            <div className="p-4 space-y-4 sm:hidden">
+              {filteredCoaches.map((coach) => (
+                <div key={coach.id} className="bg-card border border-border/50 rounded-[28px] p-5 space-y-4 shadow-sm hover:border-accent/30 transition-all group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 font-bold text-lg border border-indigo-400/20">
+                        {coach.full_name?.[0]?.toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground text-base font-['Poppins']">
+                          {coach.full_name}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <Dumbbell size={12} className="text-indigo-400" />
+                          <span className="text-[10px] text-indigo-400 font-black uppercase tracking-widest font-['Poppins']">
+                            Coach
+                          </span>
                         </div>
-                        <div>
-                          <p className="font-bold text-foreground font-['Poppins']">
-                            {coach.full_name}
-                          </p>
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <Dumbbell size={11} className="text-indigo-400" />
-                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-tight font-['Poppins']">
-                              Coach
-                            </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleUnassignCoach(coach.id)}
+                      className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 text-xs font-['Poppins']">
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-tighter text-[10px]">
+                        <Mail size={12} /> Email
+                      </div>
+                      <p className="text-foreground font-medium truncate max-w-[160px]">{coach.email}</p>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-tighter text-[10px]">
+                        <Zap size={12} /> Focus
+                      </div>
+                      <p className="text-foreground font-medium">{coach.specialization ?? "General"}</p>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50">
+                      <div className="flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-tighter text-[10px]">
+                        <Calendar size={12} /> Joined
+                      </div>
+                      <p className="text-foreground font-medium">{new Date(coach.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    {["Coach", "Contact", "Specialization", "Joined", "Actions"].map((h) => (
+                      <th
+                        key={h}
+                        className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {filteredCoaches.map((coach) => (
+                    <tr key={coach.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-11 h-11 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 font-bold text-base border border-indigo-400/20">
+                            {coach.full_name?.[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground font-['Poppins']">
+                              {coach.full_name}
+                            </p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Dumbbell size={11} className="text-indigo-400" />
+                              <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-tight font-['Poppins']">
+                                Coach
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                        <Mail size={14} className="text-muted-foreground/60" />
-                        {coach.email}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="text-sm text-muted-foreground font-['Poppins']">
-                        {coach.specialization ?? "General"}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                        <Calendar size={14} />
-                        {new Date(coach.created_at).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <button
-                        onClick={() => handleUnassignCoach(coach.id)}
-                        className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                        title="Remove from club"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                          <Mail size={14} className="text-muted-foreground/60" />
+                          {coach.email}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="text-sm text-muted-foreground font-['Poppins']">
+                          {coach.specialization ?? "General"}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                          <Calendar size={14} />
+                          {new Date(coach.created_at).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <button
+                          onClick={() => handleUnassignCoach(coach.id)}
+                          className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                          title="Remove from club"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

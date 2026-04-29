@@ -105,40 +105,48 @@ export function NotificationBell() {
         {isOpen && (
           <>
             <div 
-              className="fixed inset-0 z-40" 
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-none" 
               onClick={() => setIsOpen(false)} 
             />
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 mt-3 w-80 sm:w-96 bg-card border border-border rounded-[28px] shadow-2xl z-50 overflow-hidden"
+              className="fixed sm:absolute top-20 sm:top-auto right-4 left-4 sm:right-0 sm:left-auto sm:mt-3 sm:w-96 bg-card border border-border rounded-[28px] shadow-2xl z-50 overflow-hidden"
+              style={{ maxHeight: 'calc(100vh - 120px)' }}
             >
-              <div className="p-5 border-b border-border flex items-center justify-between">
-                <h3 className="font-bold text-foreground font-['Playfair_Display'] text-lg">Notifications</h3>
-                <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
-                  <X size={18} />
+              <div className="p-5 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-md sticky top-0 z-10">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-foreground font-['Playfair_Display'] text-lg">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <span className="px-2 py-0.5 bg-accent/20 text-accent text-[10px] font-black rounded-full uppercase tracking-widest">
+                      {unreadCount} New
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors">
+                  <X size={18} className="text-muted-foreground" />
                 </button>
               </div>
 
-              <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+              <div className="overflow-y-auto no-scrollbar" style={{ maxHeight: '400px' }}>
                 {notifications.length > 0 ? (
                   notifications.map((n) => (
                     <div 
                       key={n.id} 
-                      className={`p-4 border-b border-border/50 flex gap-3 transition-colors ${n.read ? 'opacity-60' : 'bg-accent/5'}`}
+                      className={`p-4 border-b border-border/50 flex gap-4 transition-colors relative group ${n.read ? 'opacity-60' : 'bg-accent/5'}`}
                     >
-                      <div className={`w-2 h-2 rounded-full shrink-0 mt-2 ${n.read ? 'bg-muted-foreground/30' : 'bg-accent'}`} />
+                      <div className={`w-2 h-2 rounded-full shrink-0 mt-2 ${n.read ? 'bg-muted-foreground/30' : 'bg-accent shadow-[0_0_10px_rgba(204,255,0,0.5)]'}`} />
                       <div className="flex-1">
-                        <p className="text-sm text-foreground font-medium mb-1 font-['Poppins']">{n.message}</p>
+                        <p className="text-sm text-foreground font-medium mb-1 font-['Poppins'] leading-snug">{n.message}</p>
                         <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-                          {new Date(n.created_at).toLocaleString()}
+                          {new Date(n.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                       {!n.read && (
                         <button 
                           onClick={() => handleMarkAsRead(n.id)}
-                          className="p-1.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-all"
+                          className="w-8 h-8 flex items-center justify-center rounded-xl bg-accent/10 text-accent opacity-0 group-hover:opacity-100 sm:opacity-100 transition-all"
                           title="Mark as read"
                         >
                           <Check size={14} />
@@ -147,22 +155,24 @@ export function NotificationBell() {
                     </div>
                   ))
                 ) : (
-                  <div className="py-12 text-center">
-                    <Bell size={40} className="mx-auto text-muted-foreground/20 mb-3" />
-                    <p className="text-muted-foreground text-sm font-['Poppins']">No notifications yet</p>
+                  <div className="py-16 text-center">
+                    <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Bell size={32} className="text-muted-foreground/20" />
+                    </div>
+                    <p className="text-muted-foreground text-sm font-['Poppins']">All caught up!</p>
                   </div>
                 )}
               </div>
               
-              <div className="p-4 bg-muted/30 text-center">
+              <div className="p-4 bg-muted/20 border-t border-border/50 text-center">
                 <button 
                   onClick={() => {
                     setIsOpen(false);
                     navigate('/dashboard/settings?tab=notifications');
                   }}
-                  className="text-[10px] font-black uppercase tracking-[2px] text-accent hover:opacity-80"
+                  className="w-full py-2.5 rounded-xl bg-card border border-border text-[10px] font-black uppercase tracking-[2px] text-accent hover:bg-accent hover:text-accent-foreground transition-all"
                 >
-                  View All Activity
+                  View Full History
                 </button>
               </div>
             </motion.div>

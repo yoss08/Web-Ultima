@@ -91,17 +91,11 @@ function ConfirmDialogUI({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 w-full max-w-[400px] shadow-2xl transition-all duration-300"
         style={{
-          background: "var(--theme-card, #121212)",
-          border: "1px solid var(--theme-border, #27272a)",
-          borderRadius: "24px",
-          padding: "32px",
-          maxWidth: "400px",
-          width: "100%",
           boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)",
-          transform: visible && !exiting ? "scale(1)" : "scale(0.95)",
+          transform: visible && !exiting ? "scale(1) translateY(0)" : "scale(0.95) translateY(20px)",
           opacity: visible && !exiting ? 1 : 0,
-          transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {/* Icon */}
@@ -152,57 +146,23 @@ function ConfirmDialogUI({
         </p>
 
         {/* Buttons */}
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => close(false)}
-            style={{
-              flex: 1,
-              height: "48px",
-              borderRadius: "14px",
-              border: "1px solid var(--theme-border, #27272a)",
-              background: "var(--theme-muted, #27272a)",
-              color: "var(--theme-foreground, #fff)",
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--theme-border, #3f3f46)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "var(--theme-muted, #27272a)";
-            }}
+            className="flex-1 h-12 rounded-xl border border-border bg-muted text-foreground font-semibold hover:bg-border transition-all order-2 sm:order-1"
           >
             {cancelLabel}
           </button>
           <button
             ref={confirmBtnRef}
             onClick={() => close(true)}
+            className="flex-1 h-12 rounded-xl font-bold transition-all order-1 sm:order-2 shadow-lg"
             style={{
-              flex: 1,
-              height: "48px",
-              borderRadius: "14px",
-              border: "none",
               background: s.confirmBg,
               color: s.confirmText,
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: "14px",
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "all 0.15s ease",
               boxShadow: variant === "danger"
                 ? "0 4px 14px rgba(239,68,68,0.25)"
                 : "0 4px 14px rgba(204,255,0,0.15)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.9";
-              e.currentTarget.style.transform = "scale(1.02)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "scale(1)";
             }}
           >
             {confirmLabel}

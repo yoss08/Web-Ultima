@@ -232,29 +232,31 @@ export function ToastProvider() {
     <div
       onMouseEnter={startPause}
       onMouseLeave={endPause}
+      className="fixed z-[99998] flex flex-col-reverse items-end sm:items-end w-full sm:w-auto px-4 sm:px-0"
       style={{
-        position: "fixed",
         bottom: "24px",
-        right: "24px",
-        zIndex: 99998,
-        display: "flex",
-        flexDirection: "column-reverse",
-        alignItems: "flex-end",
+        right: "0",
+        left: "0",
+        margin: "0 auto",
+        pointerEvents: "none",
+        maxWidth: "100%",
       }}
     >
-      {toasts
-        .filter((t) => t.visible || t.id)
-        .slice(0, 5)
-        .map((t) => (
-          <ToastCard
-            key={t.id}
-            id={t.id}
-            variant={getVariant(t)}
-            message={getMessage(t)}
-            visible={t.visible}
-            duration={t.duration ?? 3500}
-          />
-        ))}
+      <div className="flex flex-col-reverse items-center sm:items-end w-full sm:w-auto sm:pr-6 sm:pb-0">
+        {toasts
+          .filter((t) => t.visible || t.id)
+          .slice(0, 5)
+          .map((t) => (
+            <ToastCard
+              key={t.id}
+              id={t.id}
+              variant={getVariant(t)}
+              message={getMessage(t)}
+              visible={t.visible}
+              duration={t.duration ?? 3500}
+            />
+          ))}
+      </div>
     </div>
   );
 }

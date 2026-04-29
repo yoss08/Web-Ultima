@@ -174,18 +174,52 @@ export function PlayerDashboard() {
           </section>
 
           {/* Recent History */}
-          <section className="bg-card p-8 rounded-[32px] border border-border shadow-sm">
+          <section className="bg-card p-6 sm:p-8 rounded-[32px] border border-border shadow-sm">
             <div className="flex items-center justify-between mb-6 font-['Playfair_Display']">
               <h3 className="text-xl font-bold">Recent Matches</h3>
               <Link to="/dashboard/matches" className="text-accent text-sm font-bold flex items-center gap-1 hover:underline font-['Poppins']">
                 View All <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="overflow-x-auto">
+            
+            {/* Mobile View - Cards */}
+            <div className="space-y-4 sm:hidden">
+              {matches.map((m) => (
+                <div key={m.id} className="p-4 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-8 rounded-full ${
+                      m.winner_id === user?.id ? 'bg-accent' : 
+                      m.winner_id && m.winner_id !== '00000000-0000-0000-0000-000000000000' ? 'bg-red-500' : 
+                      'bg-gray-400'
+                    }`} />
+                    <div>
+                      <p className="text-xs font-bold text-foreground font-['Poppins']">
+                        {m.booking?.courts?.name || 'Unknown Court'}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-0.5">
+                        {m.booking?.booking_date ? new Date(m.booking.booking_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '—'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-mono text-sm font-bold text-foreground">{m.score || '-- : --'}</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-tighter ${
+                      m.winner_id === user?.id ? 'text-accent' : 
+                      m.winner_id ? 'text-red-500' : 'text-muted-foreground'
+                    }`}>
+                      {m.winner_id === user?.id ? 'Won' : m.winner_id ? 'Lost' : 'Pending'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View - Table */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left font-['Poppins']">
                 <tbody className="divide-y divide-border/50">
                   {matches.map((m) => (
-                    <tr key={m.id}>
+                    <tr key={m.id} className="group hover:bg-muted/10 transition-colors">
                       <td className="py-4">
                         <span className={`font-bold ${
                           m.winner_id === user?.id ? 'text-accent' : 
@@ -195,8 +229,8 @@ export function PlayerDashboard() {
                           {m.winner_id === user?.id ? 'Win' : m.winner_id ? 'Loss' : 'TBD'}
                         </span>
                       </td>
-                      <td className="py-4 text-sm opacity-80">{m.booking?.courts?.name || '—'}</td>
-                      <td className="py-4 font-mono text-sm">{m.score || '-- : --'}</td>
+                      <td className="py-4 text-sm opacity-80 group-hover:opacity-100">{m.booking?.courts?.name || '—'}</td>
+                      <td className="py-4 font-mono text-sm group-hover:text-accent transition-colors">{m.score || '-- : --'}</td>
                       <td className="py-4 text-right opacity-40 text-xs">
                         {m.booking?.booking_date ? new Date(m.booking.booking_date).toLocaleDateString() : '—'}
                       </td>

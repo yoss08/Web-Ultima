@@ -125,50 +125,89 @@ export function AdminManagement() {
               <p className="text-muted-foreground font-medium">All players currently have a coach.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                    <th className="pb-4 px-2">Player Name</th>
-                    <th className="pb-4 px-2">Select Coach</th>
-                    <th className="pb-4 px-2 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {unassignedPlayers.map((player) => (
-                    <tr key={player.id} className="group">
-                      <td className="py-4 px-2">
-                        <span className="font-semibold text-foreground">{player.full_name}</span>
-                      </td>
-                      <td className="py-4 px-2">
-                        <select
-                          className="bg-muted border border-border rounded-xl px-3 h-10 text-sm text-foreground outline-none focus:border-accent transition-all w-full max-w-[200px]"
-                          onChange={(e) => setSelectedCoachForPlayer({
-                            ...selectedCoachForPlayer,
-                            [player.id]: e.target.value
-                          })}
-                          value={selectedCoachForPlayer[player.id] || ""}
-                        >
-                          <option value="">Choose a coach...</option>
-                          {coaches.map(coach => (
-                            <option key={coach.id} value={coach.id}>Coach {coach.full_name}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="py-4 px-2 text-right">
-                        <button
-                          onClick={() => handleAssign(player.id)}
-                          disabled={isAssigning === player.id}
-                          className="bg-accent text-accent-foreground font-bold text-xs px-4 py-2 rounded-lg hover:scale-105 transition-all disabled:opacity-50 shadow-md shadow-accent/20"
-                        >
-                          {isAssigning === player.id ? "Assigning..." : "Confirm"}
-                        </button>
-                      </td>
+            <>
+              {/* Mobile Card View */}
+              <div className="space-y-4 sm:hidden">
+                {unassignedPlayers.map((player) => (
+                  <div key={player.id} className="bg-muted/30 border border-border/50 rounded-2xl p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="font-bold text-foreground text-sm font-['Poppins']">
+                        {player.full_name}
+                      </p>
+                      <button
+                        onClick={() => handleAssign(player.id)}
+                        disabled={isAssigning === player.id}
+                        className="bg-accent text-accent-foreground font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all disabled:opacity-50 shadow-md shadow-accent/20 uppercase tracking-widest"
+                      >
+                        {isAssigning === player.id ? "..." : "Confirm"}
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Select Coach</label>
+                      <select
+                        className="bg-card border border-border rounded-xl px-3 h-10 text-xs text-foreground outline-none focus:border-accent transition-all w-full font-['Poppins']"
+                        onChange={(e) => setSelectedCoachForPlayer({
+                          ...selectedCoachForPlayer,
+                          [player.id]: e.target.value
+                        })}
+                        value={selectedCoachForPlayer[player.id] || ""}
+                      >
+                        <option value="">Choose a coach...</option>
+                        {coaches.map(coach => (
+                          <option key={coach.id} value={coach.id}>Coach {coach.full_name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']">
+                      <th className="pb-4 px-2">Player Name</th>
+                      <th className="pb-4 px-2">Select Coach</th>
+                      <th className="pb-4 px-2 text-right">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/50">
+                    {unassignedPlayers.map((player) => (
+                      <tr key={player.id} className="group">
+                        <td className="py-4 px-2">
+                          <span className="font-semibold text-foreground text-sm font-['Poppins']">{player.full_name}</span>
+                        </td>
+                        <td className="py-4 px-2">
+                          <select
+                            className="bg-muted border border-border rounded-xl px-3 h-10 text-sm text-foreground outline-none focus:border-accent transition-all w-full max-w-[200px] font-['Poppins']"
+                            onChange={(e) => setSelectedCoachForPlayer({
+                              ...selectedCoachForPlayer,
+                              [player.id]: e.target.value
+                            })}
+                            value={selectedCoachForPlayer[player.id] || ""}
+                          >
+                            <option value="">Choose a coach...</option>
+                            {coaches.map(coach => (
+                              <option key={coach.id} value={coach.id}>Coach {coach.full_name}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="py-4 px-2 text-right">
+                          <button
+                            onClick={() => handleAssign(player.id)}
+                            disabled={isAssigning === player.id}
+                            className="bg-accent text-accent-foreground font-bold text-xs px-4 py-2 rounded-lg hover:scale-105 transition-all disabled:opacity-50 shadow-md shadow-accent/20 font-['Poppins']"
+                          >
+                            {isAssigning === player.id ? "Assigning..." : "Confirm"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </section>

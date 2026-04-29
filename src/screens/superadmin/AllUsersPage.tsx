@@ -22,7 +22,7 @@ import { toast } from "react-hot-toast";
 interface UserProfile {
   id: string;
   full_name: string;
-  email: string;
+  email?: string;
   role: string;
   club_id?: string;
   created_at: string;
@@ -248,7 +248,7 @@ export function AllUsersPage() {
         </p>
       )}
 
-      {/* ── Table ──────────────────────────────────────────────── */}
+      {/* ── Content ────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-[32px] overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center font-['Poppins']">
@@ -260,170 +260,270 @@ export function AllUsersPage() {
             No users found.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  {["User", "Contact", "Role", "Club", "Joined", "Status", "Actions"].map((h, i) => (
-                    <th
-                      key={h}
-                      className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
-                        i === 6 ? "text-right" : ""
-                      }`}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filtered.map((user) => {
-                  const rc = getRoleConfig(user.role);
-                  const RoleIcon = rc.icon;
-                  const isProtected = user.role === "super_admin";
-                  const isDeleting  = deletingId === user.id;
-                  const isBanning   = banningId  === user.id;
+          <>
+            {/* Mobile View */}
+            <div className="p-4 space-y-4 sm:hidden">
+              {filtered.map((user) => {
+                const rc = getRoleConfig(user.role);
+                const RoleIcon = rc.icon;
+                const isProtected = user.role === "super_admin";
+                const isDeleting = deletingId === user.id;
+                const isBanning = banningId === user.id;
 
-                  return (
-                    <tr
-                      key={user.id}
-                      className={`group hover:bg-muted/30 transition-colors ${
-                        user.is_banned ? "opacity-60" : ""
-                      }`}
-                    >
-                      {/* User */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-2xl ${rc.bg} flex items-center justify-center font-bold text-sm ${rc.color}`}>
-                            {user.full_name?.[0]?.toUpperCase() ?? "?"}
-                          </div>
+                return (
+                  <div
+                    key={user.id}
+                    className={`bg-muted/30 border border-border/50 rounded-2xl p-4 space-y-4 transition-all ${
+                      user.is_banned ? "opacity-60" : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl ${rc.bg} flex items-center justify-center font-bold text-sm ${rc.color}`}>
+                          {user.full_name?.[0]?.toUpperCase() ?? "?"}
+                        </div>
+                        <div>
                           <p className="font-bold text-foreground text-sm font-['Poppins']">
                             {user.full_name}
                           </p>
-                        </div>
-                      </td>
-
-                      {/* Contact */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                          <Mail size={13} className="text-muted-foreground/60" />
-                          <span className="truncate max-w-[160px]">{user.email}</span>
-                        </div>
-                      </td>
-
-                      {/* Role */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2">
-                          <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${rc.bg} ${rc.color}`}>
-                            <RoleIcon size={11} />
-                            {rc.label}
-                          </span>
-                          {!isProtected && (
-                            <select
-                              className="text-[10px] bg-muted border border-border rounded-lg px-2 py-1 text-foreground outline-none focus:border-accent transition-all opacity-0 group-hover:opacity-100"
-                              value={user.role ?? "player"}
-                              onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                              disabled={updatingRole === user.id}
-                            >
-                              <option value="player">Player</option>
-                              <option value="coach">Coach</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Club */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                          <Building2 size={13} className="text-muted-foreground/60" />
-                          {getClubName(user.club_id)}
-                        </div>
-                      </td>
-
-                      {/* Joined */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                          <Calendar size={13} />
-                          {new Date(user.created_at).toLocaleDateString()}
-                        </div>
-                      </td>
-
-                      {/* Status (banned badge) */}
-                      <td className="px-6 py-5">
-                        {user.is_banned ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight bg-red-500/10 text-red-500">
-                            <ShieldBan size={11} /> Banned
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight bg-emerald-500/10 text-emerald-500">
-                            Active
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-5 text-right">
-                        {!isProtected && (
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-
-                            {/* Ban / Unban */}
-                            <button
-                              onClick={() =>
-                                setConfirm({
-                                  open: true,
-                                  type: user.is_banned ? "unban" : "ban",
-                                  userId: user.id,
-                                  userName: user.full_name,
-                                })
-                              }
-                              disabled={isBanning}
-                              title={user.is_banned ? "Unban user" : "Ban user"}
-                              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold font-['Poppins'] transition-all disabled:opacity-50 ${
-                                user.is_banned
-                                  ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white"
-                                  : "bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white"
-                              }`}
-                            >
-                              {isBanning ? (
-                                <Loader2 size={13} className="animate-spin" />
-                              ) : user.is_banned ? (
-                                <ShieldCheck size={13} />
-                              ) : (
-                                <ShieldBan size={13} />
-                              )}
-                              {user.is_banned ? "Unban" : "Ban"}
-                            </button>
-
-                            {/* Delete */}
-                            <button
-                              onClick={() =>
-                                setConfirm({
-                                  open: true,
-                                  type: "delete",
-                                  userId: user.id,
-                                  userName: user.full_name,
-                                })
-                              }
-                              disabled={isDeleting}
-                              title="Delete user"
-                              className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
-                            >
-                              {isDeleting ? (
-                                <Loader2 size={16} className="animate-spin" />
-                              ) : (
-                                <Trash2 size={16} />
-                              )}
-                            </button>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <RoleIcon size={10} className={rc.color} />
+                            <span className={`text-[10px] font-bold uppercase tracking-tight ${rc.color}`}>
+                              {rc.label}
+                            </span>
                           </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </div>
+                      </div>
+                      {user.is_banned ? (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-red-500/10 text-red-500">
+                          Banned
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-500">
+                          Active
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 text-[11px] font-['Poppins']">
+                      <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                        <p className="text-muted-foreground uppercase font-bold tracking-wider">Email</p>
+                        <p className="text-foreground truncate max-w-[180px]">{user.email}</p>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                        <p className="text-muted-foreground uppercase font-bold tracking-wider">Club</p>
+                        <p className="text-foreground">{getClubName(user.club_id)}</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground uppercase font-bold tracking-wider">Joined</p>
+                        <p className="text-foreground">{new Date(user.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+
+                    {!isProtected && (
+                      <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                        <select
+                          className="flex-1 h-9 text-[10px] bg-card border border-border rounded-lg px-2 text-foreground outline-none focus:border-accent min-w-[80px]"
+                          value={user.role ?? "player"}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          disabled={updatingRole === user.id}
+                        >
+                          <option value="player">Player</option>
+                          <option value="coach">Coach</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        
+                        <button
+                          onClick={() => setConfirm({ open: true, type: user.is_banned ? "unban" : "ban", userId: user.id, userName: user.full_name })}
+                          disabled={isBanning}
+                          className={`flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg text-[10px] font-bold uppercase transition-all min-w-[80px] ${
+                            user.is_banned ? "bg-emerald-500/10 text-emerald-500" : "bg-orange-500/10 text-orange-500"
+                          }`}
+                        >
+                          {isBanning ? <Loader2 size={10} className="animate-spin" /> : user.is_banned ? <ShieldCheck size={10} /> : <ShieldBan size={10} />}
+                          {user.is_banned ? "Restore" : "Ban"}
+                        </button>
+
+                        <button
+                          onClick={() => setConfirm({ open: true, type: "delete", userId: user.id, userName: user.full_name })}
+                          disabled={isDeleting}
+                          className="w-9 h-9 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                        >
+                          {isDeleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    {["User", "Contact", "Role", "Club", "Joined", "Status", "Actions"].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
+                          i === 6 ? "text-right" : ""
+                        }`}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {filtered.map((user) => {
+                    const rc = getRoleConfig(user.role);
+                    const RoleIcon = rc.icon;
+                    const isProtected = user.role === "super_admin";
+                    const isDeleting  = deletingId === user.id;
+                    const isBanning   = banningId  === user.id;
+
+                    return (
+                      <tr
+                        key={user.id}
+                        className={`group hover:bg-muted/30 transition-colors ${
+                          user.is_banned ? "opacity-60" : ""
+                        }`}
+                      >
+                        {/* User */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-2xl ${rc.bg} flex items-center justify-center font-bold text-sm ${rc.color}`}>
+                              {user.full_name?.[0]?.toUpperCase() ?? "?"}
+                            </div>
+                            <p className="font-bold text-foreground text-sm font-['Poppins']">
+                              {user.full_name}
+                            </p>
+                          </div>
+                        </td>
+
+                        {/* Contact */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                            <Mail size={13} className="text-muted-foreground/60" />
+                            <span className="truncate max-w-[160px]">{user.email}</span>
+                          </div>
+                        </td>
+
+                        {/* Role */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2">
+                            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${rc.bg} ${rc.color}`}>
+                              <RoleIcon size={11} />
+                              {rc.label}
+                            </span>
+                            {!isProtected && (
+                              <select
+                                className="text-[10px] bg-muted border border-border rounded-lg px-2 py-1 text-foreground outline-none focus:border-accent transition-all opacity-0 group-hover:opacity-100"
+                                value={user.role ?? "player"}
+                                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                disabled={updatingRole === user.id}
+                              >
+                                <option value="player">Player</option>
+                                <option value="coach">Coach</option>
+                                <option value="admin">Admin</option>
+                              </select>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Club */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                            <Building2 size={13} className="text-muted-foreground/60" />
+                            {getClubName(user.club_id)}
+                          </div>
+                        </td>
+
+                        {/* Joined */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                            <Calendar size={13} />
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </div>
+                        </td>
+
+                        {/* Status (banned badge) */}
+                        <td className="px-6 py-5">
+                          {user.is_banned ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight bg-red-500/10 text-red-500">
+                              <ShieldBan size={11} /> Banned
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight bg-emerald-500/10 text-emerald-500">
+                              Active
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-6 py-5 text-right">
+                          {!isProtected && (
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                              {/* Ban / Unban */}
+                              <button
+                                onClick={() =>
+                                  setConfirm({
+                                    open: true,
+                                    type: user.is_banned ? "unban" : "ban",
+                                    userId: user.id,
+                                    userName: user.full_name,
+                                  })
+                                }
+                                disabled={isBanning}
+                                title={user.is_banned ? "Unban user" : "Ban user"}
+                                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold font-['Poppins'] transition-all disabled:opacity-50 ${
+                                  user.is_banned
+                                    ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+                                    : "bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white"
+                                }`}
+                              >
+                                {isBanning ? (
+                                  <Loader2 size={13} className="animate-spin" />
+                                ) : user.is_banned ? (
+                                  <ShieldCheck size={13} />
+                                ) : (
+                                  <ShieldBan size={13} />
+                                )}
+                                {user.is_banned ? "Unban" : "Ban"}
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                onClick={() =>
+                                  setConfirm({
+                                    open: true,
+                                    type: "delete",
+                                    userId: user.id,
+                                    userName: user.full_name,
+                                  })
+                                }
+                                disabled={isDeleting}
+                                title="Delete user"
+                                className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
+                              >
+                                {isDeleting ? (
+                                  <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                  <Trash2 size={16} />
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -235,80 +235,130 @@ USING (
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  {["Admin", "Email", "Assigned Club", "Created", "Actions"].map((h, i) => (
-                    <th
-                      key={h}
-                      className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
-                        i === 4 ? "text-right" : ""
-                      }`}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filteredAdmins.map((admin) => (
-                  <tr key={admin.id} className="group hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-sm">
-                          {admin.full_name?.[0]?.toUpperCase() ?? <User size={16} />}
+          <>
+            {/* Mobile Cards */}
+            <div className="p-4 space-y-4 sm:hidden">
+              {filteredAdmins.map((admin) => (
+                <div key={admin.id} className="bg-muted/30 border border-border/50 rounded-2xl p-4 space-y-4 transition-all">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-sm">
+                        {admin.full_name?.[0]?.toUpperCase() ?? <User size={16} />}
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground text-sm font-['Poppins']">
+                          {admin.full_name}
+                        </p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <ShieldCheck size={11} className="text-accent" />
+                          <span className="text-[10px] text-accent font-bold uppercase tracking-tight font-['Poppins']">
+                            Admin
+                          </span>
                         </div>
-                        <div>
-                          <p className="font-bold text-foreground text-sm font-['Poppins']">
-                            {admin.full_name}
-                          </p>
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <ShieldCheck size={11} className="text-accent" />
-                            <span className="text-[10px] text-accent font-bold uppercase tracking-tight font-['Poppins']">
-                              Admin
-                            </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(admin.id, admin.full_name)}
+                      className="p-2 bg-red-500/10 text-red-500 rounded-lg"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 text-[11px] font-['Poppins']">
+                    <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Email</p>
+                      <p className="text-foreground truncate max-w-[180px]">{admin.email}</p>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Club</p>
+                      <p className="text-foreground">{getClubName(admin.club_id)}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Created</p>
+                      <p className="text-foreground">{new Date(admin.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    {["Admin", "Email", "Assigned Club", "Created", "Actions"].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
+                          i === 4 ? "text-right" : ""
+                        }`}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {filteredAdmins.map((admin) => (
+                    <tr key={admin.id} className="group hover:bg-muted/30 transition-colors">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-sm">
+                            {admin.full_name?.[0]?.toUpperCase() ?? <User size={16} />}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground text-sm font-['Poppins']">
+                              {admin.full_name}
+                            </p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <ShieldCheck size={11} className="text-accent" />
+                              <span className="text-[10px] text-accent font-bold uppercase tracking-tight font-['Poppins']">
+                                Admin
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                        <Mail size={14} className="text-muted-foreground/60" />
-                        {admin.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm font-['Poppins']">
-                        <Building2 size={14} className="text-accent" />
-                        <span
-                          className={`font-medium ${
-                            admin.club_id ? "text-foreground" : "text-muted-foreground italic"
-                          }`}
-                        >
-                          {getClubName(admin.club_id)}
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                          <Mail size={14} className="text-muted-foreground/60" />
+                          {admin.email}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm font-['Poppins']">
+                          <Building2 size={14} className="text-accent" />
+                          <span
+                            className={`font-medium ${
+                              admin.club_id ? "text-foreground" : "text-muted-foreground italic"
+                            }`}
+                          >
+                            {getClubName(admin.club_id)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-sm text-muted-foreground font-['Poppins']">
+                          {new Date(admin.created_at).toLocaleDateString()}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-sm text-muted-foreground font-['Poppins']">
-                        {new Date(admin.created_at).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <button
-                        onClick={() => handleDelete(admin.id, admin.full_name)}
-                        className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                        title="Delete admin"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        <button
+                          onClick={() => handleDelete(admin.id, admin.full_name)}
+                          className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete admin"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

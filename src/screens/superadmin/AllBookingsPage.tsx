@@ -22,8 +22,10 @@ interface Booking {
   user_id: string;
   court_id: string | number;
   club_id?: string;
-  start_time: string;
-  end_time: string;
+  start_time?: string;
+  end_time?: string;
+  booking_date?: string;
+  time_slot?: string;
   status: "pending" | "confirmed" | "cancelled";
   profiles?: { full_name: string };
   courts?: { name: string };
@@ -112,7 +114,7 @@ export function AllBookingsPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Pending", value: pending, color: "text-yellow-500", bg: "bg-yellow-500/10" },
           { label: "Confirmed", value: confirmed, color: "text-emerald-400", bg: "bg-emerald-400/10" },
@@ -120,20 +122,25 @@ export function AllBookingsPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className={`${s.bg} rounded-2xl p-4 border border-border text-center`}
+            className={`${s.bg} rounded-2xl p-4 border border-border text-center sm:text-left flex sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-4`}
           >
-            <p className={`text-2xl font-bold font-['Playfair_Display'] ${s.color}`}>
-              {loading ? "—" : s.value}
-            </p>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-['Poppins'] mt-0.5">
-              {s.label}
-            </p>
+            <div className="sm:order-2">
+              <p className={`text-2xl font-bold font-['Playfair_Display'] ${s.color}`}>
+                {loading ? "—" : s.value}
+              </p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-['Poppins'] mt-0.5">
+                {s.label}
+              </p>
+            </div>
+            <div className={`w-10 h-10 rounded-xl ${s.bg} border border-border flex items-center justify-center sm:order-1`}>
+              {s.label === "Pending" ? <RefreshCw size={18} className={s.color} /> : s.label === "Confirmed" ? <CheckCircle2 size={18} className={s.color} /> : <XCircle size={18} className={s.color} />}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         <div className="relative flex-1">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -147,11 +154,11 @@ export function AllBookingsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
-          <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins']">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins'] flex-1">
             <Filter size={15} className="text-muted-foreground" />
             <select
-              className="bg-background text-foreground outline-none text-sm font-semibold"
+              className="bg-transparent text-foreground outline-none text-sm font-semibold w-full"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -162,10 +169,10 @@ export function AllBookingsPage() {
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins']">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 h-12 font-['Poppins'] flex-1">
             <Building2 size={15} className="text-muted-foreground" />
             <select
-              className="bg-background text-foreground outline-none text-sm font-semibold max-w-[120px]"
+              className="bg-transparent text-foreground outline-none text-sm font-semibold w-full sm:max-w-[150px]"
               value={clubFilter}
               onChange={(e) => setClubFilter(e.target.value)}
             >
@@ -180,7 +187,7 @@ export function AllBookingsPage() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table/Cards */}
       <div className="bg-card border border-border rounded-[32px] overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center font-['Poppins']">
@@ -192,96 +199,169 @@ export function AllBookingsPage() {
             No bookings found.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  {["Player", "Court", "Club", "Schedule", "Status", "Actions"].map((h, i) => (
-                    <th
-                      key={h}
-                      className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
-                        i === 5 ? "text-right" : ""
+          <>
+            {/* Mobile Cards */}
+            <div className="p-4 space-y-4 sm:hidden">
+              {filtered.map((booking) => (
+                <div key={booking.id} className="bg-muted/30 border border-border/50 rounded-2xl p-4 space-y-4 transition-all group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
+                        {booking.profiles?.full_name?.[0] ?? <User size={16} />}
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground text-sm font-['Poppins'] truncate max-w-[140px]">
+                          {booking.profiles?.full_name ?? "Unknown"}
+                        </p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Building2 size={10} className="text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground font-medium font-['Poppins']">
+                            {booking.clubs?.name ?? "—"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
+                        booking.status === "confirmed"
+                          ? "bg-emerald-400/10 text-emerald-400"
+                          : booking.status === "cancelled"
+                          ? "bg-red-500/10 text-red-500"
+                          : "bg-yellow-500/10 text-yellow-500"
                       }`}
                     >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filtered.map((booking) => (
-                  <tr key={booking.id} className="group hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
-                          {booking.profiles?.full_name?.[0] ?? <User size={16} />}
-                        </div>
-                        <span className="font-bold text-foreground text-sm font-['Poppins'] truncate max-w-[100px]">
-                          {booking.profiles?.full_name ?? "Unknown"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                        <MapPin size={14} className="text-accent" />
+                      {booking.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 text-[11px] font-['Poppins']">
+                    <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Court</p>
+                      <div className="flex items-center gap-1.5 text-foreground">
+                        <MapPin size={11} className="text-accent" />
                         {booking.courts?.name ?? "—"}
                       </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
-                        <Building2 size={14} className="text-muted-foreground/60" />
-                        {booking.clubs?.name ?? "—"}
+                    </div>
+                    <div className="flex items-center justify-between border-b border-border/30 pb-2">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Date</p>
+                      <div className="flex items-center gap-1.5 text-foreground">
+                        <CalendarIcon size={11} className="text-muted-foreground" />
+                        {booking.start_time ? new Date(booking.start_time).toLocaleDateString() : booking.booking_date || "—"}
                       </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="space-y-1 font-['Poppins']">
-                        <div className="flex items-center gap-2 text-sm text-foreground font-semibold whitespace-nowrap">
-                          <CalendarIcon size={13} className="text-muted-foreground/60" />
-                          {new Date(booking.start_time).toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock size={12} />
-                          {new Date(booking.start_time).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}{" "}
-                          –{" "}
-                          {new Date(booking.end_time).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground uppercase font-bold tracking-wider">Time</p>
+                      <div className="flex items-center gap-1.5 text-foreground">
+                        <Clock size={11} className="text-muted-foreground" />
+                        {booking.start_time ? (
+                          `${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${booking.end_time ? new Date(booking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}`
+                        ) : booking.time_slot || "—"}
                       </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
-                          booking.status === "confirmed"
-                            ? "bg-emerald-400/10 text-emerald-400"
-                            : booking.status === "cancelled"
-                            ? "bg-red-500/10 text-red-500"
-                            : "bg-yellow-500/10 text-yellow-500"
+                    </div>
+                  </div>
+
+                  {booking.status !== "cancelled" && (
+                    <button
+                      onClick={() => handleCancel(booking.id)}
+                      className="w-full py-3 bg-red-500/10 text-red-500 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 size={14} />
+                      Cancel Booking
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    {["Player", "Court", "Club", "Schedule", "Status", "Actions"].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`px-6 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins'] ${
+                          i === 5 ? "text-right" : ""
                         }`}
                       >
-                        {booking.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      {booking.status !== "cancelled" && (
-                        <button
-                          onClick={() => handleCancel(booking.id)}
-                          className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                          title="Cancel booking"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      )}
-                    </td>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {filtered.map((booking) => (
+                    <tr key={booking.id} className="group hover:bg-muted/30 transition-colors">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
+                            {booking.profiles?.full_name?.[0] ?? <User size={16} />}
+                          </div>
+                          <span className="font-bold text-foreground text-sm font-['Poppins'] truncate max-w-[100px]">
+                            {booking.profiles?.full_name ?? "Unknown"}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                          <MapPin size={14} className="text-accent" />
+                          {booking.courts?.name ?? "—"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
+                          <Building2 size={14} className="text-muted-foreground/60" />
+                          {booking.clubs?.name ?? "—"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="space-y-1 font-['Poppins']">
+                          <div className="flex items-center gap-2 text-sm text-foreground font-semibold whitespace-nowrap">
+                            <CalendarIcon size={13} className="text-muted-foreground/60" />
+                            {booking.start_time ? new Date(booking.start_time).toLocaleDateString() : booking.booking_date || "—"}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Clock size={12} />
+                            {booking.start_time ? (
+                              <>
+                                {new Date(booking.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                {booking.end_time && ` – ${new Date(booking.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
+                              </>
+                            ) : booking.time_slot || "—"}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <span
+                          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
+                            booking.status === "confirmed"
+                              ? "bg-emerald-400/10 text-emerald-400"
+                              : booking.status === "cancelled"
+                              ? "bg-red-500/10 text-red-500"
+                              : "bg-yellow-500/10 text-yellow-500"
+                          }`}
+                        >
+                          {booking.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        {booking.status !== "cancelled" && (
+                          <button
+                            onClick={() => handleCancel(booking.id)}
+                            className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            title="Cancel booking"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

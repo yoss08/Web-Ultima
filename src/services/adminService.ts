@@ -17,41 +17,58 @@ async function authHeaders(): Promise<HeadersInit> {
 export const adminService = {
   // ─── PLAYERS ────────────────────────────────────────────────
   async getUnassignedPlayers() {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/players`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch players');
-    const players = await response.json();
-    return players.filter((p: any) => !p.coach_id);
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'player')
+      .is('coach_id', null);
+    
+    if (error) throw error;
+    return data ?? [];
   },
 
   async getClubPlayers(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/players?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club players');
-    return response.json();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'player')
+      .eq('club_id', clubId);
+    
+    if (error) throw error;
+    return data ?? [];
   },
 
   // ─── COACHES ────────────────────────────────────────────────
   async getAllCoaches() {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/players`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch coaches');
-    const profiles = await response.json();
-    return profiles.filter((p: any) => p.account_type === 'Coach' || p.role === 'coach');
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'coach');
+    
+    if (error) throw error;
+    return data ?? [];
   },
 
   async getClubCoaches(clubId: string) {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/coaches?club_id=${clubId}`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch club coaches');
-    return response.json();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'coach')
+      .eq('club_id', clubId);
+    
+    if (error) throw error;
+    return data ?? [];
   },
 
   async getUnassignedCoaches() {
-    const headers = await authHeaders();
-    const response = await fetch(`${ADMIN_API}/unassigned-coaches`, { headers });
-    if (!response.ok) throw new Error('Failed to fetch unassigned coaches');
-    return response.json();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'coach')
+      .is('club_id', null);
+    
+    if (error) throw error;
+    return data ?? [];
   },
 
   async assignCoachToClub(coachId: string) {
