@@ -156,7 +156,7 @@ export function StudentComparison() {
             <h3 className="font-bold mb-4 flex items-center gap-2 text-foreground">
               <BarChart3 size={18} className="text-accent" /> Skill Comparison
             </h3>
-            <div className="h-[350px] font-['Poppins']">
+            <div className="h-[300px] sm:h-[400px] font-['Poppins']">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="var(--theme-border)" opacity={0.3} />

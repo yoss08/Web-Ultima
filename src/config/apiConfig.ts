@@ -26,3 +26,4 @@ export const API_URL = getApiUrl();
 export const ADMIN_API = `${API_URL}/api/admin`;
 export const SUPERADMIN_API = `${API_URL}/api/superadmin`;
 export const COACH_API = `${API_URL}/api/coach`;
+export const PLAYER_API = `${API_URL}/api/player`;

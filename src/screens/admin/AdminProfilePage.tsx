@@ -6,14 +6,20 @@ import {
   Grid3X3,
   Loader2,
   ShieldCheck,
-  ClipboardList
+  ClipboardList,
+  Bell,
+  RefreshCw,
+  Check,
+  Clock,
+  X
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
+import { notificationService } from "../../services/NotificationService";
 
-type Tab = "Account Profile";
+type Tab = "Account Profile" | "Notification history";
 
 export function AdminProfilePage() {
   const { user } = useAuth();
@@ -25,6 +31,10 @@ export function AdminProfilePage() {
   // Profile data
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Notification history
+  const [notificationHistory, setNotificationHistory] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   // Admin stats
   const [clubsCount, setClubsCount] = useState(0);
@@ -85,6 +95,25 @@ export function AdminProfilePage() {
       setIsLoading(false);
     }
   }
+
+  async function fetchNotificationHistory() {
+    if (!user) return;
+    setHistoryLoading(true);
+    try {
+      const data = await notificationService.getMyNotifications();
+      setNotificationHistory(data || []);
+    } catch (e) {
+      console.error("Error fetching notification history:", e);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "Notification history") {
+      fetchNotificationHistory();
+    }
+  }, [activeTab]);
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -197,12 +226,12 @@ export function AdminProfilePage() {
       </div>
 
       {/* ── TAB BAR ───────────────────────────────────────────────────────── */}
-      <div className="flex bg-card border border-border rounded-[18px] p-1 mb-6">
-        {(["Account Profile"] as Tab[]).map((tab) => (
+      <div className="flex bg-card border border-border rounded-[18px] p-1 mb-6 overflow-x-auto no-scrollbar">
+        {(["Account Profile", "Notification history"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2.5 rounded-[14px] text-[11px] font-black tracking-[1.5px] uppercase transition-all relative ${
+            className={`flex-1 min-w-max px-4 py-2.5 rounded-[14px] text-[10px] md:text-[11px] font-black tracking-[1.5px] uppercase transition-all relative ${
               activeTab === tab ? "text-black" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -245,6 +274,28 @@ export function AdminProfilePage() {
               </ul>
             </div>
           )}
+
+          {activeTab === "Notification history" && (
+            <NotificationHistoryTab 
+              notifications={notificationHistory}
+              isLoading={historyLoading}
+              onRefresh={fetchNotificationHistory}
+              onMarkAsRead={async (id) => {
+                await notificationService.markAsRead(id);
+                setNotificationHistory(prev => 
+                  prev.map(n => n.id === id ? { ...n, read: true } : n)
+                );
+              }}
+              onRespond={async (id, action) => {
+                try {
+                  await notificationService.respondToNotification(id, action);
+                  fetchNotificationHistory();
+                } catch (error) {
+                  console.error("Error responding to notification:", error);
+                }
+              }}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -256,7 +307,127 @@ function StatChip({ icon, value, label }: { icon: React.ReactNode; value: number
     <div className="flex-1 flex flex-col items-center">
       {icon}
       <span className="text-black font-black text-xl leading-none mt-0.5">{value}</span>
-      <span className="text-black/60 text-[9px] md:text-[10px] font-bold tracking-[1.5px] uppercase mt-0.5 text-center">{label}</span>
+      <span className="text-black/50 text-[9px] md:text-[10px] font-bold tracking-[1.5px] uppercase mt-0.5 text-center">{label}</span>
+    </div>
+  );
+}
+
+// ─── SECTION HEADER ───────────────────────────────────────────────────────────
+
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <div className="text-accent">{icon}</div>
+      <span className="text-[10px] font-black uppercase tracking-[2px] text-muted-foreground">
+        {title}
+      </span>
+    </div>
+  );
+}
+
+// ─── NOTIFICATION HISTORY TAB ──────────────────────────────────────────────────
+
+function NotificationHistoryTab({
+  notifications,
+  isLoading,
+  onRefresh,
+  onMarkAsRead,
+  onRespond,
+}: {
+  notifications: any[];
+  isLoading: boolean;
+  onRefresh: () => void;
+  onMarkAsRead: (id: string) => Promise<void>;
+  onRespond: (id: string, action: 'confirm' | 'decline') => Promise<void>;
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <SectionHeader icon={<Bell className="w-3.5 h-3.5" />} title="NOTIFICATION HISTORY" />
+        <button 
+          onClick={onRefresh}
+          disabled={isLoading}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
+          Refresh
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-card border border-border rounded-[24px] border-dashed">
+          <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest">Loading history...</p>
+        </div>
+      ) : notifications.length > 0 ? (
+        <div className="space-y-3">
+          {notifications.map((n) => (
+            <motion.div 
+              key={n.id} 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-5 rounded-[24px] border transition-all flex items-start gap-4 ${
+                n.read 
+                  ? "bg-card/40 border-border/50 opacity-60" 
+                  : "bg-card border-accent/20 shadow-lg shadow-accent/5"
+              }`}
+            >
+              <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${n.read ? "bg-muted-foreground/30" : "bg-accent shadow-[0_0_10px_rgba(204,255,0,0.5)]"}`} />
+              <div className="flex-1">
+                <p className={`text-sm font-medium leading-relaxed ${n.read ? "text-muted-foreground" : "text-foreground"}`}>
+                  {n.message}
+                </p>
+
+                {n.type === 'student_assignment' && !n.read && (
+                  <div className="flex gap-2 mt-4 mb-2">
+                    <button 
+                      onClick={() => onRespond(n.id, 'confirm')}
+                      className="px-6 py-2 bg-accent text-accent-foreground rounded-xl text-[10px] font-black uppercase tracking-wider hover:scale-[1.02] transition-all flex items-center gap-1.5"
+                    >
+                      <Check size={14} strokeWidth={3} /> Confirm
+                    </button>
+                    <button 
+                      onClick={() => onRespond(n.id, 'decline')}
+                      className="px-6 py-2 bg-muted text-foreground rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-red-500/10 hover:text-red-500 transition-all flex items-center gap-1.5"
+                    >
+                      <X size={14} strokeWidth={3} /> Decline
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3 mt-2.5">
+                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest flex items-center gap-1.5">
+                    <Clock size={11} />
+                    {new Date(n.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+              {!n.read && (
+                <button 
+                  onClick={() => onMarkAsRead(n.id)}
+                  className="p-2 rounded-xl bg-accent/10 text-accent hover:bg-accent hover:text-accent-foreground transition-all"
+                  title="Mark as read"
+                >
+                  <Check size={16} />
+                </button>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="py-20 text-center bg-card border border-border rounded-[24px] border-dashed">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <Bell className="text-muted-foreground/30" size={32} />
+          </div>
+          <p className="text-muted-foreground text-sm font-medium">Your notification history is empty</p>
+          <button 
+            onClick={onRefresh}
+            className="mt-5 px-6 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-black text-[10px] uppercase tracking-widest rounded-full border border-border transition-all"
+          >
+            Check for activity
+          </button>
+        </div>
+      )}
     </div>
   );
 }

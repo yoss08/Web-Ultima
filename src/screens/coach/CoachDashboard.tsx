@@ -127,7 +127,7 @@ export function CoachDashboard() {
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Ready to start coaching?</h3>
           <p className="text-muted-foreground max-w-sm mx-auto mb-8 text-sm font-['Poppins']">
-            You don't have any students assigned yet. Contact the club administrator to link players to your profile or schedule your first open clinic.
+            You don't have any students assigned yet. You can find and add players to your roster in the Manage Students section.
           </p>
           <Link 
             to="/dashboard/coach/schedule" 

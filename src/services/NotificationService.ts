@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import { PLAYER_API } from '../config/apiConfig';
 
 export const notificationService = {
   async getMyNotifications() {
@@ -51,5 +52,24 @@ export const notificationService = {
 
     if (error) throw error;
     return count || 0;
+  },
+  
+  async respondToNotification(notificationId: string, action: 'confirm' | 'decline') {
+    const { data: { session } } = await supabase.auth.getSession();
+    const response = await fetch(`${PLAYER_API}/notifications/${notificationId}/respond`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      },
+      body: JSON.stringify({ action })
+    });
+    
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Failed to respond to notification');
+    }
+    
+    return response.json();
   }
 };

@@ -101,24 +101,24 @@ export function StudentDetails() {
   setSubmitting(true);
 
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('coach_feedbacks')
       .insert([{
-        student_id: id, // L'ID de l'élève récupéré par useParams
+        student_id: id,
         coach_id: user?.id,
         content: note,
         rating: rating,
-        // On envoie les valeurs des sliders
         speed: skills.speed,
         power: skills.power,
         technique: skills.technique,
         stamina: skills.stamina,
         mental: skills.mental
-      }]);
+      }])
+      .select();
 
     if (error) throw error;
     
-    const feedback = data[0];
+    const feedback = data?.[0];
 
     // Send real-time notification via Socket.io
     socket.emit('send-feedback-notification', { 
@@ -126,14 +126,16 @@ export function StudentDetails() {
       coachName: user?.user_metadata?.full_name || 'your coach' 
     });
 
-    await supabase.from('notifications').insert([{
-      user_id: id,
-      type: 'coach_feedback',
-      message: `Coach ${user?.user_metadata?.full_name || 'your coach'} has added new feedback for you.`,
-      related_entity_id: feedback.id,
-      related_entity_type: 'feedback',
-      read: false
-    }]);
+    if (feedback) {
+      await supabase.from('notifications').insert([{
+        user_id: id,
+        type: 'coach_feedback',
+        message: `Coach ${user?.user_metadata?.full_name || 'your coach'} has added new feedback for you.`,
+        related_entity_id: feedback.id,
+        related_entity_type: 'feedback',
+        read: false
+      }]);
+    }
 
     toast.success("Feedback and Skills updated!");
     setNote(""); // On vide le champ texte
@@ -163,7 +165,7 @@ export function StudentDetails() {
         
         {/* COLONNE GAUCHE : FORMULAIRE FEEDBACK */}
         <div className="lg:col-span-2 space-y-6">
-          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground font-['Playfair_Display']">
               <Star className="text-accent" size={22} />
               Technical Evaluation
@@ -201,7 +203,7 @@ export function StudentDetails() {
           </section>
 
           {/* PERFORMANCE CHART */}
-          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground font-['Playfair_Display']">
               <Activity className="text-accent" size={22} />
               Progress Over Time
@@ -230,7 +232,7 @@ export function StudentDetails() {
           </section>
 
           {/* MATCH HISTORY */}
-          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
             <h3 className="text-xl font-bold mb-6 text-foreground font-['Playfair_Display']">Recent Matches</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -261,7 +263,7 @@ export function StudentDetails() {
 
         {/* COLONNE DROITE : MISE À JOUR DES SCORES (SKILLS) */}
         <div className="space-y-6">
-          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm">
+          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-foreground font-['Playfair_Display']">
               📝 Private Notes
             </h3>
@@ -291,7 +293,7 @@ export function StudentDetails() {
               {savingNotes ? 'Saving...' : 'Save Notes'}
             </button>
           </section>
-          <section className="bg-card border border-border rounded-[32px] p-4 sm:p-6 lg:p-8 shadow-sm transition-colors duration-300">
+          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm transition-colors duration-300">
             <h3 className="text-lg font-bold mb-8 flex items-center gap-2 text-foreground font-['Playfair_Display']">
               <Activity className="text-accent" size={20} />
               Update Skills
@@ -308,7 +310,7 @@ export function StudentDetails() {
                     type="range" 
                     min="0" max="100" 
                     value={value}
-                    onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value)})}
+                    onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value) || 0})}
                     className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-accent transition-all"
                   />
                 </div>

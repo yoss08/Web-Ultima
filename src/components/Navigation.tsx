@@ -99,9 +99,9 @@ export default function Navigation() {
                   </Link>
                 ) : (
                   // SI DÉCONNECTÉ
-                  <button className="w-full bg-accent hover:bg-accent/90 h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/50">
+                  <Link to="/login" className="w-full bg-accent hover:bg-accent/90 h-[40px] px-6 rounded-full hover:scale-105 transition-all duration-300 font-['Poppins',sans-serif] font-semibold text-[14px] text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/50">
                     Get Started
-                  </button>
+                  </Link>
                 )}
               </div>
             </div>

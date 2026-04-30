@@ -71,9 +71,10 @@ export const coachService = {
   },
 
   // Récupérer les joueurs non assignés dans le même club
-  async getUnassignedPlayers(clubId: string) {
+  async getUnassignedPlayers(clubId?: string) {
     const headers = await authHeaders();
-    const response = await fetch(`${API_URL}/unassigned-players?clubId=${clubId}`, { headers });
+    const url = clubId ? `${API_URL}/unassigned-players?clubId=${clubId}` : `${API_URL}/unassigned-players`;
+    const response = await fetch(url, { headers });
     if (!response.ok) throw new Error('Failed to fetch unassigned players');
     return response.json();
   },
@@ -87,6 +88,16 @@ export const coachService = {
       body: JSON.stringify({ coachId, studentId })
     });
     if (!response.ok) throw new Error('Failed to add student');
+    return response.json();
+  },
+  // Supprimer un élève du roster
+  async removeStudent(studentId: string) {
+    const headers = await authHeaders();
+    const response = await fetch(`${API_URL}/students/${studentId}`, {
+      method: 'DELETE',
+      headers
+    });
+    if (!response.ok) throw new Error('Failed to remove student');
     return response.json();
   }
 };

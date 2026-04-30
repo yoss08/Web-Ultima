@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, User as UserIcon, Loader2, UserPlus, ArrowRight, Plus } from "lucide-react";
+import { Search, User as UserIcon, Loader2, UserPlus, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { coachService } from "../../services/CoachService";
 import { useAuth } from "../../services/AuthContext";
 import { Link } from "react-router";
@@ -37,9 +37,8 @@ export function StudentList() {
   }
 
   const loadPlayerAccounts = async () => {
-    if (!user?.club_id) return;
     try {
-      const data = await coachService.getUnassignedPlayers(user.club_id);
+      const data = await coachService.getUnassignedPlayers();
       setPlayerAccounts(data || []);
     } catch (error) {
       console.error("Error loading player accounts:", error);
@@ -80,7 +79,7 @@ export function StudentList() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
+          <div className="relative flex-1 md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input 
               type="text"
@@ -101,7 +100,7 @@ export function StudentList() {
           }}>
             <DialogTrigger asChild>
               <button className="h-12 px-6 bg-accent text-accent-foreground font-bold rounded-[16px] hover:scale-105 transition-transform shadow-lg shadow-accent/20 flex items-center gap-2">
-                <UserPlus size={20} /> <span className="hidden sm:inline">Add Student</span>
+                <UserPlus size={20} /> <span>Add Student</span>
               </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] bg-card border-border">
@@ -123,17 +122,25 @@ export function StudentList() {
                   {filteredPlayerAccounts.length > 0 ? (
                     filteredPlayerAccounts.map((player) => (
                       <div key={player.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden shrink-0">
                             {player.avatar_url ? (
                               <img src={player.avatar_url} alt={player.full_name} className="w-full h-full object-cover rounded-full" />
                             ) : (
                               <UserIcon size={20} className="text-accent" />
                             )}
                           </div>
-                          <div>
-                            <p className="font-bold text-foreground">{player.full_name}</p>
-                            <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                          <div className="min-w-0">
+                            <p className="font-bold text-foreground text-sm truncate">{player.full_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold whitespace-nowrap">{player.account_type || 'Player'}</p>
+                              {player.clubs?.name && (
+                                <>
+                                  <span className="text-muted-foreground/30">•</span>
+                                  <p className="text-[10px] text-accent uppercase font-bold truncate">{player.clubs.name}</p>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <button
@@ -149,7 +156,7 @@ export function StudentList() {
                   ) : playerAccounts.length > 0 ? (
                     <p className="text-center py-10 text-muted-foreground italic">No players match your search.</p>
                   ) : (
-                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found in your club.</p>
+                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found.</p>
                   )}
                 </div>
               </div>
@@ -212,7 +219,15 @@ export function StudentList() {
                           </div>
                           <div>
                             <p className="font-bold text-foreground">{player.full_name}</p>
-                            <p className="text-xs text-muted-foreground uppercase">{player.account_type || 'Player'}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-[10px] text-muted-foreground uppercase font-bold">{player.account_type || 'Player'}</p>
+                              {player.clubs?.name && (
+                                <>
+                                  <span className="text-muted-foreground/30">•</span>
+                                  <p className="text-[10px] text-accent uppercase font-bold truncate max-w-[120px]">{player.clubs.name}</p>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <button
@@ -228,7 +243,7 @@ export function StudentList() {
                   ) : playerAccounts.length > 0 ? (
                     <p className="text-center py-10 text-muted-foreground italic">No players match your search.</p>
                   ) : (
-                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found in your club.</p>
+                    <p className="text-center py-10 text-muted-foreground italic">No player accounts found.</p>
                   )}
                 </div>
               </div>
@@ -252,19 +267,33 @@ export function StudentList() {
                       <UserIcon className="text-accent" size={28} />
                     )}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-lg text-foreground group-hover:text-accent transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-lg text-foreground group-hover:text-accent transition-colors truncate pr-8">
                       {student.full_name}
                     </h4>
-                    <div className="flex gap-2 mt-1">
-                      <span className="text-[10px] bg-muted text-muted-foreground px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <span className="text-[10px] bg-muted text-muted-foreground px-2 py-1 rounded-md font-bold uppercase tracking-tighter whitespace-nowrap">
                         {student.account_type || 'Player'}
                       </span>
-                      <span className="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
+                      <span className="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded-md font-bold uppercase tracking-tighter whitespace-nowrap">
                         {student.skill_level || 'Intermediate'}
                       </span>
                     </div>
                   </div>
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (window.confirm(`Are you sure you want to remove ${student.full_name} from your roster?`)) {
+                        coachService.removeStudent(student.id).then(() => {
+                          toast.success("Student removed");
+                          loadStudents();
+                        }).catch(() => toast.error("Failed to remove student"));
+                      }
+                    }}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-red-500/10 text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white z-20"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
 
                 <div className="mt-8 grid grid-cols-2 gap-4">

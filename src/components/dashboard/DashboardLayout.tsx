@@ -209,9 +209,9 @@ export function DashboardLayout() {
       default:
         return {
           icon: Trophy,
-          color: "text-accent",
-          bg: "bg-accent/10",
-          border: "border-accent/30",
+          color: "text-emerald-400",
+          bg: "bg-emerald-400/10",
+          border: "border-emerald-400/30",
           label: "Player",
         };
     }

@@ -37,7 +37,7 @@ router.get('/students', async (req, res) => {
       .from('coach_students')
       .select(`
         student_id,
-        profiles!student_id (id, full_name, avatar_url, account_type)
+        profiles!student_id (id, full_name, avatar_url)
       `)
       .eq('coach_id', coachId);
       
@@ -122,9 +122,11 @@ router.post('/sessions', async (req, res) => {
       return res.status(400).json({ error: `${missingField} is required` });
     }
 
+    const { drill_plan, ...otherData } = sessionData;
     const sessionPayload = {
-      ...sessionData,
-      status: sessionData.status || 'scheduled'
+      ...otherData,
+      status: sessionData.status || 'scheduled',
+      club_id: req.user.club_id
     };
 
     const { data, error } = await supabase
@@ -132,37 +134,48 @@ router.post('/sessions', async (req, res) => {
       .insert([sessionPayload])
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[CoachRoutes] Supabase Insert Error:', error);
+      throw error;
+    }
+    
+    const session = data?.[0];
+    if (!session) throw new Error("Failed to create session record");
 
-    const session = data[0];
+    // Fetch coach profile for notification message
     const { data: coachProfile } = await supabase
       .from('profiles')
       .select('full_name')
       .eq('id', sessionPayload.coach_id)
       .single();
 
-    const scheduledAt = new Date(sessionPayload.start_time);
-    const formattedDate = scheduledAt.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-    const formattedTime = scheduledAt.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      const scheduledAt = new Date(sessionPayload.start_time);
+      const formattedDate = scheduledAt.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      const formattedTime = scheduledAt.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-    await supabase.from('notifications').insert([{
-      user_id: sessionPayload.student_id,
-      type: 'training_session',
-      message: `Coach ${coachProfile?.full_name || 'your coach'} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
-      related_entity_id: session.id,
-      related_entity_type: 'training_session',
-      read: false
-    }]);
+      await supabase.from('notifications').insert([{
+        user_id: sessionPayload.student_id,
+        type: 'training_session',
+        message: `Coach ${coachProfile?.full_name || 'your coach'} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
+        related_entity_id: session.id,
+        related_entity_type: 'training_session',
+        read: false
+      }]);
+    } catch (notifErr) {
+      console.error('[CoachRoutes] Failed to send session notification:', notifErr);
+    }
 
     res.status(201).json(session);
   } catch (error) {
+    console.error('[CoachRoutes] Error in POST /sessions:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -204,13 +217,9 @@ router.get('/recommendations', async (req, res) => {
 // GET /api/coach/unassigned-players - list all player accounts in the coach's club
 router.get('/unassigned-players', async (req, res) => {
   try {
-    const clubId = req.query.clubId || req.user?.club_id;
-    if (!clubId) return res.status(400).json({ error: "clubId is required" });
-
     const { data: players, error: playersError } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, account_type, role')
-      .eq('club_id', clubId)
+      .select('id, full_name, avatar_url, role, club_id')
       .eq('role', 'player')
       .order('full_name', { ascending: true });
 
@@ -235,42 +244,65 @@ router.get('/unassigned-players', async (req, res) => {
   }
 });
 
-// POST /api/coach/students - assign a student to a coach
+// POST /api/coach/students - request to assign a student to a coach
 router.post('/students', async (req, res) => {
   try {
     const { coachId, studentId } = req.body;
     if (!coachId || !studentId) return res.status(400).json({ error: "coachId and studentId are required" });
 
-    const { data, error } = await supabase
+    // 1. Check if already assigned
+    const { data: existing } = await supabase
       .from('coach_students')
-      .insert([{ coach_id: coachId, student_id: studentId }])
-      .select();
+      .select('*')
+      .eq('coach_id', coachId)
+      .eq('student_id', studentId)
+      .single();
 
-    if (error) throw error;
-
-    // Create notification for student
-    try {
-      const { data: coachProfile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', coachId)
-        .single();
-      
-      const coachName = coachProfile?.full_name || 'Your coach';
-
-      await supabase.from('notifications').insert([{
-        user_id: studentId,
-        type: 'student_assignment',
-        message: `You are now assigned to coach ${coachName}.`,
-        related_entity_id: coachId,
-        related_entity_type: 'coach',
-        read: false
-      }]);
-    } catch (notifError) {
-      console.error('Failed to create assignment notification:', notifError);
+    if (existing) {
+      return res.status(400).json({ error: "This player is already assigned to you." });
     }
 
-    res.status(201).json(data[0]);
+    // 2. Get coach name for the message
+    const { data: coachProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', coachId)
+      .single();
+    
+    const coachName = coachProfile?.full_name || 'A coach';
+
+    // 3. Create notification for student with confirmation request
+    const { data: notif, error: notifError } = await supabase.from('notifications').insert([{
+      user_id: studentId,
+      type: 'student_assignment',
+      message: `Coach ${coachName} wants to add you to their roster. Do you confirm?`,
+      related_entity_id: coachId,
+      related_entity_type: 'coach',
+      read: false
+    }]).select();
+
+    if (notifError) throw notifError;
+
+    res.status(201).json({ message: "Assignment request sent to player", notificationId: notif[0].id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/coach/students/:id - remove a student from the coach's roster
+router.delete('/students/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const coachId = req.user.id;
+
+    const { error } = await supabase
+      .from('coach_students')
+      .delete()
+      .eq('coach_id', coachId)
+      .eq('student_id', id);
+
+    if (error) throw error;
+    res.json({ message: "Student removed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

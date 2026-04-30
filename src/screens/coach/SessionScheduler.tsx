@@ -73,7 +73,7 @@ export function SessionScheduler() {
         <p className="text-muted-foreground text-sm font-medium">Create a new session with your students.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-[24px] p-8 space-y-6 shadow-sm font-['Poppins']">
+      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-[24px] p-6 sm:p-8 space-y-6 shadow-sm font-['Poppins']">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Sélection de l'élève */}
           <div className="space-y-2">
@@ -156,7 +156,7 @@ export function SessionScheduler() {
                 step="15"
                 className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground"
                 value={formData.duration}
-                onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
+                onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value) || 0})}
               />
             </div>
           </div>

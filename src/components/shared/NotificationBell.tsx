@@ -23,8 +23,17 @@ export function NotificationBell() {
   const fetchNotifications = async () => {
     if (!user || !mountedRef.current) return;
     try {
-      const data = await notificationService.getMyNotifications();
+      let data = await notificationService.getMyNotifications();
       if (!mountedRef.current) return;
+
+      // Filter out booking-related notifications for coaches
+      if (user.role === 'coach') {
+        data = (data ?? []).filter((n: any) => 
+          !n.type?.toLowerCase().includes('booking') && 
+          !n.message?.toLowerCase().includes('booking')
+        );
+      }
+
       setNotifications(data ?? []);
       setUnreadCount((data ?? []).filter((n: any) => !n.read).length);
     } catch (error: any) {
@@ -87,6 +96,15 @@ export function NotificationBell() {
     }
   };
 
+  const handleRespond = async (id: string, action: 'confirm' | 'decline') => {
+    try {
+      await notificationService.respondToNotification(id, action);
+      fetchNotifications();
+    } catch (error) {
+      console.error("Error responding to notification:", error);
+    }
+  };
+
   return (
     <div className="relative">
       <button 
@@ -139,11 +157,30 @@ export function NotificationBell() {
                       <div className={`w-2 h-2 rounded-full shrink-0 mt-2 ${n.read ? 'bg-muted-foreground/30' : 'bg-accent shadow-[0_0_10px_rgba(204,255,0,0.5)]'}`} />
                       <div className="flex-1">
                         <p className="text-sm text-foreground font-medium mb-1 font-['Poppins'] leading-snug">{n.message}</p>
+                        
+                        {/* Interactive Actions for Coach Assignments */}
+                        {n.type === 'student_assignment' && !n.read && (
+                          <div className="flex gap-2 mt-3 mb-1">
+                            <button 
+                              onClick={() => handleRespond(n.id, 'confirm')}
+                              className="flex-1 h-8 bg-accent text-accent-foreground rounded-lg text-[10px] font-black uppercase tracking-wider hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
+                            >
+                              <Check size={12} strokeWidth={3} /> Confirm
+                            </button>
+                            <button 
+                              onClick={() => handleRespond(n.id, 'decline')}
+                              className="flex-1 h-8 bg-muted text-foreground rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-red-500/10 hover:text-red-500 transition-all flex items-center justify-center gap-1.5"
+                            >
+                              <X size={12} strokeWidth={3} /> Decline
+                            </button>
+                          </div>
+                        )}
+
                         <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                           {new Date(n.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
-                      {!n.read && (
+                      {!n.read && n.type !== 'student_assignment' && (
                         <button 
                           onClick={() => handleMarkAsRead(n.id)}
                           className="w-8 h-8 flex items-center justify-center rounded-xl bg-accent/10 text-accent opacity-0 group-hover:opacity-100 sm:opacity-100 transition-all"

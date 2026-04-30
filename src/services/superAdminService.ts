@@ -155,6 +155,20 @@ export const superAdminService = {
     if (error) throw new Error(error.message);
   },
 
+  async updateUserDetails(id: string, data: { email?: string; phone?: string; role?: string; fullName?: string }) {
+    const headers = await authHeaders();
+    const response = await fetch(`${API_URL}/api/superadmin/users/${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update user details');
+    }
+    return response.json();
+  },
+
   // ─── BOOKINGS ───────────────────────────────────────────────
 
   async getAllBookings() {

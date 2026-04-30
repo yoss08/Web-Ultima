@@ -132,4 +132,50 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+/**
+ * PATCH /api/superadmin/users/:id
+ * Update user details (email, phone, role, fullName) via Admin API
+ */
+router.patch('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, phone, role, fullName } = req.body;
+
+    // 1. Update Auth record
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (fullName || phone) {
+      updateData.user_metadata = {
+        full_name: fullName,
+        phone_number: phone
+      };
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      const { error: authError } = await supabase.auth.admin.updateUserById(id, updateData);
+      if (authError) throw authError;
+    }
+
+    // 2. Update Profile record
+    const profileUpdate = {};
+    if (fullName) profileUpdate.full_name = fullName;
+    if (email) profileUpdate.email = email;
+    if (phone) profileUpdate.phone = phone;
+    if (role) profileUpdate.role = role;
+
+    if (Object.keys(profileUpdate).length > 0) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update(profileUpdate)
+        .eq('id', id);
+      if (profileError) throw profileError;
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[SuperAdmin] Update user error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
