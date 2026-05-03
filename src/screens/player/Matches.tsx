@@ -3,6 +3,7 @@ import { CheckCircle2, Clock, Loader2, Activity, Zap, ChevronRight, X, Calendar,
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
+import { MOCK_MATCHES, MOCK_USER_ID } from "../../utils/mockData";
 
 export function Matches() {
   const { user } = useAuth();
@@ -18,16 +19,33 @@ export function Matches() {
       if (!user?.id) return;
       setLoading(true);
       
-      const { data, error } = await supabase
-        .from('matches')
-        .select(`
-          *,
-          player1:profiles!player1_id(full_name),
-          player2:profiles!player2_id(full_name),
-          booking:bookings(booking_date, time_slot, courts(name, surface))
-        `)
-        .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-        .order('created_at', { ascending: sortOrder === 'asc' });
+      const USE_MOCK_DATA = true; // SET THIS TO FALSE TO USE REAL DATABASE DATA
+
+      let data: any[] | null = null;
+      let error = null;
+
+      if (USE_MOCK_DATA) {
+        data = MOCK_MATCHES.map(m => ({
+          ...m,
+          winner_id: m.winner_id === MOCK_USER_ID ? user.id : m.winner_id,
+          player1_id: m.player1_id === MOCK_USER_ID ? user.id : m.player1_id,
+        }));
+        await new Promise(r => setTimeout(r, 500)); // Simulate network loading
+      } else {
+        const { data: dbData, error: dbError } = await supabase
+          .from('matches')
+          .select(`
+            *,
+            player1:profiles!player1_id(full_name),
+            player2:profiles!player2_id(full_name),
+            booking:bookings(booking_date, time_slot, courts(name, surface))
+          `)
+          .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+          .order('created_at', { ascending: sortOrder === 'asc' });
+        
+        data = dbData;
+        error = dbError;
+      }
       
       if (!error && data) {
         // Flatten for the UI
@@ -174,9 +192,6 @@ export function Matches() {
               <button onClick={() => setSelectedMatch(null)} className="absolute top-8 right-8 w-10 h-10 rounded-full bg-muted flex items-center justify-center opacity-60 hover:opacity-100 hover:bg-red-500/20 hover:text-red-500 transition-all"><X size={20} /></button>
               
               <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[2px] mb-6 border border-accent/20">
-                  <Zap size={14} /> ALMUS Performance Core
-                </div>
                 <h2 className="text-4xl md:text-5xl font-black mb-2 tracking-tighter">{selectedMatch.courts?.name}</h2>
                 <div className="flex items-center justify-center gap-4 text-sm font-black opacity-40 uppercase tracking-widest text-foreground">
                    <span>{selectedMatch.time_slot}</span>

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { notificationService } from '../../services/NotificationService';
+import { MOCK_TOURNAMENTS } from '../../utils/mockData';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,7 +84,9 @@ const PlayerTournamentsPage: React.FC = () => {
 
       const regMap = new Map(myRegs?.map((r: any) => [r.tournament_id, { id: r.id, status: r.status }]) ?? []);
 
-      const enriched = await Promise.all(
+      const USE_MOCK_DATA = true; // Set to false to use only real DB data
+      
+      let enriched = await Promise.all(
         (allTournaments ?? []).map(async (t: any) => {
           const { count } = await supabase
             .from('tournament_registrations')
@@ -95,9 +98,15 @@ const PlayerTournamentsPage: React.FC = () => {
             ...t,
             current_players: count ?? 0,
             userRegistration: regMap.get(t.id) ?? null,
-          };
+          } as Tournament;
         })
       );
+
+      if (USE_MOCK_DATA) {
+        // We cast MOCK_TOURNAMENTS to any then back to Tournament if needed, 
+        // but we already have the type defined.
+        enriched = [...enriched, ...(MOCK_TOURNAMENTS as any[])];
+      }
 
       setTournaments(enriched);
     } catch (err: any) {
@@ -135,6 +144,13 @@ const PlayerTournamentsPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      if ((registeringTournament as any).isMock) {
+        await new Promise(r => setTimeout(r, 1000));
+        setShowSuccess(true);
+        toast.success('Registration submitted (Mock)!');
+        setIsSubmitting(false);
+        return;
+      }
       const { error } = await supabase.from('tournament_registrations').insert({
         player_id: user.id,
         tournament_id: registeringTournament.id,

@@ -11,6 +11,7 @@ import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
 import { useSocket } from "../../hooks/useSocket";
 import { toast } from "react-hot-toast";
+import { MOCK_MATCHES, MOCK_FEEDBACKS, MOCK_USER_ID, MOCK_STATS } from "../../utils/mockData";
 
 const CACHE_KEY = "ultima_player_dashboard_cache";
 
@@ -19,7 +20,7 @@ export function PlayerDashboard() {
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<any[]>([]);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
-  const [stats, setStats] = useState({ winRate: 0, totalMatches: 0, wins: 0 });
+  const [stats, setStats] = useState({ winRate: 0, totalMatches: 0, wins: 0, performanceScore: 0, rank: "" });
   const [skillData, setSkillData] = useState([
     { subject: 'Speed', score: 0 }, { subject: 'Power', score: 0 },
     { subject: 'Technique', score: 0 }, { subject: 'Stamina', score: 0 }, { subject: 'Mental', score: 0 },
@@ -42,18 +43,44 @@ export function PlayerDashboard() {
       if (!user?.id) return;
 
       try {
-        // Fetch matches from the dedicated matches table
-        const { data: matchData } = await supabase
-          .from('matches')
-          .select('*, booking:bookings(booking_date, time_slot, courts(name))')
-          .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-          .order('created_at', { ascending: false });
+        const USE_MOCK_DATA = true; // SET THIS TO FALSE TO USE REAL DATABASE DATA
 
-        const { data: fbData } = await supabase
-          .from('coach_feedbacks')
-          .select('*')
-          .eq('student_id', user.id)
-          .order('created_at', { ascending: false });
+        let matchData: any[] | null = null;
+        let fbData: any[] | null = null;
+
+        if (USE_MOCK_DATA) {
+          matchData = MOCK_MATCHES.map(m => ({ 
+            ...m, 
+            winner_id: m.winner_id === MOCK_USER_ID ? user.id : m.winner_id 
+          }));
+          fbData = MOCK_FEEDBACKS;
+          
+          // Use hardcoded mock stats to match screenshot exactly
+          setStats({
+            totalMatches: MOCK_STATS.sessions,
+            wins: MOCK_STATS.wins,
+            winRate: MOCK_STATS.winRate,
+            performanceScore: MOCK_STATS.performanceScore,
+            rank: MOCK_STATS.rank
+          });
+
+          await new Promise(r => setTimeout(r, 500)); // Simulate network loading
+        } else {
+          // Fetch matches from the dedicated matches table
+          const { data: mData } = await supabase
+            .from('matches')
+            .select('*, booking:bookings(booking_date, time_slot, courts(name))')
+            .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+            .order('created_at', { ascending: false });
+          matchData = mData;
+
+          const { data: fData } = await supabase
+            .from('coach_feedbacks')
+            .select('*')
+            .eq('student_id', user.id)
+            .order('created_at', { ascending: false });
+          fbData = fData;
+        }
 
         if (matchData) {
           const wins = matchData.filter(m => m.winner_id === user.id).length;
@@ -136,12 +163,25 @@ export function PlayerDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          {/* Performance Score Card (New) */}
+          <div className="bg-card p-8 rounded-[32px] border border-border shadow-sm flex items-center gap-6 group hover:border-accent/50 transition-all">
+            <div className="w-20 h-20 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+               <Activity size={40} className="text-accent" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Performance Score</p>
+              <h2 className="text-6xl font-black text-foreground tracking-tighter">{stats.performanceScore}</h2>
+              <p className="text-accent font-bold mt-1 flex items-center gap-2">
+                <Trophy size={16} />
+                {stats.rank}
+              </p>
+            </div>
+          </div>
+
           {/* Stats Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={Trophy} label="Win Rate" value={`${stats.winRate}%`} color="#CCFF00" />
-            <StatCard icon={CheckCircle2} label="Wins" value={stats.wins} color="#CCFF00" />
-            <StatCard icon={XCircle} label="Losses" value={stats.totalMatches - stats.wins} color="#F43F5E" />
-            <StatCard icon={Calendar} label="Upcoming" value={matches.filter(m => new Date(m.booking_date) >= new Date()).length} color="#CCFF00" />
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+            <StatCard icon={TrendingUp} label="Win Rate" value={`${stats.winRate}%`} color="#CCFF00" />
+            <StatCard icon={History} label="Sessions" value={stats.totalMatches} color="#CCFF00" />
           </div>
 
           {/* Quick Actions */}
@@ -184,34 +224,44 @@ export function PlayerDashboard() {
             
             {/* Mobile View - Cards */}
             <div className="space-y-4 sm:hidden">
-              {matches.map((m) => (
-                <div key={m.id} className="p-4 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-8 rounded-full ${
-                      m.winner_id === user?.id ? 'bg-accent' : 
-                      m.winner_id && m.winner_id !== '00000000-0000-0000-0000-000000000000' ? 'bg-red-500' : 
-                      'bg-gray-400'
-                    }`} />
-                    <div>
-                      <p className="text-xs font-bold text-foreground font-['Poppins']">
-                        {m.booking?.courts?.name || 'Unknown Court'}
+              {matches.map((m) => {
+                const isWin = m.winner_id === user?.id;
+                const isTraining = m.match_type === 'training';
+                const title = isTraining ? "Training Session" : isWin ? "Padel Victory" : "Padel Match";
+                const subtitle = isTraining ? `With ${m.player2?.full_name}` : `Against ${m.player2?.full_name}`;
+                const dateLabel = m.booking?.booking_date ? new Date(m.booking.booking_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '—';
+                const isToday = m.booking?.booking_date && new Date(m.booking.booking_date).toDateString() === new Date().toDateString();
+                const isYesterday = m.booking?.booking_date && new Date(m.booking.booking_date).toDateString() === new Date(Date.now() - 86400000).toDateString();
+                const timeLabel = isToday ? "Today" : isYesterday ? "Yesterday" : dateLabel;
+
+                return (
+                  <div key={m.id} className="p-4 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between group hover:bg-muted/30 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-1.5 h-10 rounded-full ${
+                        isWin ? 'bg-accent' : 
+                        m.winner_id && m.winner_id !== '00000000-0000-0000-0000-000000000000' ? 'bg-red-500' : 
+                        isTraining ? 'bg-blue-400' : 'bg-gray-400'
+                      }`} />
+                      <div>
+                        <p className="text-sm font-bold text-foreground font-['Poppins']">
+                          {title}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground font-medium">
+                          {subtitle}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-mono text-sm font-black ${isWin ? 'text-accent' : 'text-foreground'}`}>
+                        {m.score || '-- : --'}
                       </p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-0.5">
-                        {m.booking?.booking_date ? new Date(m.booking.booking_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '—'}
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter mt-0.5 opacity-60">
+                        {timeLabel}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-mono text-sm font-bold text-foreground">{m.score || '-- : --'}</p>
-                    <p className={`text-[10px] font-bold uppercase tracking-tighter ${
-                      m.winner_id === user?.id ? 'text-accent' : 
-                      m.winner_id ? 'text-red-500' : 'text-muted-foreground'
-                    }`}>
-                      {m.winner_id === user?.id ? 'Won' : m.winner_id ? 'Lost' : 'Pending'}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Desktop View - Table */}
