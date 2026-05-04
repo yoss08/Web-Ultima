@@ -4,17 +4,6 @@ import { useAuth } from "../../services/AuthContext";
 import { Star, Send, ChevronLeft, Loader2, Activity } from "lucide-react";
 import { supabase } from "../../config/supabase";
 import { toast } from "react-hot-toast";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from "recharts";
 import { coachService } from "../../services/CoachService";
 import { useSocket } from "../../hooks/useSocket";
 
@@ -24,8 +13,6 @@ export function StudentDetails() {
   const { user } = useAuth();
   
   const [student, setStudent] = useState<any>(null);
-  const [matches, setMatches] = useState<any[]>([]);
-  const [trend, setTrend] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { socket } = useSocket();
@@ -38,15 +25,6 @@ export function StudentDetails() {
   const [privateNotes, setPrivateNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
 
-  // État pour les scores techniques (Skills)
-  const [skills, setSkills] = useState({
-    speed: 50,
-    power: 50,
-    technique: 50,
-    stamina: 50,
-    mental: 50
-  });
-
   useEffect(() => {
     async function loadData() {
       if (!id) return;
@@ -54,20 +32,6 @@ export function StudentDetails() {
         setLoading(true);
         const data = await coachService.getStudentStats(id);
         setStudent(data.profile);
-        setMatches(data.matches);
-        setTrend(data.performanceTrend);
-        
-        // Update sliders if latest trend exists
-        if (data.performanceTrend.length > 0) {
-          const latest = data.performanceTrend[data.performanceTrend.length - 1];
-          setSkills({
-            speed: latest.speed || 50,
-            power: latest.power || 50,
-            technique: latest.technique || 50,
-            stamina: latest.stamina || 50,
-            mental: latest.mental || 50
-          });
-        }
 
         // Load private notes
         if (user?.id) {
@@ -108,11 +72,6 @@ export function StudentDetails() {
         coach_id: user?.id,
         content: note,
         rating: rating,
-        speed: skills.speed,
-        power: skills.power,
-        technique: skills.technique,
-        stamina: skills.stamina,
-        mental: skills.mental
       }])
       .select();
 
@@ -137,7 +96,7 @@ export function StudentDetails() {
       }]);
     }
 
-    toast.success("Feedback and Skills updated!");
+    toast.success("Feedback updated!");
     setNote(""); // On vide le champ texte
   } catch (err) {
     toast.error("Error saving data");
@@ -177,7 +136,7 @@ export function StudentDetails() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Analyze the student's progress, strengths, and weaknesses..."
-                className="w-full h-40 p-4 rounded-2xl bg-muted border border-transparent focus:border-accent outline-none transition-all resize-none text-sm text-foreground shadow-inner"
+                className="w-full h-48 p-4 rounded-2xl bg-muted border border-transparent focus:border-accent outline-none transition-all resize-none text-sm text-foreground shadow-inner"
               />
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pt-6 border-t border-border font-['Poppins']">
@@ -199,64 +158,6 @@ export function StudentDetails() {
                   <Send size={18} />
                 </button>
               </div>
-            </div>
-          </section>
-
-          {/* PERFORMANCE CHART */}
-          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground font-['Playfair_Display']">
-              <Activity className="text-accent" size={22} />
-              Progress Over Time
-            </h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--theme-accent)" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="var(--theme-accent)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" vertical={false} opacity={0.1} className="text-muted-foreground" />
-                  <XAxis dataKey="created_at" tickFormatter={(str) => new Date(str).toLocaleDateString()} stroke="currentColor" className="text-muted-foreground/50" />
-                  <YAxis domain={[0, 100]} stroke="currentColor" className="text-muted-foreground/50" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-border)', borderRadius: '12px', color: 'var(--theme-foreground)' }}
-                    labelFormatter={(str) => new Date(str).toLocaleDateString()}
-                  />
-                  <Area type="monotone" dataKey="technique" stroke="var(--theme-accent)" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
-                  <Area type="monotone" dataKey="power" stroke="var(--theme-muted-foreground)" fillOpacity={0} strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </section>
-
-          {/* MATCH HISTORY */}
-          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-foreground font-['Playfair_Display']">Recent Matches</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-border font-['Poppins']">
-                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Date</th>
-                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Score</th>
-                    <th className="pb-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Result</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50 font-['Poppins']">
-                  {matches.map((m: any, i: number) => (
-                    <tr key={i} className="group hover:bg-muted/50 transition-colors">
-                      <td className="py-4 text-sm text-foreground/80">{new Date(m.created_at).toLocaleDateString()}</td>
-                      <td className="py-4 font-mono font-bold text-foreground">{m.score || "6-4, 3-6, 7-5"}</td>
-                      <td className="py-4">
-                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${m.winner_id === id ? 'bg-accent/20 text-accent' : 'bg-red-500/10 text-red-500'}`}>
-                          {m.winner_id === id ? 'Victory' : 'Defeat'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </section>
         </div>
@@ -292,36 +193,6 @@ export function StudentDetails() {
             >
               {savingNotes ? 'Saving...' : 'Save Notes'}
             </button>
-          </section>
-          <section className="bg-card border border-border rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm transition-colors duration-300">
-            <h3 className="text-lg font-bold mb-8 flex items-center gap-2 text-foreground font-['Playfair_Display']">
-              <Activity className="text-accent" size={20} />
-              Update Skills
-            </h3>
-            
-            <div className="space-y-8 font-['Poppins']">
-              {Object.entries(skills).map(([skill, value]) => (
-                <div key={skill} className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">{skill}</span>
-                    <span className="text-accent font-mono font-bold">{value}%</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" max="100" 
-                    value={value}
-                    onChange={(e) => setSkills({...skills, [skill]: parseInt(e.target.value) || 0})}
-                    className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-accent transition-all"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 p-4 bg-accent/5 rounded-2xl border border-accent/10 font-['Poppins']">
-              <p className="text-[11px] text-accent/80 font-medium leading-relaxed italic">
-                Updating these values will immediately refresh the histogram on the student's analytics dashboard.
-              </p>
-            </div>
           </section>
         </div>
 

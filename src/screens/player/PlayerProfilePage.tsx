@@ -18,6 +18,10 @@ import {
   Check,
   RefreshCw,
   X,
+  Search,
+  Flag,
+  Star,
+  Users
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../services/AuthContext";
@@ -238,23 +242,25 @@ export function PlayerProfilePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500 px-4">
+        <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500 px-4">
       {/* ── HERO HEADER ───────────────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-[32px] mb-6 bg-gradient-to-b from-accent to-background"
-      >
+        className="relative overflow-hidden rounded-[32px] mb-6 bg-gradient-to-b from-accent to-background">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-2">
-          <div className="text-black font-black text-lg tracking-[2px]">ULTIMA</div>
-          <div className="flex items-center gap-1.5 bg-black/10 rounded-full px-3 py-1.5">
-            <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-            </svg>
-            <span className="text-black text-xs font-bold">Tunisia</span>
+        <div className="flex items-center justify-between px-8 pt-8 pb-4">
+          <div className="flex items-center gap-1.5 bg-black/10 rounded-full px-4 py-2 backdrop-blur-md">
+            <Trophy className="w-3.5 h-3.5 text-black" />
+            <span className="text-black text-[10px] font-black uppercase tracking-widest">Player</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="bg-black/10 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+               <Bolt className="fill-black" size={16} />
+               <span className="text-sm font-black text-black">{points} Pts</span>
+            </div>
           </div>
         </div>
 
-        {/* Avatar & Info Wrapper */}
+      {/* Avatar & Info Wrapper */}
         <div className="flex flex-col md:flex-row items-center md:items-start md:px-10 pt-4 pb-8 md:gap-12">
           {/* Avatar Section */}
           <div className="flex flex-col items-center">
@@ -348,21 +354,22 @@ export function PlayerProfilePage() {
           </div>
         </div>
       </div>
-
-      {/* ── TAB BAR ───────────────────────────────────────────────────────── */}
-      <div className="flex bg-card border border-border rounded-[18px] p-1 mb-6 overflow-x-auto no-scrollbar">
+ 
+     
+     
+      <div className="flex bg-card border border-border rounded-[22px] p-1.5 mb-8 overflow-x-auto no-scrollbar shadow-sm">
         {(["Overview", "Notification history"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 min-w-max px-4 py-2.5 rounded-[14px] text-[10px] md:text-[11px] font-black tracking-[1.5px] uppercase transition-all relative ${
+            className={`flex-1 min-w-max px-6 py-3 rounded-[16px] text-[10px] md:text-[11px] font-black tracking-[2px] uppercase transition-all relative ${
               activeTab === tab ? "text-black" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {activeTab === tab && (
               <motion.div
                 layoutId="tab-pill"
-                className="absolute inset-0 rounded-[14px] bg-accent"
+                className="absolute inset-0 rounded-[16px] bg-[#CCFF00]"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
@@ -371,61 +378,57 @@ export function PlayerProfilePage() {
         ))}
       </div>
 
-      {/* ── TAB CONTENT ──────────────────────────────────────────────────── */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25 }}
-        >
-          {activeTab === "Overview" && (
-            <OverviewTab points={points} currentLevel={currentLevel} />
-          )}
-          {activeTab === "Notification history" && (
-            <NotificationHistoryTab 
-              notifications={notificationHistory}
-              isLoading={historyLoading}
-              onRefresh={fetchNotificationHistory}
-              onMarkAsRead={async (id) => {
-                await notificationService.markAsRead(id);
-                setNotificationHistory(prev => 
-                  prev.map(n => n.id === id ? { ...n, read: true } : n)
-                );
-              }}
-              onRespond={async (id, action) => {
-                try {
-                  await notificationService.respondToNotification(id, action);
-                  fetchNotificationHistory();
-                } catch (error) {
-                  console.error("Error responding to notification:", error);
-                }
-              }}
-            />
-          )}
-        </motion.div>
+        {activeTab === "Overview" ? (
+          <OverviewTab 
+            points={points} 
+            currentLevel={currentLevel} 
+            notificationHistory={notificationHistory} 
+            wins={wins} 
+            bookings={bookings} 
+            setActiveTab={setActiveTab} 
+          />
+        ) : (
+          <motion.div
+            key="history"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="px-6 space-y-6"
+          >
+             <NotificationHistoryTab 
+                notifications={notificationHistory}
+                isLoading={historyLoading}
+                onRefresh={fetchNotificationHistory}
+                onMarkAsRead={async (id) => {
+                  await notificationService.markAsRead(id);
+                  setNotificationHistory(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+                }}
+                onRespond={async (id, action) => {
+                  try {
+                    await notificationService.respondToNotification(id, action);
+                    fetchNotificationHistory();
+                  } catch (error) { console.error(error); }
+                }}
+              />
+          </motion.div>
+        )}
       </AnimatePresence>
+
+      {/* Hidden file input */}
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
     </div>
   );
 }
 
 // ─── STAT CHIP ───────────────────────────────────────────────────────────────
 
-function StatChip({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-}) {
+function StatChip({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
   return (
     <div className="flex-1 flex flex-col items-center">
       {icon}
-      <span className="text-black font-black text-lg md:text-xl leading-none mt-0.5">{value}</span>
-      <span className="text-black/50 text-[8px] md:text-[9px] font-bold tracking-[1.5px] uppercase mt-0.5">{label}</span>
+      <span className="text-foreground font-black text-xl md:text-2xl leading-none mt-0.5">{value}</span>
+      <span className="text-muted-foreground text-[9px] md:text-[10px] font-bold tracking-[1.5px] uppercase mt-0.5 text-center">{label}</span>
     </div>
   );
 }
@@ -448,124 +451,108 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
 function OverviewTab({
   points,
   currentLevel,
+  notificationHistory,
+  wins,
+  bookings,
+  setActiveTab
 }: {
   points: number;
   currentLevel: PlayerLevel;
+  notificationHistory: any[];
+  wins: number;
+  bookings: number;
+  setActiveTab: (tab: Tab) => void;
 }) {
   return (
-    <div className="space-y-8">
-      {/* Levels */}
-      <div>
-        <SectionHeader icon={<Trophy className="w-3.5 h-3.5" />} title="LEVELS" />
-        <div className="space-y-2.5">
-          {LEVELS.map((lvl) => {
-            const isCurrentLevel = lvl.level === currentLevel.level;
-            const isUnlocked     = points >= lvl.minPoints;
-
-            return (
-              <motion.div
-                key={lvl.level}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: lvl.level * 0.06 }}
-                className="flex items-center gap-4 p-4 rounded-[16px] border transition-all"
-                style={{
-                  background: isCurrentLevel
-                    ? lvl.hex.startsWith('var') 
-                      ? `color-mix(in srgb, ${lvl.hex}, transparent 90%)` 
-                      : `${lvl.hex}18`
-                    : "var(--card)",
-                  borderColor: isCurrentLevel 
-                    ? (lvl.hex.startsWith('var') ? lvl.hex : lvl.hex) 
-                    : "var(--border)",
-                  borderWidth: isCurrentLevel ? "1.5px" : "1px",
-                }}
-              >
-                {/* Level number box */}
-                <div
-                  className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0"
-                  style={{ 
-                    background: isUnlocked 
-                      ? lvl.hex.startsWith('var')
-                        ? `color-mix(in srgb, ${lvl.hex}, transparent 85%)`
-                        : `${lvl.hex}20` 
-                      : "var(--muted)" 
-                  }}
-                >
-                  {isUnlocked ? (
-                    <span
-                      className="font-black text-xl leading-none"
-                      style={{ color: lvl.hex }}
-                    >
-                      {lvl.level}
-                    </span>
-                  ) : (
-                    <Lock className="w-4 h-4 text-muted-foreground/40" />
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className="font-bold text-sm"
-                      style={{
-                        color: isUnlocked ? "var(--foreground)" : "var(--muted-foreground)",
-                      }}
-                    >
-                      {lvl.title}
-                    </span>
-                    {isCurrentLevel && (
-                        <span
-                          className="text-[8px] font-black tracking-widest px-2 py-0.5 rounded-full uppercase"
-                          style={{
-                            background: lvl.hex.startsWith('var')
-                              ? `color-mix(in srgb, ${lvl.hex}, transparent 85%)`
-                              : `${lvl.hex}20`,
-                            color: lvl.hex,
-                          }}
-                        >
-                        CURRENT
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-muted-foreground text-[11px]">
-                    {lvl.level < LEVELS.length
-                      ? `${lvl.minPoints} – ${lvl.maxPoints} pts`
-                      : `${lvl.minPoints}+ pts`}
-                  </span>
-                </div>
-
-                {/* Unlocked check */}
-                {isUnlocked && (
-                  <ShieldCheck className="w-5 h-5 flex-shrink-0" style={{ color: lvl.hex }} />
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+    <motion.div
+      key="overview"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="space-y-12"
+    >
+      {/* Quick Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <StatSquare icon={<Bolt size={24} />} value={points} label="Total Points" />
+        <StatSquare icon={<Bell size={24} />} value={notificationHistory.length} label="Activity" color="#FFD700" />
+        <StatSquare icon={<Trophy size={24} />} value={wins} label="Match Wins" color="#C0C0C0" />
+        <StatSquare icon={<Calendar size={24} />} value={bookings} label="Court Bookings" color="#ADD8E6" />
       </div>
 
-      {/* How to earn points */}
-      <div>
-        <SectionHeader icon={<Bolt className="w-3.5 h-3.5" />} title="HOW TO EARN POINTS" />
-        <div className="bg-card border border-border rounded-[20px] p-5 space-y-4 shadow-sm">
-          <PointsRow
-            icon={<Calendar className="w-4.5 h-4.5" />}
-            label="Confirmed Booking"
-            pts="+3 pts"
-            color="#2196F3"
-          />
-          <div className="border-t border-border" />
-          <PointsRow
-            icon={<Trophy className="w-4.5 h-4.5" />}
-            label="Match Win"
-            pts="+10 pts"
-            color="var(--accent)"
-          />
+      <div className="space-y-16">
+        {/* Row 1: Game Profile & Notifications */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+           <section>
+              <SectionHeader icon={<Search className="w-4 h-4" />} title="Game Profile" />
+              <div className="bg-card border border-border rounded-[32px] overflow-hidden shadow-xl">
+                 <InfoRow icon={<Search size={18} />} label="Sport" value="Padel" />
+                 <InfoRow icon={<Flag size={18} />} label="Total Played" value={wins} />
+                 <InfoRow icon={<Star size={18} />} label="Rank" value={currentLevel.title} />
+                 <InfoRow icon={<Calendar size={18} />} label="Confirmed" value={bookings} isLast />
+              </div>
+           </section>
         </div>
+
+        {/* Row 2: Ranks & Progression (Full Width) */}
+        <section>
+           <SectionHeader icon={<Trophy className="w-5 h-5" />} title="Ranks & Global Progression" />
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/20 p-8 rounded-[40px] border border-border shadow-inner">
+             {LEVELS.map((lvl) => {
+               const isCurrentLevel = lvl.level === currentLevel.level;
+               const isUnlocked     = points >= lvl.minPoints;
+
+               return (
+                 <motion.div
+                   key={lvl.level}
+                   whileHover={{ scale: 1.01 }}
+                   className={`flex items-center gap-6 p-6 rounded-[28px] border transition-all ${
+                     isCurrentLevel 
+                       ? "bg-accent/10 border-accent/40 shadow-[0_0_30px_rgba(204,255,0,0.1)]" 
+                       : isUnlocked 
+                         ? "bg-card border-border" 
+                         : "bg-muted/10 border-border opacity-50"
+                   }`}
+                 >
+                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl ${isUnlocked ? 'bg-background border border-border' : 'bg-muted/20'}`}>
+                      {isUnlocked ? (
+                        <span className="font-black text-2xl" style={{ color: lvl.hex }}>{lvl.level}</span>
+                      ) : (
+                        <Lock className="w-6 h-6 text-muted-foreground/20" />
+                      )}
+                   </div>
+                   <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-sm md:text-base font-black uppercase tracking-wider ${isUnlocked ? 'text-foreground' : 'text-muted-foreground/30'}`}>{lvl.title}</span>
+                        {isCurrentLevel && <span className="text-[8px] bg-accent text-black px-2 py-1 rounded-lg font-black uppercase shadow-[0_0_10px_rgba(204,255,0,0.5)]">Current Rank</span>}
+                      </div>
+                      <div className="flex items-center gap-4 mt-1.5">
+                         <p className="text-xs opacity-40 font-bold">{lvl.minPoints} Points Required</p>
+                         {isUnlocked && !isCurrentLevel && <ShieldCheck size={16} className="text-accent opacity-30" />}
+                      </div>
+                   </div>
+                 </motion.div>
+               );
+             })}
+           </div>
+        </section>
+
+        {/* Row 3: How to Earn Points (Full Width) */}
+        <section>
+           <SectionHeader icon={<Bolt className="w-5 h-5" />} title="How to Earn Points" />
+           <div className="bg-card border border-border rounded-[40px] p-10 shadow-2xl relative overflow-hidden">
+             {/* Decorative background element */}
+             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[100px] -mr-32 -mt-32 rounded-full" />
+             
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                <PointsGuideCard icon={<Calendar size={28} />} label="Court Booking" sub="Confirmed and played" pts="+3 pts" color="#3B82F6" />
+                <PointsGuideCard icon={<Trophy size={28} />} label="Match Victory" sub="Win against opponents" pts="+10 pts" color="#CCFF00" />
+                <PointsGuideCard icon={<Users size={28} />} label="Tournament" sub="Entry and participation" pts="+15 pts" color="#C084FC" />
+                <PointsGuideCard icon={<Star size={28} />} label="Perfect Score" sub="Flawless performance" pts="+20 pts" color="#FACC15" />
+             </div>
+           </div>
+        </section>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -678,6 +665,39 @@ function NotificationHistoryTab({
 
 // ─── HELPERS ───────────────────────────────────────────────────────────────
 
+function PointsGuideCard({
+  icon,
+  label,
+  sub,
+  pts,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  sub: string;
+  pts: string;
+  color: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center p-6 bg-muted/20 border border-border rounded-[32px] hover:bg-muted/30 hover:border-accent/20 transition-all group">
+      <div
+        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-xl"
+        style={{ 
+          background: `color-mix(in srgb, ${color}, transparent 90%)`, 
+          color 
+        }}
+      >
+        {icon}
+      </div>
+      <h4 className="text-foreground font-black text-sm uppercase tracking-wider mb-1">{label}</h4>
+      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-4">{sub}</p>
+      <span className="text-2xl font-black" style={{ color }}>
+        {pts}
+      </span>
+    </div>
+  );
+}
+
 function PointsRow({
   icon,
   label,
@@ -710,6 +730,34 @@ function PointsRow({
   );
 }
 
+function StatSquare({ icon, value, label, color = "var(--accent)" }: { icon: React.ReactNode; value: number | string; label: string; color?: string }) {
+  return (
+    <div className="bg-card border border-border rounded-[24px] p-4 flex flex-col items-center gap-1 group hover:border-accent/30 transition-all">
+       <div className="p-2.5 rounded-xl bg-muted/50 group-hover:scale-110 transition-transform" style={{ color }}>
+          {icon}
+       </div>
+       <span className="text-lg font-black mt-1 leading-none">{value}</span>
+       <span className="text-[9px] font-bold uppercase tracking-widest opacity-30">{label}</span>
+    </div>
+  );
+}
+
+function InfoRow({ icon, label, value, isLast = false }: { icon: React.ReactNode; label: string; value?: string | number; isLast?: boolean }) {
+  return (
+    <div className={`flex items-center justify-between px-6 py-5 group hover:bg-muted/20 transition-colors ${!isLast ? 'border-b border-border' : ''}`}>
+       <div className="flex items-center gap-4">
+          <div className="text-accent opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+             {icon}
+          </div>
+          <span className="text-sm font-bold opacity-80 group-hover:opacity-100 text-foreground">{label}</span>
+       </div>
+       {value !== undefined && (
+          <span className="text-sm font-black opacity-90">{value}</span>
+       )}
+    </div>
+  );
+}
+
 function SwitchRow({
   label,
   checked,
@@ -727,7 +775,7 @@ function SwitchRow({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
-          checked ? "bg-[#CCFF00]" : "bg-muted"
+          checked ? "bg-accent" : "bg-muted"
         }`}
       >
         <span

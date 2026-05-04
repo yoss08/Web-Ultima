@@ -19,6 +19,7 @@ import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
 import { AdminManagement } from "../screens/admin/AdminManagement";
 import { AdminCourtConfig } from "../screens/admin/AdminConfig";
+import { AdminMatchControl } from "../screens/admin/AdminMatchControl";
 
 // ── Super Admin screens ─────────────────────────────────────────
 import { SuperAdminDashboard } from "../screens/superadmin/SuperAdminDashboard";
@@ -41,7 +42,6 @@ import { StudentComparison } from "../screens/coach/StudentComparison";
 import { PlayerDashboard } from "../screens/player/PlayerDashboard";
 import { CourtBooking } from "../screens/player/CourtBooking";
 import { Matches } from "../screens/player/Matches";
-import { PlayerStats } from "../screens/player/PlayerStats";
 import { MatchDetails } from "../screens/player/MatchDetails";
 import PlayerTournamentsPage from "../screens/player/PlayerTournamentsPage";
 
@@ -126,6 +126,7 @@ export const router = createBrowserRouter([
       { path: "admin/competitions", Component: AdminCompetitionsPage },
       { path: "admin/management", Component: AdminManagement },
       { path: "admin/courts-config", Component: AdminCourtConfig },
+      { path: "admin/match-control", Component: AdminMatchControl },
 
       // ─ Coach ─────────────────────────────────────────────────
       { path: "coach/home", Component: CoachDashboard },
@@ -138,7 +139,6 @@ export const router = createBrowserRouter([
 
       // ─ Player ────────────────────────────────────────────────
       { path: "player/home", Component: PlayerDashboard },
-      { path: "player/stats", Component: PlayerStats },
       { path: "player/matches/:id", Component: MatchDetails },
       { path: "player/tournaments", Component: PlayerTournamentsPage },
       { path: "matches", Component: Matches },

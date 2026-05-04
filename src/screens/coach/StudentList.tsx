@@ -290,7 +290,7 @@ export function StudentList() {
                         }).catch(() => toast.error("Failed to remove student"));
                       }
                     }}
-                    className="absolute top-4 right-4 p-2 rounded-full bg-red-500/10 text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white z-20"
+                    className="absolute top-4 right-4 p-2 rounded-full bg-red-500/10 text-red-500 transition-all hover:bg-red-500 hover:text-white z-20"
                   >
                     <Trash2 size={16} />
                   </button>

@@ -38,6 +38,45 @@ export const adminService = {
     return data ?? [];
   },
 
+  async getStaffAndPlayers(clubId: string) {
+    // Get profiles explicitly assigned to this club (Admins & Players)
+    const { data: assignedProfiles, error: assignedError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('club_id', clubId);
+
+    if (assignedError) throw assignedError;
+
+    // Get bookings for this club to find players who booked
+    const { data: bookings, error: bookingsError } = await supabase
+      .from('bookings')
+      .select('user_id')
+      .eq('club_id', clubId)
+      .not('user_id', 'is', null);
+
+    if (bookingsError) throw bookingsError;
+
+    const bookedUserIds = Array.from(new Set(bookings.map((b: any) => b.user_id)));
+    
+    let bookedProfiles: any[] = [];
+    if (bookedUserIds.length > 0) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', bookedUserIds);
+        
+      if (error) throw error;
+      bookedProfiles = data ?? [];
+    }
+
+    // Combine and deduplicate by ID
+    const allProfiles = [...(assignedProfiles ?? []), ...bookedProfiles];
+    const uniqueProfiles = Array.from(new Map(allProfiles.map((item) => [item.id, item])).values());
+
+    // Filter to only admins and players
+    return uniqueProfiles.filter(p => p.role === 'admin' || p.role === 'player');
+  },
+
   // ─── COACHES ────────────────────────────────────────────────
   async getAllCoaches() {
     const { data, error } = await supabase
@@ -269,7 +308,14 @@ export const adminService = {
   async getClubMatches(clubId: string) {
     const { data, error } = await supabase
       .from('matches')
-      .select('*, player1:profiles!player1_id(full_name), player2:profiles!player2_id(full_name), booking:bookings(booking_date, time_slot, courts(name, club_id))')
+      .select(`
+        *, 
+        player1:profiles!player1_id(full_name), 
+        player2:profiles!player2_id(full_name),
+        player3:profiles!player3_id(full_name),
+        player4:profiles!player4_id(full_name),
+        booking:bookings(booking_date, time_slot, courts(name, club_id))
+      `)
       .eq('club_id', clubId);
     
     if (error) throw error;
@@ -300,6 +346,18 @@ export const adminService = {
     const { data, error } = await supabase
       .from('matches')
       .update({ score: score })
+      .eq('id', matchId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateMatchStatus(matchId: string | number, status: string, additionalUpdates: Record<string, any> = {}) {
+    const { data, error } = await supabase
+      .from('matches')
+      .update({ status, ...additionalUpdates })
       .eq('id', matchId)
       .select()
       .single();

@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'motion/react';
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useTheme } from "../../styles/useTheme";
+import { useAuth } from "../../services/AuthContext";
 import { supabase } from "../../config/supabase";
 import { CourtCard } from "../../components/dashboard/CourtCard";
-import PadelArena from "../../assets/images/padel_arena.png";
 
 const getISODate = (d: Date) => {
   const tzOffset = d.getTimezoneOffset() * 60000;
@@ -37,6 +37,7 @@ export function ClubDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isDark, setIsDark } = useTheme();
+  const { user } = useAuth();
 
   const [displayClub, setDisplayClub] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -84,7 +85,7 @@ export function ClubDetailsPage() {
           ...data,
           rating: 4.8, // Mock rating
           reviews: Math.floor(Math.random() * 200) + 10,
-          image: data.photo_url || PadelArena,
+          image: data.photo_url,
           price: data.price_per_court || 0,
           courts: data.courts || []
         });
@@ -99,6 +100,45 @@ export function ClubDetailsPage() {
       fetchClubDetails();
     }
   }, [id]);
+
+  useEffect(() => {
+    // If user clicks the magic link in the email and gets logged in
+    // while the OTP modal is open, we can automatically confirm.
+    if (user && showOtpModal && !isSubmitting) {
+      handleConfirmAfterLogin();
+    }
+  }, [user, showOtpModal]);
+
+  const handleConfirmAfterLogin = async () => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from('bookings').insert([
+        {
+          full_name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          user_id: user?.id || null,
+          club_id: displayClub.id,
+          court_id: selectedCourt,
+          booking_date: selectedDate,
+          time_slot: selectedTimeObj?.time || '',
+          duration: selectedDurObj?.value || 1,
+          total_price: totalPrice,
+          status: 'pending',
+        }
+      ]);
+
+      if (error) throw error;
+
+      toast.success("Booking confirmed via Magic Link!");
+      setShowOtpModal(false);
+      navigate('/booking');
+    } catch (err: any) {
+      toast.error("Failed to finalize booking");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -185,7 +225,7 @@ export function ClubDetailsPage() {
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email: formData.email,
         token: otpCode.trim(),
-        type: 'email',
+        type: 'magiclink',
       });
       if (verifyError) {
         setOtpError("Invalid or expired code. Please try again.");

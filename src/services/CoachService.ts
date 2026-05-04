@@ -70,6 +70,37 @@ export const coachService = {
     return response.json();
   },
 
+  // Récupérer les sessions planifiées
+  async getSessions(coachId: string) {
+    const headers = await authHeaders();
+    const response = await fetch(`${API_URL}/sessions?coachId=${coachId}`, { headers });
+    if (!response.ok) throw new Error('Failed to fetch sessions');
+    return response.json();
+  },
+
+  // Mettre à jour une session
+  async updateSession(sessionIds: string[], sessionData: any) {
+    const headers = await authHeaders();
+    const response = await fetch(`${API_URL}/sessions`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ session_ids: sessionIds, ...sessionData })
+    });
+    if (!response.ok) throw new Error('Failed to update session');
+    return response.json();
+  },
+
+  // Supprimer une session
+  async deleteSession(sessionIds: string[]) {
+    const headers = await authHeaders();
+    const response = await fetch(`${API_URL}/sessions?ids=${sessionIds.join(',')}`, {
+      method: 'DELETE',
+      headers
+    });
+    if (!response.ok) throw new Error('Failed to delete session');
+    return response.json();
+  },
+
   // Récupérer les joueurs non assignés dans le même club
   async getUnassignedPlayers(clubId?: string) {
     const headers = await authHeaders();

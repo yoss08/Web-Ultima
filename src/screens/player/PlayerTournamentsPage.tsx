@@ -443,23 +443,6 @@ const PlayerTournamentsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <h4 className="font-bold text-[15px] text-foreground mb-4">Skill Level</h4>
-                <div className="flex gap-3 mb-10">
-                  {['Beginner', 'Intermediate', 'Pro'].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSkillLevel(level)}
-                      className={`flex-1 py-3.5 rounded-[14px] text-[13px] font-bold transition-all border ${
-                        skillLevel === level 
-                          ? 'bg-accent border-accent text-black shadow-[0_4px_12px_rgba(202,246,133,0.2)]' 
-                          : 'bg-card border-border text-muted-foreground hover:border-accent/40 hover:bg-accent/5'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-
                 {/* Terms Checkbox */}
                 <label className="flex items-start gap-4 cursor-pointer mb-10 group bg-card p-4 rounded-[16px] border border-border hover:border-accent/30 transition-colors">
                   <div className="relative flex items-center shrink-0 mt-0.5">

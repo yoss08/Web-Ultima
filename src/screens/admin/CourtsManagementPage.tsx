@@ -153,7 +153,6 @@ setSaving(false);
         name: courtFormModal.name,
         type: courtFormModal.type ? courtFormModal.type.toLowerCase() : undefined,
         surface: courtFormModal.surface,
-        capacity: courtFormModal.capacity,
       };
       await adminService.updateCourt(editingCourt.id, updates);
       toast.success("Court updated successfully!");
@@ -447,11 +446,7 @@ setSaving(false);
 
                 <div className="space-y-4">
                   {/* Stats Row */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-3 bg-muted/30 rounded-2xl border border-border">
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase font-['Poppins']">Capacity</p>
-                      <p className="text-sm text-foreground font-bold">{court.capacity || 4} Players</p>
-                    </div>
+                  <div className="grid grid-cols-1 gap-2">
                     <div className="p-3 bg-muted/30 rounded-2xl border border-border">
                       <p className="text-[10px] text-muted-foreground font-bold uppercase font-['Poppins']">Rate</p>
                       <p className="text-sm text-foreground font-bold">{clubInfo?.price_per_court || 0} DT/hr</p>
@@ -550,15 +545,6 @@ setSaving(false);
                     <option value="Grass">Grass</option>
                   </select>
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Capacity (Players)</label>
-                <input
-                  type="number"
-                  className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground outline-none focus:border-accent transition-all"
-                  value={courtFormModal.capacity || 4}
-                  onChange={(e) => setCourtFormModal({ ...courtFormModal, capacity: parseInt(e.target.value) || 4 })}
-                />
               </div>
               <button
                 onClick={handleSaveCourt}

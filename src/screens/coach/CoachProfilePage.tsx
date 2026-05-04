@@ -272,12 +272,6 @@ export function CoachProfilePage() {
                   </div>
                   <span>Schedule and review training sessions.</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                    <Activity className="w-5 h-5" />
-                  </div>
-                  <span>Access student analytics and performance history.</span>
-                </li>
               </ul>
             </div>
           )}

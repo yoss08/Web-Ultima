@@ -79,7 +79,7 @@ router.post('/admins', async (req, res) => {
     const superAdminId = req.user?.id || null; // Adjust as needed
     const { error: clubUpdateError } = await supabase
       .from('clubs')
-      .update({ admin_id: authData.user.id, super_admin_id: superAdminId })
+      .update({ super_admin_id: superAdminId })
       .eq('id', clubId);
     if (clubUpdateError) throw clubUpdateError;
 

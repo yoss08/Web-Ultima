@@ -11,16 +11,47 @@ const router = express.Router();
 router.get('/stats', async (req, res) => {
   try {
     const { coachId } = req.query;
-    const finalCoachId = coachId || req.user.id;
+    const finalCoachId = coachId || req.user?.id;
     
     if (!finalCoachId) return res.status(400).json({ error: "coachId is required" });
 
-    const { data, error } = await supabase.rpc('rpc_coach_stats', { p_coach_id: finalCoachId });
-    
-    if (error) throw error;
+    // 1. Get student count
+    const { count: studentCount, error: studentError } = await supabase
+      .from('coach_students')
+      .select('*', { count: 'exact', head: true })
+      .eq('coach_id', finalCoachId);
 
-    res.json(data);
+    if (studentError) throw studentError;
+
+    // 2. Get upcoming sessions (today or future)
+    const today = new Date().toISOString().split('T')[0];
+    const { count: sessionCount, error: sessionError } = await supabase
+      .from('training_sessions')
+      .select('*', { count: 'exact', head: true })
+      .eq('coach_id', finalCoachId)
+      .gte('start_time', today);
+
+    if (sessionError) throw sessionError;
+
+    // 3. Get average rating from feedbacks
+    const { data: feedbacks, error: feedbackError } = await supabase
+      .from('coach_feedbacks')
+      .select('rating')
+      .eq('coach_id', finalCoachId);
+
+    if (feedbackError) throw feedbackError;
+
+    const avgRating = feedbacks.length > 0
+      ? (feedbacks.reduce((acc, curr) => acc + (curr.rating || 0), 0) / feedbacks.length).toFixed(1)
+      : "5.0";
+
+    res.json({
+      studentCount: studentCount || 0,
+      upcomingSessions: sessionCount || 0,
+      performanceAvg: avgRating
+    });
   } catch (error) {
+    console.error('[CoachStats] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -101,13 +132,18 @@ router.get('/sessions', async (req, res) => {
 
     const { data, error } = await supabase
       .from('training_sessions')
-      .select('*')
+      .select(`
+        *,
+        student:profiles!student_id (id, full_name, avatar_url),
+        court:courts!court_id (id, name, type)
+      `)
       .eq('coach_id', coachId)
       .order('start_time', { ascending: true });
       
     if (error) throw error;
     res.json(data);
   } catch (error) {
+    console.error('[CoachRoutes] GET /sessions error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -116,22 +152,44 @@ router.get('/sessions', async (req, res) => {
 router.post('/sessions', async (req, res) => {
   try {
     const sessionData = req.body;
-    const requiredFields = ['coach_id', 'student_id', 'start_time', 'end_time', 'session_type'];
+    const requiredFields = ['coach_id', 'start_time', 'end_time', 'session_type'];
     const missingField = requiredFields.find((field) => !sessionData[field]);
     if (missingField) {
       return res.status(400).json({ error: `${missingField} is required` });
     }
 
-    const { drill_plan, ...otherData } = sessionData;
-    const sessionPayload = {
-      ...otherData,
-      status: sessionData.status || 'scheduled',
-      club_id: req.user.club_id
-    };
+    // Support both single student_id and array of student_ids
+    const studentIds = Array.isArray(sessionData.student_ids) 
+      ? sessionData.student_ids 
+      : sessionData.student_id ? [sessionData.student_id] : [];
+
+    if (studentIds.length === 0) {
+      return res.status(400).json({ error: "At least one student_id is required" });
+    }
+
+    const { drill_plan, student_id, student_ids, ...otherData } = sessionData;
+    const coachId = sessionData.coach_id;
+
+    // Create session records for all students
+    const sessionPayloads = studentIds.map(sid => {
+      const payload = {
+        coach_id: coachId,
+        student_id: sid,
+        court_id: otherData.court_id || null,
+        start_time: otherData.start_time,
+        end_time: otherData.end_time,
+        session_type: otherData.session_type,
+        notes: otherData.notes || '',
+        status: sessionData.status || 'scheduled',
+      };
+      // Only include club_id if it exists on the user (avoids schema error if column not yet migrated)
+      if (req.user?.club_id) payload.club_id = req.user.club_id;
+      return payload;
+    });
 
     const { data, error } = await supabase
       .from('training_sessions')
-      .insert([sessionPayload])
+      .insert(sessionPayloads)
       .select();
 
     if (error) {
@@ -139,18 +197,20 @@ router.post('/sessions', async (req, res) => {
       throw error;
     }
     
-    const session = data?.[0];
-    if (!session) throw new Error("Failed to create session record");
+    const createdSessions = data || [];
 
     // Fetch coach profile for notification message
     const { data: coachProfile } = await supabase
       .from('profiles')
       .select('full_name')
-      .eq('id', sessionPayload.coach_id)
+      .eq('id', coachId)
       .single();
 
+    const coachName = coachProfile?.full_name || 'your coach';
+
+    // Send notifications to all students
     try {
-      const scheduledAt = new Date(sessionPayload.start_time);
+      const scheduledAt = new Date(sessionData.start_time);
       const formattedDate = scheduledAt.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -161,21 +221,103 @@ router.post('/sessions', async (req, res) => {
         minute: '2-digit'
       });
 
-      await supabase.from('notifications').insert([{
-        user_id: sessionPayload.student_id,
+      const notificationPayloads = createdSessions.map(session => ({
+        user_id: session.student_id,
         type: 'training_session',
-        message: `Coach ${coachProfile?.full_name || 'your coach'} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
+        message: `Coach ${coachName} scheduled a training session on ${formattedDate} at ${formattedTime}.`,
         related_entity_id: session.id,
         related_entity_type: 'training_session',
         read: false
-      }]);
+      }));
+
+      await supabase.from('notifications').insert(notificationPayloads);
     } catch (notifErr) {
-      console.error('[CoachRoutes] Failed to send session notification:', notifErr);
+      console.error('[CoachRoutes] Failed to send session notifications:', notifErr);
     }
 
-    res.status(201).json(session);
+    res.status(201).json(createdSessions);
   } catch (error) {
     console.error('[CoachRoutes] Error in POST /sessions:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/coach/sessions - update training session
+router.put('/sessions', async (req, res) => {
+  try {
+    const { session_ids, ...sessionData } = req.body;
+    if (!session_ids || !Array.isArray(session_ids) || session_ids.length === 0) {
+      return res.status(400).json({ error: "session_ids array is required" });
+    }
+
+    // Delete old sessions
+    const { error: deleteError } = await supabase
+      .from('training_sessions')
+      .delete()
+      .in('id', session_ids);
+
+    if (deleteError) throw deleteError;
+
+    // Create new sessions
+    const studentIds = Array.isArray(sessionData.student_ids) 
+      ? sessionData.student_ids 
+      : sessionData.student_id ? [sessionData.student_id] : [];
+
+    if (studentIds.length === 0) {
+      return res.status(400).json({ error: "At least one student_id is required" });
+    }
+
+    const { drill_plan, student_id, student_ids, ...otherData } = sessionData;
+    const coachId = sessionData.coach_id;
+
+    const sessionPayloads = studentIds.map(sid => {
+      const payload = {
+        coach_id: coachId,
+        student_id: sid,
+        court_id: otherData.court_id || null,
+        start_time: otherData.start_time,
+        end_time: otherData.end_time,
+        session_type: otherData.session_type,
+        notes: otherData.notes || '',
+        status: sessionData.status || 'scheduled',
+      };
+      if (req.user?.club_id) payload.club_id = req.user.club_id;
+      return payload;
+    });
+
+    const { data, error: insertError } = await supabase
+      .from('training_sessions')
+      .insert(sessionPayloads)
+      .select();
+
+    if (insertError) throw insertError;
+    
+    res.json(data);
+  } catch (error) {
+    console.error('[CoachRoutes] Error in PUT /sessions:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/coach/sessions - delete training sessions
+router.delete('/sessions', async (req, res) => {
+  try {
+    const { ids } = req.query;
+    if (!ids) {
+      return res.status(400).json({ error: "ids query parameter is required" });
+    }
+
+    const idArray = ids.split(',');
+
+    const { error } = await supabase
+      .from('training_sessions')
+      .delete()
+      .in('id', idArray);
+
+    if (error) throw error;
+    res.json({ message: "Sessions deleted successfully" });
+  } catch (error) {
+    console.error('[CoachRoutes] Error in DELETE /sessions:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -217,11 +359,12 @@ router.get('/recommendations', async (req, res) => {
 // GET /api/coach/unassigned-players - list all player accounts in the coach's club
 router.get('/unassigned-players', async (req, res) => {
   try {
-    const { data: players, error: playersError } = await supabase
+    let query = supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, role, club_id')
-      .eq('role', 'player')
-      .order('full_name', { ascending: true });
+      .select('id, full_name, avatar_url, role, club_id, clubs(name)')
+      .eq('role', 'player');
+
+    const { data: players, error: playersError } = await query.order('full_name', { ascending: true });
 
     if (playersError) throw playersError;
 

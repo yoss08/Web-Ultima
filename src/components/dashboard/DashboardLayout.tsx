@@ -118,6 +118,12 @@ export function DashboardLayout() {
             path: "/dashboard/admin/overview",
           },
           {
+            icon: Zap,
+            label: "Match Control",
+            path: "/dashboard/admin/match-control",
+            badge: "Live"
+          },
+          {
             icon: ClipboardList,
             label: "Booking Requests",
             path: "/dashboard/admin/bookings",
@@ -133,14 +139,14 @@ export function DashboardLayout() {
             path: "/dashboard/admin/competitions",
           },
           {
-            icon: Users,
-            label: "Players",
-            path: "/dashboard/admin/players",
-          },
-          {
             icon: Dumbbell,
             label: "Coaches",
             path: "/dashboard/admin/coaches",
+          },
+          {
+            icon: Users,
+            label: "Staff & Players",
+            path: "/dashboard/admin/players",
           },
         ]
       : []),
@@ -161,11 +167,6 @@ export function DashboardLayout() {
           { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
           { icon: Users, label: "My Students", path: "/dashboard/coach/students" },
           { icon: CalendarDays, label: "Schedule Session", path: "/dashboard/coach/schedule" },
-          {
-            icon: BarChart3,
-            label: "Student Analytics",
-            path: "/dashboard/coach/students/:id",
-          },
         ]
       : []),
 

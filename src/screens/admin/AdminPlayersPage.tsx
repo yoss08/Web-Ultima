@@ -7,35 +7,37 @@ import {
   Loader2,
   RefreshCw,
   AlertCircle,
-  Lock,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
 
-interface Player {
+interface Member {
   id: string;
   full_name: string;
   email: string;
   created_at: string;
   avatar_url?: string;
+  role: string;
 }
 
 export function AdminPlayersPage() {
   const { user } = useAuth();
   const clubId = user?.club_id;
 
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'player'>('all');
 
-  const fetchPlayers = async () => {
+  const fetchMembers = async () => {
     if (!clubId) return;
     try {
       setLoading(true);
-      const data = await adminService.getClubPlayers(clubId);
-      setPlayers(data ?? []);
+      const data = await adminService.getStaffAndPlayers(clubId);
+      setMembers((data as any) ?? []);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -44,14 +46,22 @@ export function AdminPlayersPage() {
   };
 
   useEffect(() => {
-    fetchPlayers();
+    fetchMembers();
   }, [clubId]);
 
-  const filteredPlayers = players.filter(
-    (p) =>
-      p.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMembers = members.filter(
+    (m) =>
+      (roleFilter === 'all' || m.role === roleFilter) &&
+      (m.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.email?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  // Sort so admins are on top
+  const sortedMembers = [...filteredMembers].sort((a, b) => {
+    if (a.role === "admin" && b.role !== "admin") return -1;
+    if (a.role !== "admin" && b.role === "admin") return 1;
+    return 0;
+  });
 
   if (!clubId) {
     return (
@@ -72,34 +82,52 @@ export function AdminPlayersPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground font-['Playfair_Display']">
-              Players
+              Staff & Players
             </h1>
           </div>
           <p className="text-muted-foreground text-sm font-['Poppins'] mt-1">
-            Members registered at your club.
+            Manage your club administrators and registered players.
           </p>
         </div>
         <button
-          onClick={fetchPlayers}
-          className="p-3 bg-card border border-border rounded-xl text-foreground hover:bg-muted/80 transition-all self-start"
+          onClick={fetchMembers}
+          className="p-3 bg-card border border-border rounded-xl text-foreground hover:bg-muted/80 transition-all shadow-sm self-start"
         >
           <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-          size={20}
-        />
-        <input
-          type="text"
-          placeholder="Search by name or email..."
-          className="w-full h-14 pl-12 pr-4 bg-card border border-border rounded-2xl text-foreground outline-none focus:border-accent transition-all font-['Poppins']"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Filters & Search */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            className="w-full h-14 pl-12 pr-4 bg-card border border-border rounded-2xl text-foreground outline-none focus:border-accent transition-all shadow-sm font-['Poppins']"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex bg-card border border-border rounded-2xl p-1 h-14 shadow-sm">
+          {(['all', 'admin', 'player'] as const).map((filterValue) => (
+            <button
+              key={filterValue}
+              onClick={() => setRoleFilter(filterValue)}
+              className={`px-6 py-2 rounded-xl text-sm font-bold capitalize transition-all font-['Poppins'] ${
+                roleFilter === filterValue
+                  ? 'bg-accent text-accent-foreground shadow-md'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
+            >
+              {filterValue === 'admin' ? 'Staff' : filterValue === 'player' ? 'Players' : 'All'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Table */}
@@ -107,32 +135,47 @@ export function AdminPlayersPage() {
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center font-['Poppins']">
             <Loader2 className="animate-spin text-accent w-10 h-10 mb-4" />
-            <p className="text-muted-foreground">Loading players...</p>
+            <p className="text-muted-foreground">Loading members...</p>
           </div>
-        ) : filteredPlayers.length === 0 ? (
+        ) : sortedMembers.length === 0 ? (
           <div className="p-20 text-center font-['Poppins']">
             <Users size={44} className="text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground italic">No players found for your club.</p>
+            <p className="text-muted-foreground italic">No members found.</p>
           </div>
         ) : (
           <>
             {/* Mobile View */}
             <div className="p-4 space-y-4 sm:hidden">
-              {filteredPlayers.map((player) => (
-                <div key={player.id} className="bg-card border border-border/50 rounded-[28px] p-5 space-y-4 shadow-sm hover:border-accent/30 transition-all group">
+              {sortedMembers.map((member) => (
+                <div key={member.id} className="bg-card border border-border/50 rounded-[28px] p-5 space-y-4 shadow-sm hover:border-accent/30 transition-all group">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-bold text-lg border border-accent/20 group-hover:scale-105 transition-transform">
-                      {player.full_name?.[0]?.toUpperCase()}
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg border group-hover:scale-105 transition-transform ${
+                      member.role === 'admin' 
+                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                        : 'bg-accent/10 text-accent border-accent/20'
+                    }`}>
+                      {member.full_name?.[0]?.toUpperCase() || <Users size={20} />}
                     </div>
                     <div>
                       <p className="font-bold text-foreground text-base font-['Poppins']">
-                        {player.full_name}
+                        {member.full_name}
                       </p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <ShieldCheck size={12} className="text-accent" />
-                        <span className="text-[10px] text-accent font-black uppercase tracking-widest font-['Poppins']">
-                          Member
-                        </span>
+                        {member.role === 'admin' ? (
+                          <>
+                            <Star size={12} className="text-amber-500" />
+                            <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest font-['Poppins']">
+                              Staff Admin
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck size={12} className="text-accent" />
+                            <span className="text-[10px] text-accent font-black uppercase tracking-widest font-['Poppins']">
+                              Player
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -142,13 +185,13 @@ export function AdminPlayersPage() {
                       <div className="flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-tighter text-[10px]">
                         <Mail size={12} /> Email
                       </div>
-                      <p className="text-foreground font-medium truncate max-w-[160px]">{player.email}</p>
+                      <p className="text-foreground font-medium truncate max-w-[160px]">{member.email}</p>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50">
                       <div className="flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-tighter text-[10px]">
                         <Calendar size={12} /> Joined
                       </div>
-                      <p className="text-foreground font-medium">{new Date(player.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                      <p className="text-foreground font-medium">{new Date(member.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     </div>
                   </div>
                 </div>
@@ -160,7 +203,7 @@ export function AdminPlayersPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
-                    {["Player", "Contact", "Joined"].map((h) => (
+                    {["Member", "Role", "Contact", "Joined"].map((h) => (
                       <th
                         key={h}
                         className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Poppins']"
@@ -171,33 +214,47 @@ export function AdminPlayersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {filteredPlayers.map((player) => (
-                    <tr key={player.id} className="hover:bg-muted/20 transition-colors">
+                  {sortedMembers.map((member) => (
+                    <tr key={member.id} className="hover:bg-muted/20 transition-colors">
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
-                          <div className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center text-accent font-bold text-base border border-accent/20">
-                            {player.full_name?.[0]?.toUpperCase()}
+                          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-base border ${
+                            member.role === 'admin' 
+                              ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                              : 'bg-accent/10 text-accent border-accent/20'
+                          }`}>
+                            {member.full_name?.[0]?.toUpperCase() || <Users size={20} />}
                           </div>
                           <div>
                             <p className="font-bold text-foreground font-['Poppins']">
-                              {player.full_name}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5 uppercase font-bold tracking-tight font-['Poppins']">
-                              Member
+                              {member.full_name}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
+                        {member.role === 'admin' ? (
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500">
+                            <Star size={12} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest font-['Poppins']">Staff</span>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent">
+                            <ShieldCheck size={12} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest font-['Poppins']">Player</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-8 py-6">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
                           <Mail size={14} className="text-muted-foreground/60" />
-                          {player.email}
+                          {member.email}
                         </div>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Poppins']">
                           <Calendar size={14} />
-                          {new Date(player.created_at).toLocaleDateString()}
+                          {new Date(member.created_at).toLocaleDateString()}
                         </div>
                       </td>
                     </tr>
@@ -211,3 +268,4 @@ export function AdminPlayersPage() {
     </div>
   );
 }
+

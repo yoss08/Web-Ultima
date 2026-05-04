@@ -169,6 +169,23 @@ for (let i = 0; i < 6; i++) {
 
 export const MOCK_MATCHES = [...baseMatches, ...paddingMatches];
 
+export const MOCK_BOOKINGS = [
+  {
+    id: "booking-1",
+    booking_date: new Date(Date.now() + 24 * 3600000).toISOString(), // Tomorrow
+    time_slot: "10:00 - 11:30",
+    status: "confirmed",
+    courts: { name: "Padel Arena - Court 2" }
+  },
+  {
+    id: "booking-2",
+    booking_date: new Date(Date.now() + 48 * 3600000).toISOString(), // Day after tomorrow
+    time_slot: "18:00 - 19:30",
+    status: "pending",
+    courts: { name: "Padel Club" }
+  }
+];
+
 export const MOCK_FEEDBACKS = [
   {
     content: "Training Session: 1.5 hours. Excellent footwork today. Keep pushing!",
@@ -217,7 +234,7 @@ export const MOCK_TOURNAMENTS = [
     competition_type: "Friendly",
     registration_deadline: new Date(Date.now() + 3600000).toISOString(),
     entry_fee: 20,
-    clubs: { name: "Lake Padel", location: "Berges du Lac" },
+    clubs: { name: "Padel Club", location: "Berges du Lac" },
     userRegistration: null,
     isMock: true
   },
@@ -246,6 +263,91 @@ export const MOCK_STATS = {
   wins: 16,
   losses: 8,
   upcoming: 1
-};
-
-
+};export const MOCK_ADMIN_MATCHES = [
+  // Live match — 2nd set in progress
+  {
+    id: "admin-match-1",
+    status: "live",
+    score: "6-4, 3-2",
+    points: "30-15",
+    match_type: "doubles",
+    winner_team: null,
+    player1_id: "user-1",
+    player2_id: "user-2",
+    player3_id: "user-3",
+    player4_id: "user-4",
+    player1: { full_name: "Ahmed Laouini" },
+    player2: { full_name: "Yassine Ben Ali" },
+    player3: { full_name: "Yossr Ellefi" },
+    player4: { full_name: "Senda zaghdoudi" },
+    booking: {
+      booking_date: new Date().toISOString().split('T')[0],
+      time_slot: "10:00 - 11:30",
+      courts: { name: "Court A" }
+    }
+  },
+  // Paused match — 3rd set just started
+  {
+    id: "admin-match-2",
+    status: "paused",
+    score: "7-5, 2-6, 1-1",
+    points: "15-15",
+    match_type: "doubles",
+    winner_team: null,
+    player1_id: "user-5",
+    player2_id: "user-6",
+    player3_id: "user-7",
+    player4_id: "user-8",
+    player1: { full_name: "Karim Mansouri" },
+    player2: { full_name: "Bilel Gharbi" },
+    player3: { full_name: "Nabil Ferjani" },
+    player4: { full_name: "Sami Trabelsi" },
+    booking: {
+      booking_date: new Date().toISOString().split('T')[0],
+      time_slot: "11:00 - 12:30",
+      courts: { name: "Court B" }
+    }
+  },
+  // Scheduled match — hasn't started yet
+  {
+    id: "admin-match-3",
+    status: "scheduled",
+    score: "0-0",
+    match_type: "doubles",
+    winner_team: null,
+    player1_id: "user-9",
+    player2_id: "user-10",
+    player3_id: "user-11",
+    player4_id: "user-12",
+    player1: { full_name: "Rami Bouaziz" },
+    player2: { full_name: "Amine Jlassi" },
+    player3: { full_name: "Hatem Dridi" },
+    player4: { full_name: "Wael Cherni" },
+    booking: {
+      booking_date: new Date().toISOString().split('T')[0],
+      time_slot: "13:00 - 14:30",
+      courts: { name: "Court C" }
+    }
+  },
+  // Completed match — Team 1 won 6-2, 6-3
+  {
+    id: "admin-match-4",
+    status: "completed",
+    score: "6-2, 6-3",
+    match_type: "doubles",
+    winner_team: 1, // Team 1 (player1 + player2) won
+    player1_id: "user-13",
+    player2_id: "user-14",
+    player3_id: "user-15",
+    player4_id: "user-16",
+    player1: { full_name: "Sofiane Belkaid" },
+    player2: { full_name: "Tarek Ouali" },
+    player3: { full_name: "Lotfi Aissa" },
+    player4: { full_name: "Mehdi Chaker" },
+    booking: {
+      booking_date: new Date().toISOString().split('T')[0],
+      time_slot: "09:00 - 10:30",
+      courts: { name: "Court A" }
+    }
+  }
+];

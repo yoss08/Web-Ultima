@@ -721,69 +721,6 @@ export function CourtBooking() {
                           </div>
                         </div>
                       </section>
-
-                      {/* ── 4. Details & Extras ── */}
-                      <section>
-                        <SectionHeading step={4} title="Details & Extras" />
-                        <div className="bg-card rounded-[40px] p-8 border border-border space-y-8">
-                          {/* Discount & Opponent */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="min-w-0">
-                                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
-                                  <Tag size={12} /> Discount Code
-                                </label>
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                  <input
-                                    type="text"
-                                    value={discountCode}
-                                    onChange={(e) => setDiscountCode(e.target.value)}
-                                    placeholder="Enter code"
-                                    className="flex-1 h-16 sm:h-12 px-6 bg-muted rounded-2xl border-2 border-transparent outline-none font-bold text-base sm:text-sm dark:text-white focus:border-accent/50 focus:bg-white dark:focus:bg-black/40 transition-all placeholder:opacity-40"
-                                  />
-                                  <button
-                                    onClick={handleApplyDiscount}
-                                    className="px-8 sm:px-6 h-12 bg-accent text-accent-foreground font-black rounded-2xl text-[11px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
-                                  >
-                                    Apply
-                                  </button>
-                                </div>
-                            </div>
-
-                            {/* Opponent Selection (Condensed) */}
-                            <div className="min-w-0 overflow-hidden">
-                                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 mb-3">
-                                  <Users size={14} /> Play Against (Optional)
-                                </label>
-                                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                                  {playersLoading ? (
-                                    <div className="flex items-center justify-center p-2">
-                                      <Loader2 className="animate-spin text-accent" size={20} />
-                                    </div>
-                                  ) : (
-                                    players.slice(0, 5).map(player => (
-                                      <button
-                                        key={player.id}
-                                        onClick={() => setSelectedOpponentId(selectedOpponentId === player.id ? null : player.id)}
-                                        className={`shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 transition-all p-0.5 ${
-                                          selectedOpponentId === player.id ? 'border-accent scale-110 ring-4 ring-accent/20' : 'border-transparent'
-                                        }`}
-                                      >
-                                        <img 
-                                          src={player.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.full_name}`} 
-                                          className="w-full h-full rounded-full object-cover"
-                                          alt={player.full_name}
-                                        />
-                                      </button>
-                                    ))
-                                  )}
-                                  <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center border border-dashed border-white/20">
-                                    <ChevronRight size={18} className="opacity-40" />
-                                  </div>
-                                </div>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
                     </motion.div>
                   )}
                 </AnimatePresence>

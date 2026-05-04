@@ -112,6 +112,20 @@ router.post('/notifications/:id/respond', async (req, res) => {
 
         if (assignError) throw assignError;
 
+        // NEW: Sync the player's club_id with the coach's club_id so they show up in AdminPlayersPage
+        const { data: coachData } = await supabase
+          .from('profiles')
+          .select('club_id')
+          .eq('id', coachId)
+          .single();
+
+        if (coachData?.club_id) {
+          await supabase
+            .from('profiles')
+            .update({ club_id: coachData.club_id })
+            .eq('id', studentId);
+        }
+
         // Notify coach
         const { data: studentProfile } = await supabase.from('profiles').select('full_name').eq('id', studentId).single();
         await supabase.from('notifications').insert([{
