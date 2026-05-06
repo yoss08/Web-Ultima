@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun, ArrowRight, Check, Mail, Phone, Menu, X, LayoutDashboard } from "lucide-react";
-import { ImageWithFallback } from "../../components/Design/ImageWithFallback";
 import { useTheme } from "../../styles/useTheme";
 import { toast, Toaster } from 'sonner';
 
@@ -29,7 +28,7 @@ export function Solutions() {
       title: "Padel Sports Dashboard",
       description:
         "Comprehensive court management and analytics platform for padel facilities. Monitor live matches, track player performance, and optimize facility operations.",
-      color: "#CCFF00",
+      color: "#E6E600",
       darkColor: "#CCFF00",
       image: summa2Image,
       features: [
@@ -47,7 +46,7 @@ export function Solutions() {
       title: "Smart Hydration Station",
       description:
         "On-site hydration solution delivering flavored, low-calorie beverages designed for active environments. Enhance user experience while maintaining facility standards.",
-      color: "#CCFF00",
+      color: "#E6E600",
       darkColor: "#CCFF00",
       image: waterImage,
       features: [
@@ -213,10 +212,14 @@ export function Solutions() {
                   >
                     <div className="bg-white/80 dark:bg-card border border-gray-200 dark:border-border rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 md:p-8 shadow-xl backdrop-blur-sm transition-colors duration-300">
                       <div className="aspect-square bg-gradient-to-br from-gray-100 to-transparent dark:from-white/10 dark:to-transparent rounded-[20px] sm:rounded-[24px] overflow-hidden transition-colors duration-300">
-                        <ImageWithFallback
+                        <img
                           src={solution.image}
                           alt={`${solution.name} - ${solution.title}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.style.background = 'linear-gradient(to bottom right, var(--color-accent), transparent)';
+                          }}
                         />
                       </div>
                     </div>

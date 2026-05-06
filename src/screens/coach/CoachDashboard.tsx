@@ -99,13 +99,6 @@ export function CoachDashboard() {
           >
             <Video size={20} className="text-accent" /> Video Review
           </Link>
-
-          <Link 
-            to="/dashboard/coach/ai-analysis" 
-            className="flex items-center gap-3 px-6 h-14 bg-card text-foreground border border-border rounded-[18px] font-bold hover:bg-muted/80 transition-all shadow-sm"
-          >
-            <Sparkles size={20} className="text-accent" /> AI Insights
-          </Link>
         </div>
       </div>
 

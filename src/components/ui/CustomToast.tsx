@@ -80,7 +80,8 @@ function ToastCard({
     >
       <div
         style={{
-          background: "var(--theme-card, #121212)",
+          background: "rgba(18, 18, 18, 0.8)",
+          backdropFilter: "blur(12px)",
           border: `1px solid ${config.borderColor}`,
           borderRadius: "20px",
           overflow: "hidden",

@@ -1,4 +1,4 @@
-@import "../../theme/tokens.css";
+@import "./tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 

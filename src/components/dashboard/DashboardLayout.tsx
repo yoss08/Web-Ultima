@@ -139,11 +139,6 @@ export function DashboardLayout() {
             path: "/dashboard/admin/competitions",
           },
           {
-            icon: Dumbbell,
-            label: "Coaches",
-            path: "/dashboard/admin/coaches",
-          },
-          {
             icon: Users,
             label: "Staff & Players",
             path: "/dashboard/admin/players",

@@ -73,8 +73,8 @@ export const adminService = {
     const allProfiles = [...(assignedProfiles ?? []), ...bookedProfiles];
     const uniqueProfiles = Array.from(new Map(allProfiles.map((item) => [item.id, item])).values());
 
-    // Filter to only admins and players
-    return uniqueProfiles.filter(p => p.role === 'admin' || p.role === 'player');
+    // Filter to only admins, players and coaches
+    return uniqueProfiles.filter(p => p.role === 'admin' || p.role === 'player' || p.role === 'coach');
   },
 
   // ─── COACHES ────────────────────────────────────────────────

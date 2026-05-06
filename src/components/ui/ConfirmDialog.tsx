@@ -61,7 +61,7 @@ function ConfirmDialogUI({
     },
     default: {
       iconBg: "rgba(204,255,0,0.08)",
-      iconBorder: "rgba(204,255,0,0.20)",
+      iconBorder: "rgba(204,255,0,0.15)",
       iconColor: "var(--theme-accent, #CCFF00)",
       confirmBg: "var(--theme-accent, #CCFF00)",
       confirmHoverBg: "var(--theme-accent, #CCFF00)",

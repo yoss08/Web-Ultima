@@ -339,23 +339,6 @@ router.get('/video-library', async (req, res) => {
   }
 });
 
-// GET /api/coach/recommendations - get AI training recommendations
-router.get('/recommendations', async (req, res) => {
-  try {
-    const { coachId } = req.query;
-    const { data, error } = await supabase
-      .from('ai_recommendations')
-      .select('*')
-      .eq('coach_id', coachId)
-      .order('created_at', { ascending: false });
-
-    if (error && error.code !== 'PGRST116') throw error;
-    res.json(data || []);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // GET /api/coach/unassigned-players - list all player accounts in the coach's club
 router.get('/unassigned-players', async (req, res) => {
   try {

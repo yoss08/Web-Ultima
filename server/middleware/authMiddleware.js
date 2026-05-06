@@ -23,13 +23,39 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
  */
 export async function requireAuth(req, res, next) {
   try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.error('[AuthMiddleware] Invalid token:', error?.message);
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    // Get the user's profile to get the role and club_id
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role, club_id, full_name')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('[AuthMiddleware] Profile fetch error:', profileError.message);
+      return res.status(500).json({ error: 'Failed to fetch user profile' });
+    }
+
     req.user = {
-      id: 'c3ebc583-776b-4016-b2a8-af2fb64085b9',
-      email: 'coach@test.com',
-      role: 'coach',
-      fullName: 'Test Coach',
-      club_id: null,
+      id: user.id,
+      email: user.email,
+      role: profile.role,
+      fullName: profile.full_name,
+      club_id: profile.club_id,
     };
+    
     next();
   } catch (err) {
     console.error('[AuthMiddleware] Error:', err.message);

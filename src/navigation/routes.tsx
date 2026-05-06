@@ -13,7 +13,6 @@ import { AboutPage } from "../screens/public/AboutPage";
 import { OverviewPage } from "../screens/admin/OverviewPage";
 import { AdminBookingsPage } from "../screens/admin/AdminBookingsPage";
 import { AdminPlayersPage } from "../screens/admin/AdminPlayersPage";
-import { AdminCoachesPage } from "../screens/admin/AdminCoachesPage";
 import { AdminCompetitionsPage } from "../screens/admin/AdminCompetitionsPage";
 import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
@@ -31,7 +30,6 @@ import { MatchCompetitionManagement } from "../screens/superadmin/MatchCompetiti
 
 // ── Coach screens ───────────────────────────────────────────────
 import { VideoReviewPage } from "../screens/coach/VideoReviewPage";
-import { AIRecommendations } from "../screens/coach/AIRecommendations";
 import { CoachDashboard } from "../screens/coach/CoachDashboard";
 import { StudentList } from "../screens/coach/StudentList";
 import { SessionScheduler } from "../screens/coach/SessionScheduler";
@@ -122,7 +120,6 @@ export const router = createBrowserRouter([
       { path: "admin/overview", Component: OverviewPage },
       { path: "admin/bookings", Component: AdminBookingsPage },
       { path: "admin/players", Component: AdminPlayersPage },
-      { path: "admin/coaches", Component: AdminCoachesPage },
       { path: "admin/competitions", Component: AdminCompetitionsPage },
       { path: "admin/management", Component: AdminManagement },
       { path: "admin/courts-config", Component: AdminCourtConfig },
@@ -135,8 +132,6 @@ export const router = createBrowserRouter([
       { path: "coach/compare", Component: StudentComparison },
       { path: "coach/schedule", Component: SessionScheduler },
       { path: "coach/video-review", Component: VideoReviewPage },
-      { path: "coach/ai-analysis", Component: AIRecommendations },
-
       // ─ Player ────────────────────────────────────────────────
       { path: "player/home", Component: PlayerDashboard },
       { path: "player/matches/:id", Component: MatchDetails },

@@ -5,6 +5,7 @@ import { coachService } from "../../services/CoachService";
 import { adminService } from "../../services/adminService";
 import { useAuth } from "../../services/AuthContext";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 export function SessionScheduler() {
   const { user } = useAuth();
@@ -146,7 +147,13 @@ export function SessionScheduler() {
   };
 
   const handleDelete = async (sessionIds: string[]) => {
-    if (!confirm("Are you sure you want to delete this session?")) return;
+    const ok = await confirmDialog({
+      title: "Delete Session",
+      message: "Are you sure you want to delete this training session? This action cannot be undone.",
+      confirmLabel: "Delete",
+      variant: "danger"
+    });
+    if (!ok) return;
     setFetchingSessions(true);
     try {
       await coachService.deleteSession(sessionIds);

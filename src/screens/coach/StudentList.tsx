@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import { useTheme } from "../../styles/useTheme";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { toast } from "react-hot-toast";
+import { confirmDialog } from "../../components/ui/ConfirmDialog";
 
 export function StudentList() {
   const { user } = useAuth();
@@ -281,9 +282,15 @@ export function StudentList() {
                     </div>
                   </div>
                   <button 
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
-                      if (window.confirm(`Are you sure you want to remove ${student.full_name} from your roster?`)) {
+                      const ok = await confirmDialog({
+                        title: "Remove Student",
+                        message: `Are you sure you want to remove ${student.full_name} from your roster?`,
+                        confirmLabel: "Remove",
+                        variant: "danger"
+                      });
+                      if (ok) {
                         coachService.removeStudent(student.id).then(() => {
                           toast.success("Student removed");
                           loadStudents();
