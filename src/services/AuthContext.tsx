@@ -10,6 +10,7 @@ interface CustomUser extends SupabaseUser {
   phoneNumber?: string;
   role?: string;
   club_id?: string;
+  is_banned?: boolean;
 }
 
 /**
@@ -59,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('full_name, phone, role, club_id')
+      .select('full_name, phone, role, club_id, is_banned')
       .eq('id', supabaseUser.id)
       .single();
 
@@ -76,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabaseUser.user_metadata?.account_type ??
         supabaseUser.user_metadata?.accountType,
       club_id: profile?.club_id ?? undefined,
+      is_banned: profile?.is_banned ?? false,
     });
   };
 

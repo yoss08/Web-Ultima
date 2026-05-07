@@ -1,12 +1,24 @@
 import { Navigate } from 'react-router';
 import { useAuth } from '../services/AuthContext';
+import { toast } from 'react-hot-toast';
+import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    if (user?.is_banned) {
+      toast.error('Your account is inactive', {
+        duration: 5000,
+        position: 'top-center',
+      });
+      signOut();
+    }
+  }, [user?.is_banned, signOut]);
 
   if (loading) {
     return (
@@ -19,8 +31,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/" replace />;
+  if (!user || user.is_banned) {
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
