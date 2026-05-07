@@ -49,7 +49,6 @@ import { SettingsPage } from "../components/dashboard/SettingsPage";
 import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
 import { Profile } from "../components/dashboard/Profile";
 import { useAuth } from "../services/AuthContext";
-import { LiveMatchesPage } from "../screens/public/LiveMatchesPage";
 import BookingPage from "../screens/public/BookingPage";
 import ClubDetailsPage from "../screens/public/ClubDetailsPage";
 
@@ -102,7 +101,6 @@ export const router = createBrowserRouter([
   { path: "/signup", Component: SignUpPage },
   { path: "/forgot-password", Component: ForgotPasswordPage },
   { path: "/about", Component: AboutPage },
-  { path: "/live-matches", Component: LiveMatchesPage },
   { path: "/booking", Component: BookingPage },
   { path: "/club/:id", Component: ClubDetailsPage },
 
