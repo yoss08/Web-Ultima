@@ -88,6 +88,10 @@ function RoleBasedRoute({
   return role === "player" ? playerComponent : adminComponent;
 }
 
+/**
+ * The application's main router configuration.
+ * Defines all public and protected routes, including role-based redirects.
+ */
 export const router = createBrowserRouter([
   // ── Public ──────────────────────────────────────────────────
   { path: "/", Component: HomePage },

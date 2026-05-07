@@ -345,14 +345,6 @@ export function DashboardLayout() {
           />
           <nav className="absolute left-0 top-0 bottom-0 w-72 bg-background p-6 shadow-2xl overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              {role === "super_admin" && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                  <Crown size={14} className="text-yellow-500" />
-                  <span className="text-xs font-bold text-yellow-500 font-['Poppins']">
-                    Super Admin
-                  </span>
-                </div>
-              )}
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="ml-auto text-foreground"

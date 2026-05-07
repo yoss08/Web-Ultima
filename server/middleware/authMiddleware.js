@@ -20,6 +20,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 /**
  * Middleware: Verify JWT token from Authorization header.
  * Attaches `req.user` with Supabase user data and role.
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The next middleware function.
  */
 export async function requireAuth(req, res, next) {
   try {
@@ -64,8 +67,10 @@ export async function requireAuth(req, res, next) {
 }
 
 /**
- * Middleware: Require specific role(s).
- * Usage: requireRole('admin') or requireRole('admin', 'coach')
+ * Middleware factory: Require specific role(s) to access a route.
+ * @param {...string} roles - The roles allowed to access the route.
+ * @returns {import('express').RequestHandler} An Express middleware function.
+ * @example app.use('/admin', requireAuth, requireRole('admin'))
  */
 export function requireRole(...roles) {
   return (req, res, next) => {

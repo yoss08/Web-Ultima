@@ -5,6 +5,11 @@ import { supabase } from "../config/supabase";
  */
 
 // Get player stats (career overview)
+/**
+ * Retrieves statistics and match history for a specific player.
+ * @param {string} userId - The ID of the player.
+ * @returns {Promise<Array>} List of matches associated with the player.
+ */
 export async function getPlayerStats(userId: string) {
   // Query matches where user is either player1 or player2
   const { data, error } = await supabase
@@ -18,6 +23,10 @@ export async function getPlayerStats(userId: string) {
 }
 
 // Get all players for opponent selection
+/**
+ * Retrieves a list of all players for opponent selection.
+ * @returns {Promise<Array>} List of player profiles (id, full_name, avatar_url).
+ */
 export async function getPlayers() {
   const { data, error } = await supabase
     .from("profiles")
@@ -30,6 +39,12 @@ export async function getPlayers() {
 }
 
 // Get match history with optional filters
+/**
+ * Retrieves match history for a player with optional filters.
+ * @param {string} userId - The ID of the player.
+ * @param {Object} [filters] - Optional filters for results and date range.
+ * @returns {Promise<Array>} List of filtered matches.
+ */
 export async function getMatchHistory(
   userId: string,
   filters?: { result?: string; dateFrom?: string; dateTo?: string }
@@ -54,6 +69,11 @@ export async function getMatchHistory(
 }
 
 // Get single match details
+/**
+ * Retrieves details for a single match.
+ * @param {string} matchId - The ID of the match.
+ * @returns {Promise<Object>} The match details.
+ */
 export async function getMatchDetails(matchId: string) {
   const { data, error } = await supabase
     .from("matches")
@@ -66,6 +86,11 @@ export async function getMatchDetails(matchId: string) {
 }
 
 // Create a match record
+/**
+ * Creates a new match record.
+ * @param {Object} matchData - The match data to insert.
+ * @returns {Promise<Object>} The created match record.
+ */
 export async function createMatch(matchData: {
   booking_id: string;
   player1_id: string;
@@ -82,6 +107,12 @@ export async function createMatch(matchData: {
 }
 
 // Update a booking (modify reservation)
+/**
+ * Updates an existing booking.
+ * @param {string} bookingId - The ID of the booking to update.
+ * @param {Record<string, any>} updates - The fields to update.
+ * @returns {Promise<Object>} The updated booking record.
+ */
 export async function updateBooking(bookingId: string, updates: Record<string, any>) {
   const { data, error } = await supabase
     .from("bookings")
@@ -94,6 +125,11 @@ export async function updateBooking(bookingId: string, updates: Record<string, a
 }
 
 // Cancel a booking
+/**
+ * Cancels a booking by deleting it.
+ * @param {string} bookingId - The ID of the booking to cancel.
+ * @returns {Promise<Object>} Success indicator.
+ */
 export async function cancelBooking(bookingId: string) {
   const { error } = await supabase
     .from("bookings")
@@ -105,6 +141,11 @@ export async function cancelBooking(bookingId: string) {
 }
 
 // Get player's upcoming bookings
+/**
+ * Retrieves upcoming bookings for a specific player.
+ * @param {string} userId - The ID of the player.
+ * @returns {Promise<Array>} List of upcoming bookings.
+ */
 export async function getUpcomingBookings(userId: string) {
   const today = new Date().toISOString().split("T")[0];
   const { data, error } = await supabase
@@ -119,6 +160,11 @@ export async function getUpcomingBookings(userId: string) {
 }
 
 // Get player profile
+/**
+ * Retrieves the profile of a specific player.
+ * @param {string} userId - The ID of the player.
+ * @returns {Promise<Object>} The player profile.
+ */
 export async function getPlayerProfile(userId: string) {
   const { data, error } = await supabase
     .from("profiles")
@@ -131,6 +177,12 @@ export async function getPlayerProfile(userId: string) {
 }
 
 // Update player profile
+/**
+ * Updates the profile of a specific player.
+ * @param {string} userId - The ID of the player.
+ * @param {Record<string, any>} updates - The fields to update.
+ * @returns {Promise<Object>} The updated player profile.
+ */
 export async function updatePlayerProfile(userId: string, updates: Record<string, any>) {
   const { data, error } = await supabase
     .from("profiles")

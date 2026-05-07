@@ -2,6 +2,9 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 
+/**
+ * CustomUser interface extends Supabase User with application-specific profile data.
+ */
 interface CustomUser extends SupabaseUser {
   fullName?: string;
   phoneNumber?: string;
@@ -9,6 +12,9 @@ interface CustomUser extends SupabaseUser {
   club_id?: string;
 }
 
+/**
+ * AuthContextType defines the shape of the authentication context.
+ */
 interface AuthContextType {
   user: CustomUser | null;
   loading: boolean;
@@ -21,16 +27,30 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
+/**
+ * Custom hook to access the AuthContext.
+ * @returns {AuthContextType} The authentication context value.
+ * @throws {Error} If used outside of an AuthProvider.
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 };
 
+/**
+ * AuthProvider component that wraps the application and provides authentication state.
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components to be wrapped.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<CustomUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Loads the user's profile from the database and merges it with the Supabase user data.
+   * @param {SupabaseUser | null} supabaseUser - The Supabase user object.
+   */
   const loadUserWithProfile = async (supabaseUser: SupabaseUser | null) => {
     if (!supabaseUser) {
       setUser(null);
@@ -72,6 +92,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  /**
+   * Signs out the current user.
+   */
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);

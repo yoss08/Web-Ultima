@@ -2,6 +2,10 @@ import { io, Socket } from 'socket.io-client';
 
 import { API_URL } from '../config/apiConfig';
 
+/**
+ * Determines the WebSocket URL based on the environment.
+ * @returns {string} The formatted socket URL.
+ */
 const getSocketURL = () => {
   // If API_URL is set (even if empty string for relative paths), use it.
   // But for WebSockets, we need a full URL. If it's empty, we assume current host.
@@ -22,12 +26,19 @@ const getSocketURL = () => {
 
 const URL = getSocketURL();
 
+/**
+ * The main Socket.io client instance.
+ */
 export const socket: Socket = io(URL, {
   autoConnect: false, // We'll manage connection manually (e.g., in a provider or layout)
   reconnection: true,
   withCredentials: true,
 });
 
+/**
+ * Establishes a connection to the socket server.
+ * @param {string} [userId] - Optional user ID to pass in the query parameters.
+ */
 export const connectSocket = (userId?: string) => {
   if (!socket.connected) {
     if (userId) {
@@ -37,6 +48,9 @@ export const connectSocket = (userId?: string) => {
   }
 };
 
+/**
+ * Disconnects from the socket server if connected.
+ */
 export const disconnectSocket = () => {
   if (socket.connected) {
     socket.disconnect();

@@ -12,6 +12,11 @@ import Footer from "../../components/Footer";
 import imgImageSummaPadelSportsDashboard from "../../assets/images/image.jpg";
 const imgImageAlmusSmartDispenserStation = "https://www.thoughtco.com/thmb/BVnoDc9J_65SCnuAQ9fvciTSyLQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/splashing-165192_1280-7879d2914dfb4e5d8dbf2e943669bd92.jpg";
 
+/**
+ * The public-facing landing page of the Ultima platform.
+ * Showcases the platform's features, product offerings (SUMMA, ALMUS, PersonaVision AI), 
+ * and includes a contact form for inquiries.
+ */
 export function HomePage() {
 
   const { isDark, setIsDark } = useTheme();
@@ -24,11 +29,19 @@ export function HomePage() {
     message: "",
   });
 
+  /**
+   * Handles the contact form submission.
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert("Form submitted!");
   };
 
+  /**
+   * Updates the form data state as the user types.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event.
+   */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -39,6 +52,9 @@ export function HomePage() {
   };
 
 
+  /**
+   * Displays a custom toast with the company's contact details.
+   */
   const handleContactClick = () => {
     toast.custom((t) => (
       <div className="bg-white dark:bg-card border border-gray-200 dark:border-border p-4 sm:p-6 rounded-[24px] shadow-2xl flex flex-col gap-4 min-w-[280px] sm:min-w-[300px] max-w-[90vw]">

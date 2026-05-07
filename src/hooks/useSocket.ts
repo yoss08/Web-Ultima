@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { socket, connectSocket, disconnectSocket } from '../services/socket';
 import { useAuth } from '../services/AuthContext';
 
+/**
+ * Custom hook to manage the Socket.io connection state.
+ * @returns {Object} An object containing the socket instance and its connection status.
+ */
 export function useSocket() {
   const { user } = useAuth();
   const [isConnected, setIsConnected] = useState(socket.connected);

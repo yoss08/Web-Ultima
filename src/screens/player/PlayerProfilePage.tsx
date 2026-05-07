@@ -369,7 +369,7 @@ export function PlayerProfilePage() {
             {activeTab === tab && (
               <motion.div
                 layoutId="tab-pill"
-                className="absolute inset-0 rounded-[16px] bg-[#CCFF00]"
+                className="absolute inset-0 rounded-[16px] bg-accent"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}

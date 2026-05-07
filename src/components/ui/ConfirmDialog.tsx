@@ -7,14 +7,26 @@ import { AlertTriangle, Trash2, X } from "lucide-react";
    design system. Called via: await confirmDialog({ ... })
 ────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Options for the confirm dialog.
+ */
 interface ConfirmDialogOptions {
+  /** The title of the dialog modal. */
   title?: string;
+  /** The message text to display. */
   message: string;
+  /** Label for the confirmation button (e.g., "Delete", "OK"). */
   confirmLabel?: string;
+  /** Label for the cancellation button (e.g., "Cancel", "No"). */
   cancelLabel?: string;
+  /** The visual variant of the dialog. */
   variant?: "danger" | "warning" | "default";
 }
 
+/**
+ * Internal UI component for the themed confirm dialog.
+ * Handles animations and rendering logic.
+ */
 function ConfirmDialogUI({
   title,
   message,
@@ -183,6 +195,19 @@ function ConfirmDialogUI({
      });
 ────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Imperative API to show a themed confirm dialog.
+ * @param {ConfirmDialogOptions} options - Configuration for the dialog.
+ * @returns {Promise<boolean>} A promise that resolves to true if confirmed, false otherwise.
+ * 
+ * @example
+ * const ok = await confirmDialog({
+ *   title: "Delete Club",
+ *   message: "This cannot be undone.",
+ *   confirmLabel: "Delete",
+ *   variant: "danger",
+ * });
+ */
 export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
   return new Promise((resolve) => {
     const container = document.createElement("div");

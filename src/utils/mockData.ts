@@ -167,8 +167,9 @@ for (let i = 0; i < 6; i++) {
   });
 }
 
+//mock matches
 export const MOCK_MATCHES = [...baseMatches, ...paddingMatches];
-
+//mock bookings
 export const MOCK_BOOKINGS = [
   {
     id: "booking-1",
@@ -186,6 +187,7 @@ export const MOCK_BOOKINGS = [
   }
 ];
 
+//mock feedbacks
 export const MOCK_FEEDBACKS = [
   {
     content: "Training Session: 1.5 hours. Excellent footwork today. Keep pushing!",
@@ -204,7 +206,7 @@ export const MOCK_FEEDBACKS = [
     mental: 85
   }
 ];
-
+//mock tournaments
 export const MOCK_TOURNAMENTS = [
   {
     id: "mock-tournament-1",
@@ -254,7 +256,7 @@ export const MOCK_TOURNAMENTS = [
     isMock: true
   }
 ];
-
+//mock stats
 export const MOCK_STATS = {
   performanceScore: 84,
   winRate: 68,

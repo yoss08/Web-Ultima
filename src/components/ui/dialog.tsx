@@ -1,17 +1,27 @@
+/**
+ * Dialog component based on Radix UI's Dialog primitive.
+ * Provides a structured set of components (Dialog, DialogTrigger, DialogContent, etc.) 
+ * to build accessible modal dialogs.
+ */
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "../../lib/utils"
 
+/** Root component that manages the dialog state. */
 const Dialog = DialogPrimitive.Root
 
+/** Component that triggers the dialog to open. */
 const DialogTrigger = DialogPrimitive.Trigger
 
+/** Portal that renders the dialog content into a separate DOM node. */
 const DialogPortal = DialogPrimitive.Portal
 
+/** Component that closes the dialog. */
 const DialogClose = DialogPrimitive.Close
 
+/** Semi-transparent backdrop for the dialog. */
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -27,6 +37,7 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+/** The main container for the dialog content. */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>

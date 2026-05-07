@@ -35,6 +35,15 @@ const variantConfig = {
 
 /* ─── Single toast card ──────────────────────────────────────────────────── */
 
+/**
+ * Individual Toast Card component that renders a single notification.
+ * @param {Object} props - Component props.
+ * @param {string} props.id - Unique ID of the toast.
+ * @param {Variant} props.variant - The type of notification (success, error, loading, info).
+ * @param {string} props.message - The message to display.
+ * @param {boolean} props.visible - Whether the toast is currently visible.
+ * @param {number} props.duration - Duration in milliseconds before the toast auto-dismisses.
+ */
 function ToastCard({
   id,
   variant,
@@ -80,13 +89,13 @@ function ToastCard({
     >
       <div
         style={{
-          background: "rgba(18, 18, 18, 0.8)",
+          background: "var(--theme-card)",
           backdropFilter: "blur(12px)",
-          border: `1px solid ${config.borderColor}`,
+          border: `1px solid var(--theme-border)`,
           borderRadius: "20px",
           overflow: "hidden",
           position: "relative",
-          boxShadow: `0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px ${config.borderColor}, inset 0 1px 0 rgba(255,255,255,0.03)`,
+          boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px var(--theme-border)`,
         }}
       >
         {/* Top glow */}
@@ -97,7 +106,8 @@ function ToastCard({
             left: 0,
             right: 0,
             height: "60px",
-            background: `linear-gradient(180deg, ${config.bgGlow} 0%, transparent 100%)`,
+            background: `linear-gradient(180deg, var(--theme-accent) 0%, transparent 100%)`,
+            opacity: 0.05,
             pointerEvents: "none",
           }}
         />
@@ -212,10 +222,19 @@ function ToastCard({
    renders them with the custom design. No call-site changes needed.
 ────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * ToastProvider component that replaces the default react-hot-toast Toaster.
+ * It provides custom-styled toasts matching the application's design system.
+ */
 export function ToastProvider() {
   const { toasts, handlers } = useToaster();
   const { startPause, endPause } = handlers;
 
+  /**
+   * Maps toast types to custom variants.
+   * @param {any} t - The toast object.
+   * @returns {Variant} The corresponding variant.
+   */
   const getVariant = (t: any): Variant => {
     if (t.type === "success") return "success";
     if (t.type === "error") return "error";
@@ -223,6 +242,11 @@ export function ToastProvider() {
     return "info";
   };
 
+  /**
+   * Extracts the message string from a toast object.
+   * @param {any} t - The toast object.
+   * @returns {string} The message text.
+   */
   const getMessage = (t: any): string => {
     if (typeof t.message === "string") return t.message;
     if (typeof t.message === "function") return "Notification";

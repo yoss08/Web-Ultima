@@ -1,3 +1,7 @@
+/**
+ * Main entry point for the ULTIMA Express server.
+ * Handles HTTP requests, Socket.io connections, and integrates with Supabase.
+ */
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -17,9 +21,11 @@ if (process.env.NODE_ENV !== 'production') {
   } catch {}
 }
 
+/** The Express application instance. */
 export const app = express();
 const PORT = process.env.PORT || 3002;
 
+/** The HTTP server instance wrapping the Express app. */
 const httpServer = createServer(app);
 
 // Only listen if this file is run directly (not imported as a module)
@@ -35,6 +41,10 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) 
   : ["http://localhost:5173", "https://ultima-web.vercel.app/"];
 
+/**
+ * The Socket.io server instance.
+ * Configured with flexible CORS to allow local and production origins.
+ */
 const io = new Server(httpServer, {
   cors: {
     origin: function(origin, callback) {
@@ -84,7 +94,10 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
-// Init Supabase Client with Service Role Key (for backend operations)
+/**
+ * The Supabase client instance initialized with the Service Role Key.
+ * Used for administrative database operations that bypass RLS.
+ */
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 export const supabase = createClient(supabaseUrl, supabaseKey);

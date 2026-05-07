@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 export function useTheme() {
   const [isDark, setIsDark] = useState(() => {
     const storedTheme = localStorage.getItem('theme');
-    // Si pas de thème stocké, on met sombre par défaut
+    // If no theme is stored, default to dark mode
     return storedTheme === 'light' ? false : true;
   });
 
