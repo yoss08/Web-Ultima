@@ -112,7 +112,7 @@ router.post('/notifications/:id/respond', async (req, res) => {
 
         if (assignError) throw assignError;
 
-        // NEW: Sync the player's club_id with the coach's club_id so they show up in AdminPlayersPage
+        // NEW: Sync the player's club_id with the coach's club_id so they show up in AdminUsersPage
         const { data: coachData } = await supabase
           .from('profiles')
           .select('club_id')

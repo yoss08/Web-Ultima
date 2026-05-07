@@ -31,7 +31,7 @@ interface Member {
   role: string;
 }
 
-export function AdminPlayersPage() {
+export function AdminUsersPage() {
   const { user } = useAuth();
   const clubId = user?.club_id;
 

@@ -141,7 +141,7 @@ export function DashboardLayout() {
           {
             icon: Users,
             label: "Staff & Players",
-            path: "/dashboard/admin/players",
+            path: "/dashboard/admin/users",
           },
         ]
       : []),

@@ -12,7 +12,7 @@ import { AboutPage } from "../screens/public/AboutPage";
 // ── Admin screens ───────────────────────────────────────────────
 import { OverviewPage } from "../screens/admin/OverviewPage";
 import { AdminBookingsPage } from "../screens/admin/AdminBookingsPage";
-import { AdminPlayersPage } from "../screens/admin/AdminPlayersPage";
+import { AdminUsersPage } from "../screens/admin/AdminUsersPage";
 import { AdminCompetitionsPage } from "../screens/admin/AdminCompetitionsPage";
 import { CourtsManagementPage } from "../screens/admin/CourtsManagementPage";
 import { AnalyticsPage } from "../screens/admin/AnalyticsPage";
@@ -119,7 +119,7 @@ export const router = createBrowserRouter([
       // ─ Admin ─────────────────────────────────────────────────
       { path: "admin/overview", Component: OverviewPage },
       { path: "admin/bookings", Component: AdminBookingsPage },
-      { path: "admin/players", Component: AdminPlayersPage },
+      { path: "admin/users", Component: AdminUsersPage },
       { path: "admin/competitions", Component: AdminCompetitionsPage },
       { path: "admin/management", Component: AdminManagement },
       { path: "admin/courts-config", Component: AdminCourtConfig },
