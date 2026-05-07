@@ -320,9 +320,25 @@ router.post('/players', async (req, res) => {
 
 router.put('/players/:id', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('profiles').update(req.body).eq('id', req.params.id).select();
-    if (error) throw error;
-    res.json(data[0]);
+    const { coach_id, ...profileUpdates } = req.body;
+    const playerId = req.params.id;
+
+    let profileData = null;
+    if (Object.keys(profileUpdates).length > 0) {
+      const { data, error } = await supabase.from('profiles').update(profileUpdates).eq('id', playerId).select();
+      if (error) throw error;
+      profileData = data[0];
+    }
+
+    if (coach_id) {
+      // Upsert into coach_students
+      const { error: coachError } = await supabase
+        .from('coach_students')
+        .upsert([{ coach_id, student_id: playerId }], { onConflict: 'coach_id,student_id' });
+      if (coachError) throw coachError;
+    }
+
+    res.json(profileData || { success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 

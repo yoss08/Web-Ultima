@@ -54,7 +54,7 @@ export function PlayerDashboard() {
         if (USE_MOCK_DATA) {
           matchData = MOCK_MATCHES.map(m => ({ 
             ...m, 
-            winner_id: m.winner_id === MOCK_USER_ID ? user.id : m.winner_id 
+            winner1_id: m.winner1_id === MOCK_USER_ID ? user.id : m.winner1_id 
           }));
           fbData = MOCK_FEEDBACKS;
           bookingData = MOCK_BOOKINGS;
@@ -108,11 +108,12 @@ export function PlayerDashboard() {
             subtitle: m.match_type === 'training' ? `With ${m.player2?.full_name}` : `Against ${m.player2?.full_name}`,
             date: m.booking?.booking_date,
             score: m.score,
-            winner_id: m.winner_id,
+            winner1_id: m.winner1_id,
+            winner2_id: m.winner2_id,
             court_name: m.booking?.courts?.name
           })));
 
-          const wins = matchData.filter(m => m.winner_id === user.id).length;
+          const wins = matchData.filter(m => m.winner1_id === user.id || m.winner2_id === user.id).length;
           setStats(prev => ({
             ...prev,
             totalMatches: matchData!.length,
@@ -296,7 +297,7 @@ export function PlayerDashboard() {
                   iconBg = "bg-blue-500/10";
                   iconColor = "text-blue-500";
                 } else if (activity.type === 'match') {
-                  const isWin = activity.winner_id === user?.id;
+                  const isWin = activity.winner1_id === user?.id || activity.winner2_id === user?.id;
                   icon = isWin ? <Trophy size={18} /> : <Activity size={18} />;
                   iconBg = isWin ? "bg-accent/10" : "bg-gray-500/10";
                   iconColor = isWin ? "text-accent" : "text-gray-500";
@@ -337,7 +338,7 @@ export function PlayerDashboard() {
                     
                     <div className="text-right shrink-0">
                       {activity.type === 'match' ? (
-                        <p className={`font-mono text-sm font-black ${activity.winner_id === user?.id ? 'text-accent' : 'text-foreground'}`}>
+                        <p className={`font-mono text-sm font-black ${(activity.winner1_id === user?.id || activity.winner2_id === user?.id) ? 'text-accent' : 'text-foreground'}`}>
                           {activity.score || '-- : --'}
                         </p>
                       ) : (

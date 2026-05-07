@@ -40,7 +40,7 @@ export function MatchDetails() {
         duration_hours: matchData.booking?.duration,
         courts: matchData.booking?.courts,
         opponent_name: matchData.player1_id === user?.id ? matchData.player2?.full_name : matchData.player1?.full_name,
-        result: matchData.winner_id === user?.id ? "Win" : matchData.winner_id ? "Loss" : "TBD"
+        result: (matchData.winner1_id === user?.id || matchData.winner2_id === user?.id) ? "Win" : (matchData.winner1_id || matchData.winner2_id) ? "Loss" : "TBD"
       };
 
       setMatch(data);

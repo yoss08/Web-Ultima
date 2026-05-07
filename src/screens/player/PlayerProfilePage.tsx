@@ -119,11 +119,11 @@ export function PlayerProfilePage() {
 
       // Wins count
       try {
-        const { data: winsList } = await supabase
+        const { count: wins } = await supabase
           .from("matches")
-          .select("id")
-          .eq("winner_id", user.id);
-        setWins(winsList?.length ?? 0);
+          .select("*", { count: "exact", head: true })
+          .or(`winner1_id.eq.${user.id},winner2_id.eq.${user.id}`);
+        setWins(wins ?? 0);
       } catch {
         // matches table may not exist yet
       }

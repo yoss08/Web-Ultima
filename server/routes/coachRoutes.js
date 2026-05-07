@@ -104,7 +104,7 @@ router.get('/students/:id/stats', async (req, res) => {
 
     // 4. Calculate stats from matches
     const totalMatches = matches?.length || 0;
-    const wins = matches?.filter(m => m.winner_id === id).length || 0;
+    const wins = matches?.filter(m => m.winner1_id === id || m.winner2_id === id).length || 0;
     const winRate = totalMatches > 0 ? `${Math.round((wins / totalMatches) * 100)}%` : "0%";
 
     res.json({

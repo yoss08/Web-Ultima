@@ -17,14 +17,23 @@ async function authHeaders(): Promise<HeadersInit> {
 export const adminService = {
   // ─── PLAYERS ────────────────────────────────────────────────
   async getUnassignedPlayers() {
-    const { data, error } = await supabase
+    // Since coach_id is not in profiles, we fetch all players and 
+    // filter them by those not present in the coach_students table.
+    const { data: players, error: playersError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('role', 'player')
-      .is('coach_id', null);
+      .eq('role', 'player');
     
-    if (error) throw error;
-    return data ?? [];
+    if (playersError) throw playersError;
+
+    const { data: assigned, error: assignedError } = await supabase
+      .from('coach_students')
+      .select('student_id');
+    
+    if (assignedError) throw assignedError;
+
+    const assignedIds = new Set(assigned.map(a => a.student_id));
+    return (players ?? []).filter(p => !assignedIds.has(p.id));
   },
 
   async getClubPlayers(clubId: string) {
@@ -131,6 +140,7 @@ export const adminService = {
   },
 
   async assignCoachToPlayer(playerId: string, coachId: string) {
+    // The backend should handle creating the entry in coach_students
     const headers = await authHeaders();
     const response = await fetch(`${ADMIN_API}/players/${playerId}`, {
       method: 'PUT',

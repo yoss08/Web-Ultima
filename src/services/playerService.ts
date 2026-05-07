@@ -57,9 +57,9 @@ export async function getMatchHistory(
 
   if (filters?.result && filters.result !== "all") {
     if (filters.result === "win") {
-      query = query.eq("winner_id", userId);
+      query = query.or(`winner1_id.eq.${userId},winner2_id.eq.${userId}`);
     } else {
-      query = query.neq("winner_id", userId).not("winner_id", "is", null);
+      query = query.not('winner1_id', 'eq', userId).not('winner2_id', 'eq', userId).not('winner1_id', 'is', null);
     }
   }
 

@@ -27,7 +27,7 @@ export function Matches() {
       if (USE_MOCK_DATA) {
         data = MOCK_MATCHES.map(m => ({
           ...m,
-          winner_id: m.winner_id === MOCK_USER_ID ? user.id : m.winner_id,
+          winner1_id: m.winner1_id === MOCK_USER_ID ? user.id : m.winner1_id,
           player1_id: m.player1_id === MOCK_USER_ID ? user.id : m.player1_id,
         }));
         await new Promise(r => setTimeout(r, 500)); // Simulate network loading
@@ -55,7 +55,7 @@ export function Matches() {
           time_slot: m.booking?.time_slot,
           courts: m.booking?.courts,
           opponent_name: m.player1_id === user.id ? m.player2?.full_name : m.player1?.full_name,
-          result: m.winner_id === user.id ? 'Win' : m.winner_id ? 'Loss' : 'TBD'
+          result: (m.winner1_id === user.id || m.winner2_id === user.id) ? 'Win' : (m.winner1_id || m.winner2_id) ? 'Loss' : 'TBD'
         }));
         setMatches(flattened);
       }

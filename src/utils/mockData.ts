@@ -10,7 +10,7 @@ const baseMatches = [
   // 1. Padel Victory: Against Slim & Amine, 6-4, 7-5, Yesterday
   {
     id: "match-1",
-    winner_id: MOCK_USER_ID, // You won
+    winner1_id: MOCK_USER_ID, // You won
     score: "6-4, 7-5",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-1",
@@ -25,7 +25,7 @@ const baseMatches = [
   // Training Session: With Coach Ahmed, 1.5 hours, 2 days ago
   {
     id: "match-training",
-    winner_id: null,
+    winner1_id: null,
     score: "1.5 hours",
     player1_id: MOCK_USER_ID,
     player2_id: "coach-ahmed",
@@ -41,7 +41,7 @@ const baseMatches = [
   // 2. Padel Match: Against Mourad & Zied, 3-6, 4-6, 4 days ago
   {
     id: "match-2",
-    winner_id: "opponent-2", // You lost
+    winner1_id: "opponent-2", // You lost
     score: "3-6, 4-6",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-2",
@@ -56,7 +56,7 @@ const baseMatches = [
   // 3. Ongoing Match: LIVE, 6-4, 3-2, Set 2
   {
     id: "match-3",
-    winner_id: null, // Ongoing
+    winner1_id: null, // Ongoing
     score: "6-4, 3-2",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-3",
@@ -71,7 +71,7 @@ const baseMatches = [
   // 4. Upcoming Match: Friday, May 5, 19:00
   {
     id: "match-4",
-    winner_id: null, // Upcoming
+    winner1_id: null, // Upcoming
     score: null,
     player1_id: MOCK_USER_ID,
     player2_id: "partner-1",
@@ -86,7 +86,7 @@ const baseMatches = [
   // Match History - Win
   {
     id: "match-5",
-    winner_id: MOCK_USER_ID,
+    winner1_id: MOCK_USER_ID,
     score: "6-2, 6-3",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-4",
@@ -101,7 +101,7 @@ const baseMatches = [
   // Match History - Loss
   {
     id: "match-6",
-    winner_id: "opponent-5",
+    winner1_id: "opponent-5",
     score: "4-6, 5-7",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-5",
@@ -116,7 +116,7 @@ const baseMatches = [
   // Match History - Win
   {
     id: "match-7",
-    winner_id: MOCK_USER_ID,
+    winner1_id: MOCK_USER_ID,
     score: "7-5, 6-4",
     player1_id: MOCK_USER_ID,
     player2_id: "opponent-6",
@@ -137,7 +137,7 @@ const paddingMatches = [];
 for (let i = 0; i < 13; i++) {
   paddingMatches.push({
     id: `match-win-pad-${i}`,
-    winner_id: MOCK_USER_ID,
+    winner1_id: MOCK_USER_ID,
     score: "6-2, 6-2",
     player1_id: MOCK_USER_ID,
     player2_id: "random",
@@ -153,7 +153,7 @@ for (let i = 0; i < 13; i++) {
 for (let i = 0; i < 6; i++) {
   paddingMatches.push({
     id: `match-loss-pad-${i}`,
-    winner_id: "random",
+    winner1_id: "random",
     score: "4-6, 4-6",
     player1_id: MOCK_USER_ID,
     player2_id: "random",
