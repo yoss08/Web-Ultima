@@ -274,6 +274,8 @@ export const superAdminService = {
     club_id: string;
     status: string;
     match_type: string;
+    start_time?: string;
+    end_time?: string;
   }) {
     const { data: result, error } = await supabase
       .from('matches')

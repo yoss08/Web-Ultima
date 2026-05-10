@@ -47,6 +47,48 @@ export const adminService = {
     return data ?? [];
   },
 
+  async searchClubPlayers(clubId: string, query: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, club_id')
+      .eq('club_id', clubId)
+      .ilike('full_name', `%${query}%`)
+      .limit(10);
+    
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async searchAllPlayers(query: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, club_id')
+      .eq('role', 'player')
+      .ilike('full_name', `%${query}%`)
+      .limit(15);
+    
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async createGuestPlayer(clubId: string, fullName: string) {
+    const response = await fetch(`${ADMIN_API}/players/guest`, {
+      method: 'POST',
+      headers: await authHeaders(),
+      body: JSON.stringify({
+        full_name: fullName
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create guest player');
+    }
+    
+    const data = await response.json();
+    return data.id;
+  },
+
   async getStaffAndPlayers(clubId: string) {
     // Get profiles explicitly assigned to this club (Admins & Players)
     const { data: assignedProfiles, error: assignedError } = await supabase
@@ -324,7 +366,8 @@ export const adminService = {
         player2:profiles!player2_id(full_name),
         player3:profiles!player3_id(full_name),
         player4:profiles!player4_id(full_name),
-        booking:bookings(booking_date, time_slot, courts(name, club_id))
+        booking:bookings(booking_date, time_slot, courts(name, club_id)),
+        clubs(name)
       `)
       .eq('club_id', clubId);
     
@@ -336,7 +379,9 @@ export const adminService = {
     booking_id?: string | number;
     player1_id: string;
     player2_id?: string;
-    court_id: string | number;
+    player3_id?: string;
+    player4_id?: string;
+    court_id?: string | number;
     status: 'live' | 'completed';
     start_time?: string;
     end_time?: string;

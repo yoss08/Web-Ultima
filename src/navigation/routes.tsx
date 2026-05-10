@@ -44,7 +44,6 @@ import { MatchDetails } from "../screens/player/MatchDetails";
 import PlayerTournamentsPage from "../screens/player/PlayerTournamentsPage";
 
 // ── Shared ──────────────────────────────────────────────────────
-import { HydrationPage } from "../components/dashboard/HydrationPage";
 import { SettingsPage } from "../components/dashboard/SettingsPage";
 import { ProtectedDashboard } from "../components/dashboard/ProtectedDashboard";
 import { Profile } from "../components/dashboard/Profile";
@@ -170,7 +169,6 @@ export const router = createBrowserRouter([
       },
 
       // ─ Shared ────────────────────────────────────────────────
-      { path: "hydration", Component: HydrationPage },
       { path: "profile", Component: Profile },
       { path: "settings", Component: SettingsPage },
     ],

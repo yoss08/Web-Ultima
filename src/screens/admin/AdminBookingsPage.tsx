@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar as CalendarIcon,
@@ -62,6 +63,7 @@ function normalizeStatus(status: string) {
 }
 
 export function AdminBookingsPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const clubId = user?.club_id;
 
@@ -130,24 +132,8 @@ export function AdminBookingsPage() {
     // eslint-disable-next-line
   }, [matches]);
   // Start match from booking
-  const handleStartMatch = async (booking: Booking) => {
-    try {
-      setActionLoading(booking.id);
-      await adminService.createMatch({
-        booking_id: booking.id,
-        player1_id: booking.user_id,
-        court_id: booking.court_id,
-        status: 'live',
-        start_time: booking.start_time,
-        end_time: booking.end_time,
-      });
-      toast.success("Match started!");
-      fetchBookings();
-    } catch (error: any) {
-      toast.error("Could not start match");
-    } finally {
-      setActionLoading(null);
-    }
+  const handleStartMatch = (booking: Booking) => {
+    navigate(`/dashboard/admin/match-control?bookingId=${booking.id}`);
   };
 
   useEffect(() => {

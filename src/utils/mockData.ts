@@ -282,6 +282,7 @@ export const MOCK_STATS = {
     player2: { full_name: "Yassine Ben Ali" },
     player3: { full_name: "Yossr Ellefi" },
     player4: { full_name: "Senda zaghdoudi" },
+    start_time: new Date(Date.now() - 32 * 60000).toISOString(), // 32 mins ago
     booking: {
       booking_date: new Date().toISOString().split('T')[0],
       time_slot: "10:00 - 11:30",
@@ -304,11 +305,14 @@ export const MOCK_STATS = {
     player2: { full_name: "Bilel Gharbi" },
     player3: { full_name: "Nabil Ferjani" },
     player4: { full_name: "Sami Trabelsi" },
+    start_time: new Date(Date.now() - 65 * 60000).toISOString(), // Started 65 mins ago
+    end_time: new Date(Date.now() - 15 * 60000).toISOString(),   // Paused 15 mins ago
     booking: {
       booking_date: new Date().toISOString().split('T')[0],
       time_slot: "11:00 - 12:30",
       courts: { name: "Court B" }
-    }
+    },
+    clubs: { name: "Padel Pro Tunisia" }
   },
   // Scheduled match — hasn't started yet
   {
@@ -329,7 +333,8 @@ export const MOCK_STATS = {
       booking_date: new Date().toISOString().split('T')[0],
       time_slot: "13:00 - 14:30",
       courts: { name: "Court C" }
-    }
+    },
+    clubs: { name: "Padel Pro Tunisia" }
   },
   // Completed match — Team 1 won 6-2, 6-3
   {
@@ -346,10 +351,13 @@ export const MOCK_STATS = {
     player2: { full_name: "Tarek Ouali" },
     player3: { full_name: "Lotfi Aissa" },
     player4: { full_name: "Mehdi Chaker" },
+    start_time: new Date(Date.now() - 105 * 60000).toISOString(),
+    end_time: new Date(Date.now() - 15 * 60000).toISOString(),
     booking: {
       booking_date: new Date().toISOString().split('T')[0],
       time_slot: "09:00 - 10:30",
       courts: { name: "Court A" }
-    }
+    },
+    clubs: { name: "Padel Pro Tunisia" }
   }
 ];

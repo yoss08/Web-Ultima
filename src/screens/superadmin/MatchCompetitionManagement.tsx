@@ -18,9 +18,11 @@ import {
   Target,
   Check,
   ChevronDown,
+  ChevronRight,
   UserCheck,
   UserX,
 } from "lucide-react";
+import { MatchCard } from "../../components/MatchCard";
 import { adminService } from "../../services/adminService";
 import { superAdminService } from "../../services/superAdminService";
 import { supabase } from "../../config/supabase";
@@ -31,16 +33,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface Match {
-  id: string | number;
-  player1_name?: string;
-  player2_name?: string;
-  player3_name?: string;
-  player4_name?: string;
-  court_name?: string;
-  match_type: string;
-  status: string;
+  id: string;
+  match_type: 'singles' | 'doubles';
+  status: 'live' | 'paused' | 'completed' | 'finished';
+  score: string;
+  points?: string;
+  player1_id: string;
+  player2_id: string;
+  player3_id?: string;
+  player4_id?: string;
+  court_id?: string;
+  start_time?: string;
+  end_time?: string;
   created_at: string;
-  score?: string;
+  player1?: { full_name: string };
+  player2?: { full_name: string };
+  player3?: { full_name: string };
+  player4?: { full_name: string };
+  court?: { name: string };
+  club_id?: string;
+  clubs?: { name: string };
 }
 
 interface Tournament {
@@ -114,6 +126,7 @@ function regStatusCfg(status: string) {
   }
 }
 
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export function MatchCompetitionManagement() {
@@ -169,29 +182,18 @@ export function MatchCompetitionManagement() {
       const { data, error } = await supabase
         .from("matches")
         .select(`
-          id, match_type, status, created_at, score,
+          *,
           player1:player1_id(full_name),
           player2:player2_id(full_name),
           player3:player3_id(full_name),
           player4:player4_id(full_name),
-          court:court_id(name)
+          court:court_id(name),
+          clubs(name)
         `)
         .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
-      const mapped = (data ?? []).map((m: any) => ({
-        id: m.id,
-        match_type: m.match_type,
-        status: m.status,
-        created_at: m.created_at,
-        score: m.score,
-        player1_name: m.player1?.full_name ?? "—",
-        player2_name: m.player2?.full_name ?? "—",
-        player3_name: m.player3?.full_name,
-        player4_name: m.player4?.full_name,
-        court_name: m.court?.name ?? "—",
-      }));
-      setMatches(mapped);
+      setMatches(data || []);
     } catch {
       toast.error("Failed to load matches");
     } finally {
@@ -290,13 +292,21 @@ export function MatchCompetitionManagement() {
 
   const handleCreateMatch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!matchForm.player1_id || !matchForm.player2_id || !matchForm.court_id)
-      return toast.error("Please fill all fields");
-    if (matchForm.player1_id === matchForm.player2_id)
-      return toast.error("Please select two different players");
+    const { player1_id, player2_id, player3_id, player4_id, court_id, match_type, club_id } = matchForm;
+    
+    if (!club_id || !player1_id || !player3_id || !court_id)
+      return toast.error("Please fill all required fields (including Club)");
+      
+    if (match_type === 'doubles' && (!player2_id || !player4_id))
+      return toast.error("Please select all 4 players for doubles");
+
     setMatchLoading(true);
     try {
-      await superAdminService.createMatch({ ...matchForm, status: "live" });
+      await superAdminService.createMatch({ 
+        ...matchForm, 
+        status: "live",
+        start_time: new Date().toISOString()
+      });
       toast.success("Match started!");
       setShowMatchModal(false);
       setMatchForm({ player1_id: "", player2_id: "", player3_id: "", player4_id: "", court_id: "", club_id: "", match_type: "singles" });
@@ -611,13 +621,13 @@ export function MatchCompetitionManagement() {
           transition={{ duration: 0.22 }}
         >
           {tab === "matches" ? (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {matchesLoading ? (
                 Array(4).fill(0).map((_, i) => (
-                  <div key={i} className="h-20 bg-card border border-border rounded-[20px] animate-pulse" />
+                  <div key={i} className="h-[240px] bg-card border border-border rounded-[32px] animate-pulse" />
                 ))
               ) : matches.length === 0 ? (
-                <div className="bg-card border-2 border-dashed border-border rounded-[32px] p-16 text-center">
+                <div className="col-span-full bg-card border-2 border-dashed border-border rounded-[32px] p-16 text-center">
                   <Zap size={44} className="text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-muted-foreground font-['Poppins'] text-sm mb-5">No matches yet. Start the first one!</p>
                   <button
@@ -628,52 +638,14 @@ export function MatchCompetitionManagement() {
                   </button>
                 </div>
               ) : (
-                matches.map((match, i) => {
-                  const cfg = matchStatusConfig(match.status);
-                  const StatusIcon = cfg.icon;
-                  const isDoubles = match.match_type === "doubles";
-                  const teamA = isDoubles ? `${match.player1_name} & ${match.player3_name ?? "—"}` : match.player1_name;
-                  const teamB = isDoubles ? `${match.player2_name} & ${match.player4_name ?? "—"}` : match.player2_name;
-
-                  return (
-                    <motion.div
-                      key={match.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.04 }}
-                      className="bg-card border border-border rounded-[20px] px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-accent/20 transition-all"
-                    >
-                      {/* Status */}
-                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.border} flex-shrink-0 w-fit`}>
-                        <StatusIcon size={12} className={`${cfg.color} ${cfg.pulse ? "animate-pulse" : ""}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${cfg.color} font-['Poppins']`}>{cfg.label}</span>
-                      </div>
-
-                      {/* Players */}
-                      <div className="flex-1 flex items-center gap-3 min-w-0">
-                        <span className="font-bold text-foreground font-['Poppins'] text-sm truncate">{teamA}</span>
-                        <span className="text-muted-foreground text-[10px] font-black uppercase tracking-widest flex-shrink-0">vs</span>
-                        <span className="font-bold text-foreground font-['Poppins'] text-sm truncate">{teamB}</span>
-                      </div>
-
-                      {/* Meta */}
-                      <div className="flex items-center gap-4 text-muted-foreground text-xs font-['Poppins'] flex-shrink-0">
-                        {match.score && <span className="font-black text-foreground text-sm">{match.score}</span>}
-                        <span className="hidden sm:flex items-center gap-1">
-                          <Layout size={12} /> {match.court_name}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock size={12} /> {new Date(match.created_at).toLocaleDateString()}
-                        </span>
-                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${
-                          isDoubles ? "bg-purple-500/10 text-purple-400" : "bg-blue-500/10 text-blue-400"
-                        }`}>
-                          {match.match_type}
-                        </span>
-                      </div>
-                    </motion.div>
-                  );
-                })
+                matches.map((match, i) => (
+                  <MatchCard 
+                    key={match.id} 
+                    match={match as any} 
+                    delay={i * 0.05} 
+                    showActions={false} 
+                  />
+                ))
               )}
             </div>
           ) : (
@@ -919,7 +891,7 @@ export function MatchCompetitionManagement() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {[{ label: "Player 1 (Team A)", key: "player1_id" }, { label: "Player 2 (Team B)", key: "player2_id" }].map(({ label, key }) => (
+                  {[{ label: "Player 1 (Team A)", key: "player1_id" }, { label: "Player 3 (Team B)", key: "player3_id" }].map(({ label, key }) => (
                     <div key={key}>
                       <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{label}</label>
                       <select
@@ -936,7 +908,7 @@ export function MatchCompetitionManagement() {
 
                 {matchForm.match_type === "doubles" && (
                   <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                    {[{ label: "Player 3 (Team A)", key: "player3_id" }, { label: "Player 4 (Team B)", key: "player4_id" }].map(({ label, key }) => (
+                    {[{ label: "Player 2 (Team A)", key: "player2_id" }, { label: "Player 4 (Team B)", key: "player4_id" }].map(({ label, key }) => (
                       <div key={key}>
                         <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{label}</label>
                         <select

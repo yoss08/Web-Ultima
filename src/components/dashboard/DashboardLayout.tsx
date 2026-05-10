@@ -118,12 +118,6 @@ export function DashboardLayout() {
             path: "/dashboard/admin/overview",
           },
           {
-            icon: Zap,
-            label: "Match Control",
-            path: "/dashboard/admin/match-control",
-            badge: "Live"
-          },
-          {
             icon: ClipboardList,
             label: "Booking Requests",
             path: "/dashboard/admin/bookings",
@@ -132,6 +126,12 @@ export function DashboardLayout() {
             icon: Grid3X3,
             label: "Court Management",
             path: "/dashboard/courts",
+          },
+          {
+            icon: Zap,
+            label: "Match Control",
+            path: "/dashboard/admin/match-control",
+            badge: "Live"
           },
            {
             icon: Trophy,

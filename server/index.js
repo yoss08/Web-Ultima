@@ -100,6 +100,7 @@ app.use(express.json());
  */
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+console.log('Server using Supabase Key (first 10):', supabaseKey.substring(0, 10));
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Import middleware

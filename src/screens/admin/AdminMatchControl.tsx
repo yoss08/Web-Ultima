@@ -1,29 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Play, 
-  Pause, 
-  Square, 
-  Edit2, 
-  Clock, 
-  Trophy, 
-  ChevronRight, 
   Plus, 
   Minus,
   X,
   RefreshCw,
   Zap,
-  CheckCircle2,
-  AlertCircle
+  Trophy,
+  
+  AlertCircle,
+  Search,
+  Users
 } from "lucide-react";
+import { MatchCard } from "../../components/MatchCard";
 import { adminService } from "../../services/adminService";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 import { toast } from "react-hot-toast";
+import { MatchSetupForm } from "./AdminMatchSetup";
 import { MOCK_ADMIN_MATCHES } from "../../utils/mockData";
 
-const USE_MOCK_DATA = true; // Toggle for development
 
 interface Match {
   id: string;
@@ -54,29 +52,53 @@ interface Match {
 export function AdminMatchControl() {
   const { isDark } = useTheme();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const bookingId = searchParams.get('bookingId');
+  
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [showScoreEditor, setShowScoreEditor] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
+  const [clubName, setClubName] = useState<string | null>(null);
+  const [setupBooking, setSetupBooking] = useState<any | null>(null);
+  const [setupLoading, setSetupLoading] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
 
   useEffect(() => {
     async function init() {
       try {
         const clubInfo = await adminService.getClubInfo();
         setClubId(clubInfo.id);
-        fetchMatches(clubInfo.id);
+        setClubName(clubInfo.name);
+        fetchMatches(clubInfo.id, clubInfo.name);
+
+        // If bookingId is present, fetch that specific booking
+        if (bookingId) {
+          setSetupLoading(true);
+          const { data, error } = await supabase
+            .from('bookings')
+            .select('*, profiles(full_name), courts(name)')
+            .eq('id', bookingId)
+            .single();
+          
+          if (error) throw error;
+          setSetupBooking(data);
+          setSetupLoading(false);
+        }
       } catch (error: any) {
         toast.error(error.message || "Failed to load club info");
         setLoading(false);
+        setSetupLoading(false);
       }
     }
     init();
-  }, []);
+  }, [bookingId, useMockData]);
 
-  const fetchMatches = async (id: string) => {
+  const fetchMatches = async (id: string, currentClubName?: string | null) => {
     try {
-      if (USE_MOCK_DATA) {
+      if (useMockData) {
         setMatches(MOCK_ADMIN_MATCHES as any);
         setLoading(false);
         return;
@@ -102,7 +124,7 @@ export function AdminMatchControl() {
             booking_id: b.id,
             status: 'scheduled' as const,
             score: '0-0',
-            match_type: 'singles' as const, // Default, can be improved
+            match_type: 'singles' as const, 
             player1_id: b.user_id,
             court_id: b.court_id,
             player1: { full_name: b.profiles?.full_name || "Unknown" },
@@ -111,6 +133,7 @@ export function AdminMatchControl() {
               time_slot: b.time_slot,
               courts: { name: b.courts?.name || "Court" }
             },
+            clubs: { name: currentClubName || clubName || "Your Club" },
             start_time: `${b.booking_date}T${start}:00`,
             end_time: `${b.booking_date}T${end}:00`
           };
@@ -126,25 +149,25 @@ export function AdminMatchControl() {
 
   const handleStartMatch = async (match: Match) => {
     try {
-      if (USE_MOCK_DATA) {
+      if (useMockData) {
         setMatches(prev => prev.map(m => m.id === match.id ? { ...m, status: 'live', start_time: new Date().toISOString() } : m));
         toast.success("Match started (Mock)!");
         return;
       }
       if (match.id.startsWith('booking-')) {
         // Create new match from booking
-        await adminService.createMatch({
-          booking_id: match.booking_id,
-          player1_id: match.player1_id,
-          court_id: match.court_id ?? '',
-          status: 'live',
-          start_time: new Date().toISOString(),
-          club_id: clubId || undefined
-        });
-      } else {
-        // Update existing match
-        await adminService.updateMatchStatus(match.id, 'live', { start_time: new Date().toISOString() });
-      }
+          await adminService.createMatch({
+            booking_id: match.booking_id,
+            player1_id: match.player1_id,
+            court_id: match.court_id ?? '',
+            status: 'live',
+            start_time: new Date().toISOString(),
+            club_id: clubId || undefined
+          });
+        } else {
+          // Update existing match
+          await adminService.updateMatchStatus(match.id, 'live', { start_time: new Date().toISOString() });
+        }
       toast.success("Match started!");
       if (clubId) fetchMatches(clubId);
     } catch (error: any) {
@@ -154,12 +177,12 @@ export function AdminMatchControl() {
 
   const handlePauseMatch = async (matchId: string) => {
     try {
-      if (USE_MOCK_DATA) {
+      if (useMockData) {
         setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'paused' } : m));
         toast.success("Match paused");
         return;
       }
-      await adminService.updateMatchStatus(matchId, 'paused');
+      await adminService.updateMatchStatus(matchId, 'paused', { end_time: new Date().toISOString() });
       toast.success("Match paused");
       if (clubId) fetchMatches(clubId);
     } catch (error: any) {
@@ -167,14 +190,26 @@ export function AdminMatchControl() {
     }
   };
 
-  const handleResumeMatch = async (matchId: string) => {
+  const handleResumeMatch = async (match: Match) => {
     try {
-      if (USE_MOCK_DATA) {
-        setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'live' } : m));
+      if (useMockData) {
+        setMatches(prev => prev.map(m => m.id === match.id ? { ...m, status: 'live' } : m));
         toast.success("Match resumed (Mock)");
         return;
       }
-      await adminService.updateMatchStatus(matchId, 'live');
+
+      // Calculate how much time was already played
+      const startTime = new Date(match.start_time!).getTime();
+      const pauseTime = new Date(match.end_time!).getTime();
+      const playedMs = pauseTime - startTime;
+      
+      // Shift start_time to preserve the played duration
+      const newStartTime = new Date(Date.now() - playedMs).toISOString();
+
+      await adminService.updateMatchStatus(match.id, 'live', { 
+        start_time: newStartTime,
+        end_time: null 
+      });
       toast.success("Match resumed");
       if (clubId) fetchMatches(clubId);
     } catch (error: any) {
@@ -185,7 +220,7 @@ export function AdminMatchControl() {
   const handleEndMatch = async (matchId: string) => {
     if (!window.confirm("Are you sure you want to end this match?")) return;
     try {
-      if (USE_MOCK_DATA) {
+      if (useMockData) {
         setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'completed', end_time: new Date().toISOString() } : m));
         toast.success("Match ended (Mock)");
         return;
@@ -228,8 +263,20 @@ export function AdminMatchControl() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => clubId && fetchMatches(clubId)}
-            className="p-3 bg-card border border-border rounded-xl text-foreground hover:bg-muted/80 transition-all shadow-sm"
+            onClick={() => setUseMockData(!useMockData)}
+            className={`flex items-center gap-2 px-4 h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
+              useMockData 
+                ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20' 
+                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+            }`}
+          >
+            <Zap size={16} fill={useMockData ? "currentColor" : "none"} />
+            {useMockData ? "Mock Mode ON" : "Mock Mode OFF"}
+          </button>
+
+          <button
+            onClick={() => clubId && fetchMatches(clubId, clubName)}
+            className="w-12 h-12 flex items-center justify-center bg-card border border-border rounded-xl text-foreground hover:bg-muted/80 transition-all shadow-sm"
           >
             <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
           </button>
@@ -254,10 +301,10 @@ export function AdminMatchControl() {
           {matches.map((match) => (
             <MatchCard 
               key={match.id} 
-              match={match} 
+              match={match as any} 
               onStart={() => handleStartMatch(match)}
               onPause={() => handlePauseMatch(match.id)}
-              onResume={() => handleResumeMatch(match.id)}
+              onResume={() => handleResumeMatch(match)}
               onEnd={() => handleEndMatch(match.id)}
               onEditScore={() => openScoreEditor(match)}
             />
@@ -266,12 +313,32 @@ export function AdminMatchControl() {
       )}
 
       <AnimatePresence>
+        {bookingId && setupBooking && (
+          <MatchSetupForm 
+            booking={setupBooking}
+            onClose={() => {
+              searchParams.delete('bookingId');
+              setSearchParams(searchParams);
+              setSetupBooking(null);
+            }}
+            onSuccess={() => {
+              searchParams.delete('bookingId');
+              setSearchParams(searchParams);
+              setSetupBooking(null);
+              if (clubId) fetchMatches(clubId);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {showScoreEditor && selectedMatch && (
           <ScoreEditorModal 
             match={selectedMatch} 
+            useMockData={useMockData}
             onClose={(newScore?: string, newPoints?: string) => {
               setShowScoreEditor(false);
-              if (newScore && USE_MOCK_DATA) {
+              if (newScore && useMockData) {
                 setMatches(prev => prev.map(m => m.id === selectedMatch.id 
                   ? { ...m, score: newScore, points: newPoints ?? m.points } 
                   : m
@@ -287,235 +354,12 @@ export function AdminMatchControl() {
   );
 }
 
-function MatchCard({ 
-  match, 
-  onStart, 
-  onPause, 
-  onResume, 
-  onEnd, 
-  onEditScore 
-}: { 
+
+
+
+function ScoreEditorModal({ match, useMockData, onClose }: { 
   match: Match; 
-  onStart: () => void;
-  onPause: () => void;
-  onResume: () => void;
-  onEnd: () => void;
-  onEditScore: () => void;
-}) {
-  const statusColors = {
-    scheduled: "text-blue-500 bg-blue-500/10 border-blue-500/20",
-    live: "text-accent bg-accent/10 border-accent/20",
-    paused: "text-orange-500 bg-orange-500/10 border-orange-500/20",
-    completed: "text-muted-foreground bg-muted/10 border-border",
-    finished: "text-muted-foreground bg-muted/10 border-border",
-  };
-
-  const isLive = match.status === 'live';
-  const isPaused = match.status === 'paused';
-  const isScheduled = match.status === 'scheduled';
-  const isFinished = match.status === 'completed' || match.status === 'finished';
-
-  return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className={`relative group bg-card border border-border rounded-[32px] overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md ${
-        isLive ? 'ring-2 ring-accent/20' : ''
-      }`}
-    >
-      <div className="p-6 sm:p-8">
-        {/* Top bar */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border font-['Poppins'] ${statusColors[match.status]}`}>
-              <div className="flex items-center gap-2">
-                {isLive && <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />}
-                {match.status}
-              </div>
-            </span>
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 font-['Poppins']">
-              <ChevronRight size={14} className="text-border" />
-              {match.booking?.courts?.name || "Unassigned Court"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground/60 text-[11px] font-bold font-['Poppins']">
-            <Clock size={14} />
-            <span>{isLive ? "32 min" : isScheduled ? match.booking?.time_slot.split(' - ')[0] : "Finished"}</span>
-          </div>
-        </div>
-
-        {/* Players & Score */}
-        <div className="flex items-center justify-between gap-4">
-          {/* Team A */}
-          <div className="flex-1 text-center sm:text-left min-w-0">
-            <div className="flex flex-col gap-1">
-              <span className="text-base sm:text-lg font-bold text-foreground truncate font-['Poppins']">
-                {match.player1?.full_name || "TBD"}
-              </span>
-              {match.match_type === 'doubles' && (
-                <span className="text-base sm:text-lg font-bold text-foreground truncate font-['Poppins']">
-                  {match.player3?.full_name || "TBD"}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Score Display */}
-          <div className="relative shrink-0">
-            <div 
-              onClick={!isFinished ? onEditScore : undefined}
-              className={`flex flex-col items-center justify-center min-w-[110px] sm:min-w-[130px] rounded-2xl bg-muted/30 border border-border transition-all px-3 py-3 ${
-                isFinished ? 'cursor-default opacity-60' : 'cursor-pointer group-hover:border-accent/30'
-              }`}
-            >
-              {/* Previous sets — small top */}
-              {(() => {
-                const parts = (match.score || '0-0').split(',').map(s => s.trim());
-                const prevSets = parts.slice(0, -1).join(', ');
-                const currentSet = parts[parts.length - 1];
-                return (
-                  <>
-                    {prevSets && (
-                      <span className="text-[10px] font-bold text-muted-foreground font-['Poppins'] mb-0.5 tracking-wide">
-                        {prevSets}
-                      </span>
-                    )}
-                    {/* Current set — large */}
-                    <span className={`text-3xl sm:text-4xl font-black font-['Poppins'] leading-none ${
-                      isLive ? 'text-accent' : isPaused ? 'text-orange-500' : isScheduled ? 'text-blue-400' : 'text-foreground'
-                    }`}>
-                      {currentSet}
-                    </span>
-                    {/* Game points — small bottom */}
-                    {!isFinished && match.points && (
-                      <span className="text-[11px] font-bold text-muted-foreground/70 font-['Poppins'] mt-0.5">
-                        {match.points.replace('-', ' — ')}
-                      </span>
-                    )}
-                    {!isFinished && !match.points && (
-                      <span className="text-[11px] font-bold text-muted-foreground/40 font-['Poppins'] mt-0.5">
-                        0 — 0
-                      </span>
-                    )}
-                  </>
-                );
-              })()}
-              {!isFinished && (
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Edit2 size={12} className="text-accent" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Team B */}
-          <div className="flex-1 text-center sm:text-right min-w-0">
-            <div className="flex flex-col gap-1">
-              <span className="text-base sm:text-lg font-bold text-foreground truncate font-['Poppins']">
-                {match.player2?.full_name || "TBD"}
-              </span>
-              {match.match_type === 'doubles' && (
-                <span className="text-base sm:text-lg font-bold text-foreground truncate font-['Poppins']">
-                  {match.player4?.full_name || "TBD"}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Winner Banner for Finished Matches */}
-        {isFinished && match.winner_team && (
-          <div className="mt-8 pt-8 border-t border-border">
-            <div className={`flex items-center justify-between rounded-2xl p-4 ${
-              match.winner_team === 1 ? 'bg-accent/10 border border-accent/20' : 'bg-red-500/10 border border-red-500/20'
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  match.winner_team === 1 ? 'bg-accent/20 text-accent' : 'bg-red-500/20 text-red-500'
-                }`}>
-                  <Trophy size={16} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground font-['Poppins']">Winners</p>
-                  <p className={`text-sm font-bold font-['Poppins'] ${
-                    match.winner_team === 1 ? 'text-accent' : 'text-red-500'
-                  }`}>
-                    {match.winner_team === 1
-                      ? `${match.player1?.full_name} & ${match.player2?.full_name}`
-                      : `${match.player3?.full_name} & ${match.player4?.full_name}`
-                    }
-                  </p>
-                </div>
-              </div>
-              <span className="text-2xl font-black text-foreground font-['Poppins']">{match.score}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Completed without winner info */}
-        {isFinished && !match.winner_team && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-muted-foreground/60 text-sm font-medium border-t border-border pt-6 font-['Poppins']">
-            <CheckCircle2 size={16} />
-            <span>Match completed · {match.score}</span>
-          </div>
-        )}
-        {!isFinished && (
-          <div className="mt-8 pt-8 border-t border-border flex flex-wrap gap-3">
-            {isScheduled && (
-              <button 
-                onClick={onStart}
-                className="flex-1 min-w-[140px] h-12 rounded-xl bg-accent text-accent-foreground font-bold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all font-['Poppins'] shadow-sm"
-              >
-                <Play size={18} fill="currentColor" /> START MATCH
-              </button>
-            )}
-
-            {isLive && (
-              <button 
-                onClick={onPause}
-                className="flex-1 min-w-[140px] h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-500/20 transition-all font-['Poppins']"
-              >
-                <Pause size={18} fill="currentColor" /> PAUSE
-              </button>
-            )}
-
-            {isPaused && (
-              <button 
-                onClick={onResume}
-                className="flex-1 min-w-[140px] h-12 rounded-xl bg-accent text-accent-foreground font-bold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all font-['Poppins'] shadow-sm"
-              >
-                <Play size={18} fill="currentColor" /> RESUME
-              </button>
-            )}
-
-            {!isScheduled && (
-              <button 
-                onClick={onEditScore}
-                className="flex-1 min-w-[140px] h-12 rounded-xl bg-muted border border-border text-foreground font-bold text-sm flex items-center justify-center gap-2 hover:bg-muted/80 transition-all font-['Poppins']"
-              >
-                <Edit2 size={18} /> SCORE
-              </button>
-            )}
-
-            {!isScheduled && (
-              <button 
-                onClick={onEnd}
-                className="flex-1 min-w-[140px] h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all font-['Poppins']"
-              >
-                <Square size={18} fill="currentColor" /> END
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-
-function ScoreEditorModal({ match, onClose }: { 
-  match: Match; 
+  useMockData: boolean;
   onClose: (newScore?: string, newPoints?: string) => void;
 }) {
   const POINTS = ['0', '15', '30', '40'];
@@ -558,7 +402,7 @@ function ScoreEditorModal({ match, onClose }: {
       const fullScore = sets.length > 0 ? `${sets.join(', ')}, ${currentScore}` : currentScore;
       const fullPoints = `${POINTS[team1Points]}-${POINTS[team2Points]}`;
 
-      if (USE_MOCK_DATA) {
+      if (useMockData) {
         onClose(fullScore, fullPoints);
         toast.success("Score updated");
         return;
@@ -643,7 +487,7 @@ function ScoreEditorModal({ match, onClose }: {
             {/* Team 1 */}
             <div className="flex-1 flex flex-col items-center gap-4">
               <span className="text-xs font-bold text-muted-foreground truncate w-full text-center font-['Poppins'] uppercase tracking-wider">
-                {match.player1?.full_name?.split(' ')[0]} & {match.player3?.full_name?.split(' ')[0]}
+                {match.player1?.full_name?.split(' ')[0]} & {match.player2?.full_name?.split(' ')[0]}
               </span>
               <span className="text-6xl font-black text-foreground tabular-nums font-['Poppins']">{team1Games}</span>
               <div className="flex gap-2">
@@ -667,7 +511,7 @@ function ScoreEditorModal({ match, onClose }: {
             {/* Team 2 */}
             <div className="flex-1 flex flex-col items-center gap-4">
               <span className="text-xs font-bold text-muted-foreground truncate w-full text-center font-['Poppins'] uppercase tracking-wider">
-                {match.player2?.full_name?.split(' ')[0]} & {match.player4?.full_name?.split(' ')[0]}
+                {match.player3?.full_name?.split(' ')[0]} & {match.player4?.full_name?.split(' ')[0]}
               </span>
               <span className="text-6xl font-black text-foreground tabular-nums font-['Poppins']">{team2Games}</span>
               <div className="flex gap-2">

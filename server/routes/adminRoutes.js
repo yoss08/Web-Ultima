@@ -1,4 +1,5 @@
 import express from 'express';
+import crypto from 'crypto';
 import { supabase } from '../index.js';
 
 const router = express.Router();
@@ -308,6 +309,37 @@ router.put('/coaches/:id/unassign', async (req, res) => {
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+router.post('/players/guest', async (req, res) => {
+  try {
+    const clubId = req.user?.club_id;
+    if (!clubId) return res.status(403).json({ error: 'No club assigned to admin' });
+    
+    const { full_name } = req.body;
+    const guestId = crypto.randomUUID();
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        id: guestId,
+        full_name,
+        role: 'player',
+        status: false,
+        club_id: clubId
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('[AdminRoutes] Guest creation error:', error);
+      throw error;
+    }
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('[AdminRoutes] Guest creation exception:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 router.post('/players', async (req, res) => {

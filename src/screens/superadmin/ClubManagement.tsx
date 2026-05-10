@@ -150,7 +150,7 @@ export function ClubManagement() {
             onClick={openAddModal}
             className="flex items-center gap-2 px-6 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:scale-105 transition-transform shadow-lg shadow-accent/20 font-['Poppins']"
           >
-            <Plus size={20} /> Add Club
+            <Plus size={20} /> Add a Club
           </button>
         </div>
       </div>
