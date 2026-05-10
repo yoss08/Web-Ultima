@@ -166,7 +166,6 @@ export function DashboardLayout() {
       : []),
 
     // ── SHARED (all roles) ────────────────────────────────────
-    { icon: Droplet, label: "Hydration", path: "/dashboard/hydration" },
     { icon: User, label: "Profile", path: "/dashboard/profile" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];

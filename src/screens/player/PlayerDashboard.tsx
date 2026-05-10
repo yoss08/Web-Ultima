@@ -11,7 +11,6 @@ import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
 import { useSocket } from "../../hooks/useSocket";
 import { toast } from "react-hot-toast";
-import { MOCK_MATCHES, MOCK_FEEDBACKS, MOCK_USER_ID, MOCK_STATS, MOCK_BOOKINGS, MOCK_TOURNAMENTS } from "../../utils/mockData";
 
 const CACHE_KEY = "ultima_player_dashboard_cache";
 
@@ -44,59 +43,32 @@ export function PlayerDashboard() {
       if (!user?.id) return;
 
       try {
-        const USE_MOCK_DATA = true; // SET THIS TO FALSE TO USE REAL DATABASE DATA
+        const { data: mData } = await supabase
+          .from('matches')
+          .select('*, booking:bookings(booking_date, time_slot, courts(name))')
+          .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+          .order('created_at', { ascending: false });
+        const matchData = mData;
 
-        let matchData: any[] | null = null;
-        let fbData: any[] | null = null;
-        let bookingData: any[] | null = null;
-        let tournamentData: any[] | null = null;
+        const { data: fData } = await supabase
+          .from('coach_feedbacks')
+          .select('*')
+          .eq('student_id', user.id)
+          .order('created_at', { ascending: false });
+        const fbData = fData;
 
-        if (USE_MOCK_DATA) {
-          matchData = MOCK_MATCHES.map(m => ({ 
-            ...m, 
-            winner1_id: m.winner1_id === MOCK_USER_ID ? user.id : m.winner1_id 
-          }));
-          fbData = MOCK_FEEDBACKS;
-          bookingData = MOCK_BOOKINGS;
-          tournamentData = MOCK_TOURNAMENTS.filter(t => t.userRegistration);
-          
-          setStats({
-            totalMatches: MOCK_STATS.sessions,
-            wins: MOCK_STATS.wins,
-            winRate: MOCK_STATS.winRate,
-            performanceScore: MOCK_STATS.performanceScore,
-            rank: MOCK_STATS.rank
-          });
+        const { data: bData } = await supabase
+          .from('bookings')
+          .select('*, courts(name)')
+          .eq('user_id', user.id)
+          .order('booking_date', { ascending: false });
+        const bookingData = bData;
 
-          await new Promise(r => setTimeout(r, 500));
-        } else {
-          const { data: mData } = await supabase
-            .from('matches')
-            .select('*, booking:bookings(booking_date, time_slot, courts(name))')
-            .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-            .order('created_at', { ascending: false });
-          matchData = mData;
-
-          const { data: fData } = await supabase
-            .from('coach_feedbacks')
-            .select('*')
-            .eq('student_id', user.id)
-            .order('created_at', { ascending: false });
-          fbData = fData;
-
-          const { data: bData } = await supabase
-            .from('bookings')
-            .select('*, courts(name)')
-            .eq('user_id', user.id)
-            .order('booking_date', { ascending: false });
-          bookingData = bData;
-
-          const { data: tData } = await supabase
-            .from('tournament_registrations')
-            .select('*, tournament:tournaments(*, clubs(name))')
-            .eq('player_id', user.id);
-          tournamentData = tData;
-        }
+        const { data: tData } = await supabase
+          .from('tournament_registrations')
+          .select('*, tournament:tournaments(*, clubs(name))')
+          .eq('player_id', user.id);
+        const tournamentData = tData;
 
         const allActivities: any[] = [];
 
@@ -381,7 +353,6 @@ export function PlayerDashboard() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 font-['Poppins']">
-            <QuickLink to="/dashboard/hydration" icon={Droplet} label="Water" color="var(--theme-accent)" />
             <QuickLink to="/dashboard/profile" icon={Star} label="Profile" color="#CCFF00" />
           </div>
 

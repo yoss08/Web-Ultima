@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
  import {Phone, Calendar, Clock, MapPin, Star, Users, CheckCircle2, ChevronLeft, Shield, Sun, Moon, Trophy,
@@ -15,17 +15,46 @@ const getISODate = (d: Date) => {
   return new Date(d.getTime() - tzOffset).toISOString().split('T')[0];
 };
 
-const MOCK_TIMES = [
-  { id: 't1', time: '8:00 AM' },
-  { id: 't2', time: '9:30 AM'},
-  { id: 't4', time: '11:00 AM' },
-  { id: 't5', time: '12:30 PM' },
-  { id: 't6', time: '2:00 PM' },
-  { id: 't8', time: '3:30 PM' },
-  { id: 't9', time: '5:00 PM' },
-  { id: 't10', time: '6:30 PM' },
-  { id: 't11', time: '8:00 PM' },
-];
+const generateTimeSlots = (openTime?: string, closeTime?: string) => {
+  const slots = [];
+  
+  const parseTime = (timeStr: string) => {
+    if (!timeStr || !timeStr.includes(':')) {
+        const d = new Date();
+        d.setHours(8, 0, 0, 0);
+        return d;
+    }
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  };
+
+  const open = openTime ? parseTime(openTime) : parseTime('08:00');
+  const close = closeTime ? parseTime(closeTime) : parseTime('22:00');
+  
+  if (close <= open) {
+      close.setDate(close.getDate() + 1);
+  }
+
+  let current = open;
+  let slotIndex = 1;
+  while (current < close) {
+    const next = new Date(current.getTime() + 90 * 60000);
+    if (next > close) break;
+    
+    slots.push({
+      id: `t${slotIndex++}`,
+      time: `${formatTime(current)} - ${formatTime(next)}`
+    });
+    current = next;
+  }
+  return slots;
+};
 
 const DURATIONS = [
   { id: 1, label: '1 session', value: 1 },
@@ -83,8 +112,8 @@ export function ClubDetailsPage() {
         if (error) throw error;
         setDisplayClub({
           ...data,
-          rating: 4.8, // Mock rating
-          reviews: Math.floor(Math.random() * 200) + 10,
+          rating: data.rating || 0,
+          reviews: data.reviews || 0,
           image: data.photo_url,
           price: data.price_per_court || 0,
           courts: data.courts || []
@@ -156,9 +185,14 @@ export function ClubDetailsPage() {
     );
   }
 
+  const generatedTimes = useMemo(() => {
+    if (!displayClub) return [];
+    return generateTimeSlots(displayClub.open_time, displayClub.close_time);
+  }, [displayClub]);
+
   const selectedCourtDetails = displayClub.courts.find((c: any) => c.id === selectedCourt);
   const selectedDurObj = DURATIONS.find(d => d.id === selectedDuration);
-  const selectedTimeObj = MOCK_TIMES.find(t => t.id === selectedTime);
+  const selectedTimeObj = generatedTimes.find(t => t.id === selectedTime);
   const basePricePerSession = displayClub.price;
   const totalPrice = basePricePerSession * selectedDuration;
 
@@ -562,8 +596,8 @@ export function ClubDetailsPage() {
                               </label>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {MOCK_TIMES.map((timeObj) => {
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {generatedTimes.map((timeObj) => {
                                 const isSelected = selectedTime === timeObj.id;
                                 return (
                                   <button

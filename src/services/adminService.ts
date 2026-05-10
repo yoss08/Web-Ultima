@@ -397,10 +397,13 @@ export const adminService = {
     return data;
   },
 
-  async updateScore(matchId: string | number, score: string) {
+  async updateScore(matchId: string | number, score: string, points?: string) {
+    const updatePayload: any = { score: score };
+    if (points) updatePayload.points = points;
+
     const { data, error } = await supabase
       .from('matches')
-      .update({ score: score })
+      .update(updatePayload)
       .eq('id', matchId)
       .select()
       .single();

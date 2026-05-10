@@ -3,7 +3,6 @@ import { CheckCircle2, Clock, Loader2, Activity, Zap, ChevronRight, X, Calendar,
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../config/supabase";
 import { useAuth } from "../../services/AuthContext";
-import { MOCK_MATCHES, MOCK_USER_ID } from "../../utils/mockData";
 
 export function Matches() {
   const { user } = useAuth();
@@ -19,34 +18,17 @@ export function Matches() {
       if (!user?.id) return;
       setLoading(true);
       
-      const USE_MOCK_DATA = true; // SET THIS TO FALSE TO USE REAL DATABASE DATA
+      const { data, error } = await supabase
+        .from('matches')
+        .select(`
+          *,
+          player1:profiles!player1_id(full_name),
+          player2:profiles!player2_id(full_name),
+          booking:bookings(booking_date, time_slot, courts(name, surface))
+        `)
+        .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+        .order('created_at', { ascending: sortOrder === 'asc' });
 
-      let data: any[] | null = null;
-      let error = null;
-
-      if (USE_MOCK_DATA) {
-        data = MOCK_MATCHES.map(m => ({
-          ...m,
-          winner1_id: m.winner1_id === MOCK_USER_ID ? user.id : m.winner1_id,
-          player1_id: m.player1_id === MOCK_USER_ID ? user.id : m.player1_id,
-        }));
-        await new Promise(r => setTimeout(r, 500)); // Simulate network loading
-      } else {
-        const { data: dbData, error: dbError } = await supabase
-          .from('matches')
-          .select(`
-            *,
-            player1:profiles!player1_id(full_name),
-            player2:profiles!player2_id(full_name),
-            booking:bookings(booking_date, time_slot, courts(name, surface))
-          `)
-          .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-          .order('created_at', { ascending: sortOrder === 'asc' });
-        
-        data = dbData;
-        error = dbError;
-      }
-      
       if (!error && data) {
         // Flatten for the UI
         const flattened = data.map(m => ({

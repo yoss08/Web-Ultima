@@ -20,7 +20,6 @@ import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 import { toast } from "react-hot-toast";
 import { MatchSetupForm } from "./AdminMatchSetup";
-import { MOCK_ADMIN_MATCHES } from "../../utils/mockData";
 
 
 interface Match {
@@ -64,7 +63,6 @@ export function AdminMatchControl() {
   const [clubName, setClubName] = useState<string | null>(null);
   const [setupBooking, setSetupBooking] = useState<any | null>(null);
   const [setupLoading, setSetupLoading] = useState(false);
-  const [useMockData, setUseMockData] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -94,15 +92,10 @@ export function AdminMatchControl() {
       }
     }
     init();
-  }, [bookingId, useMockData]);
+  }, [bookingId]);
 
   const fetchMatches = async (id: string, currentClubName?: string | null) => {
     try {
-      if (useMockData) {
-        setMatches(MOCK_ADMIN_MATCHES as any);
-        setLoading(false);
-        return;
-      }
       const [matchesData, bookingsData] = await Promise.all([
         adminService.getClubMatches(id),
         supabase
@@ -149,11 +142,6 @@ export function AdminMatchControl() {
 
   const handleStartMatch = async (match: Match) => {
     try {
-      if (useMockData) {
-        setMatches(prev => prev.map(m => m.id === match.id ? { ...m, status: 'live', start_time: new Date().toISOString() } : m));
-        toast.success("Match started (Mock)!");
-        return;
-      }
       if (match.id.startsWith('booking-')) {
         // Create new match from booking
           await adminService.createMatch({
@@ -177,11 +165,6 @@ export function AdminMatchControl() {
 
   const handlePauseMatch = async (matchId: string) => {
     try {
-      if (useMockData) {
-        setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'paused' } : m));
-        toast.success("Match paused");
-        return;
-      }
       await adminService.updateMatchStatus(matchId, 'paused', { end_time: new Date().toISOString() });
       toast.success("Match paused");
       if (clubId) fetchMatches(clubId);
@@ -192,11 +175,6 @@ export function AdminMatchControl() {
 
   const handleResumeMatch = async (match: Match) => {
     try {
-      if (useMockData) {
-        setMatches(prev => prev.map(m => m.id === match.id ? { ...m, status: 'live' } : m));
-        toast.success("Match resumed (Mock)");
-        return;
-      }
 
       // Calculate how much time was already played
       const startTime = new Date(match.start_time!).getTime();
@@ -220,11 +198,6 @@ export function AdminMatchControl() {
   const handleEndMatch = async (matchId: string) => {
     if (!window.confirm("Are you sure you want to end this match?")) return;
     try {
-      if (useMockData) {
-        setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'completed', end_time: new Date().toISOString() } : m));
-        toast.success("Match ended (Mock)");
-        return;
-      }
       await adminService.updateMatchStatus(matchId, 'completed', { end_time: new Date().toISOString() });
       toast.success("Match ended");
       if (clubId) fetchMatches(clubId);
@@ -262,17 +235,6 @@ export function AdminMatchControl() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setUseMockData(!useMockData)}
-            className={`flex items-center gap-2 px-4 h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
-              useMockData 
-                ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20' 
-                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
-            }`}
-          >
-            <Zap size={16} fill={useMockData ? "currentColor" : "none"} />
-            {useMockData ? "Mock Mode ON" : "Mock Mode OFF"}
-          </button>
 
           <button
             onClick={() => clubId && fetchMatches(clubId, clubName)}
@@ -335,15 +297,9 @@ export function AdminMatchControl() {
         {showScoreEditor && selectedMatch && (
           <ScoreEditorModal 
             match={selectedMatch} 
-            useMockData={useMockData}
             onClose={(newScore?: string, newPoints?: string) => {
               setShowScoreEditor(false);
-              if (newScore && useMockData) {
-                setMatches(prev => prev.map(m => m.id === selectedMatch.id 
-                  ? { ...m, score: newScore, points: newPoints ?? m.points } 
-                  : m
-                ));
-              } else if (clubId) {
+              if (clubId) {
                 fetchMatches(clubId);
               }
             }} 
@@ -357,9 +313,8 @@ export function AdminMatchControl() {
 
 
 
-function ScoreEditorModal({ match, useMockData, onClose }: { 
+function ScoreEditorModal({ match, onClose }: { 
   match: Match; 
-  useMockData: boolean;
   onClose: (newScore?: string, newPoints?: string) => void;
 }) {
   const POINTS = ['0', '15', '30', '40'];
@@ -402,12 +357,7 @@ function ScoreEditorModal({ match, useMockData, onClose }: {
       const fullScore = sets.length > 0 ? `${sets.join(', ')}, ${currentScore}` : currentScore;
       const fullPoints = `${POINTS[team1Points]}-${POINTS[team2Points]}`;
 
-      if (useMockData) {
-        onClose(fullScore, fullPoints);
-        toast.success("Score updated");
-        return;
-      }
-      await adminService.updateScore(match.id, fullScore);
+      await adminService.updateScore(match.id, fullScore, fullPoints);
       toast.success("Score updated");
       onClose(fullScore, fullPoints);
     } catch (error: any) {

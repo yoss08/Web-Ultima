@@ -497,7 +497,6 @@ router.get('/reports/:type', async (req, res) => {
         availableCourts: data.availableCourts || "0/0",
         maintenanceCount: data.maintenanceCount || 0,
         totalMatchesToday: data.totalMatchesToday || 0,
-        hydrationTotal: data.hydrationTotal || "24.5L"
       });
     }
 

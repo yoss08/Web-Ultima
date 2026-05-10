@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Clock, ChevronRight, CheckCircle2, Play, Pause, Square, Edit2 } from 'lucide-react';
 
@@ -51,37 +51,46 @@ export const MatchCard: React.FC<MatchCardProps> = ({
   showActions = true
 }) => {
   const [elapsed, setElapsed] = useState(0);
+  const lastElapsed = useRef(0);
 
   useEffect(() => {
     const calculateDuration = (start: string | undefined, end: string | undefined | null, status: string) => {
       const startTime = start ? new Date(start).getTime() : 0;
       if (isNaN(startTime) || startTime === 0) return 0;
 
-      const isLiveOrPaused = status === 'live' || status === 'paused';
-      const endTime = end ? new Date(end).getTime() : (isLiveOrPaused ? Date.now() : startTime);
-      const effectiveEnd = isNaN(endTime) ? (isLiveOrPaused ? Date.now() : startTime) : endTime;
-      
-      const diff = Math.floor((effectiveEnd - startTime) / 60000);
+      if (status === 'live') {
+        const diff = Math.floor((Date.now() - startTime) / 60000);
+        return diff < 0 || diff > 1440 ? 0 : diff;
+      }
+
+      const endTime = end ? new Date(end).getTime() : 0;
+      if (isNaN(endTime) || endTime === 0) {
+        // If paused/completed but no end_time, use the last known duration to prevent jumping to 0 or Huge number
+        return lastElapsed.current;
+      }
+
+      const diff = Math.floor((endTime - startTime) / 60000);
       return diff < 0 || diff > 1440 ? 0 : diff;
     };
 
     if (match.status === 'scheduled') {
       setElapsed(0);
-      return;
-    }
-
-    if (match.status !== 'live') {
-      setElapsed(calculateDuration(match.start_time, match.end_time, match.status));
+      lastElapsed.current = 0;
       return;
     }
 
     const update = () => {
-      setElapsed(calculateDuration(match.start_time, match.end_time, match.status));
+      const newElapsed = calculateDuration(match.start_time, match.end_time, match.status);
+      setElapsed(newElapsed);
+      lastElapsed.current = newElapsed;
     };
 
     update();
-    const interval = setInterval(update, 10000);
-    return () => clearInterval(interval);
+    
+    if (match.status === 'live') {
+      const interval = setInterval(update, 10000);
+      return () => clearInterval(interval);
+    }
   }, [match.start_time, match.end_time, match.status]);
 
   const statusColors: any = {
@@ -153,14 +162,14 @@ export const MatchCard: React.FC<MatchCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex flex-col items-center sm:items-start gap-1">
               <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em] font-['Poppins'] opacity-80">Team A</span>
-              <div className="flex flex-col">
-                <span className="text-lg sm:text-xl font-black text-foreground truncate font-['Poppins'] leading-tight">
-                  {match.player1?.full_name || "Player 1"}
-                </span>
-                <span className="text-sm font-bold text-muted-foreground/60 truncate font-['Poppins']">
-                  {match.player2?.full_name || ""}
-                </span>
-              </div>
+                <div className="flex flex-col">
+                  <span className="text-base sm:text-lg font-black text-foreground truncate font-['Poppins'] leading-tight">
+                    {match.player1?.full_name || "Player 1"}
+                  </span>
+                  <span className="text-base sm:text-lg font-black text-foreground truncate font-['Poppins'] leading-tight">
+                    {match.player2?.full_name || "Player 2"}
+                  </span>
+                </div>
             </div>
           </div>
 
@@ -206,14 +215,14 @@ export const MatchCard: React.FC<MatchCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex flex-col items-center sm:items-end gap-1">
               <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] font-['Poppins'] opacity-80">Team B</span>
-              <div className="flex flex-col items-center sm:items-end">
-                <span className="text-lg sm:text-xl font-black text-foreground truncate font-['Poppins'] leading-tight">
-                  {match.player3?.full_name || "Player 3"}
-                </span>
-                <span className="text-sm font-bold text-muted-foreground/60 truncate font-['Poppins']">
-                  {match.player4?.full_name || ""}
-                </span>
-              </div>
+                <div className="flex flex-col items-center sm:items-end">
+                  <span className="text-base sm:text-lg font-black text-foreground truncate font-['Poppins'] leading-tight">
+                    {match.player3?.full_name || "Player 3"}
+                  </span>
+                  <span className="text-base sm:text-lg font-black text-foreground truncate font-['Poppins'] leading-tight">
+                    {match.player4?.full_name || "Player 4"}
+                  </span>
+                </div>
             </div>
           </div>
         </div>
