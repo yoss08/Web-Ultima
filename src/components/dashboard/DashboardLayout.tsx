@@ -28,6 +28,7 @@ import {
 import { useAuth } from "../../services/AuthContext";
 import { useTheme } from "../../styles/useTheme";
 import { NotificationBell } from "../shared/NotificationBell";
+import { useBookingNotifications } from "../../hooks/useBookingNotifications";
 
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
@@ -36,6 +37,9 @@ export function DashboardLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const location = useLocation();
+
+  // Real-time booking notifications for super admin
+  useBookingNotifications();
   const navigate = useNavigate();
 
   // Resolve role — profile DB takes priority over metadata
