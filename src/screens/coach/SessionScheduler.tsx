@@ -27,6 +27,14 @@ export function SessionScheduler() {
   });
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [editingSessionIds, setEditingSessionIds] = useState<string[]>([]);
+  
+  // Date constraints logic
+  const getISODate = (date: Date) => date.toISOString().split('T')[0];
+  const todayDateObj = new Date();
+  const minDateStr = getISODate(todayDateObj);
+  const maxDateObj = new Date();
+  maxDateObj.setDate(todayDateObj.getDate() + 7);
+  const maxDateStr = getISODate(maxDateObj);
 
   useEffect(() => {
     if (user?.id) {
@@ -306,6 +314,8 @@ export function SessionScheduler() {
                     type="date"
                     className="w-full h-12 bg-muted border border-border rounded-xl px-4 text-foreground"
                     value={formData.date}
+                    min={minDateStr}
+                    max={maxDateStr}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                   />
                 </div>

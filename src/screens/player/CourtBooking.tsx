@@ -143,6 +143,14 @@ export function CourtBooking() {
   // ── My Bookings UI ──
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [qrBooking, setQrBooking] = useState<Booking | null>(null);
+  
+  // Date constraints logic
+  const getISODate = (date: Date) => date.toISOString().split('T')[0];
+  const todayDateObj = new Date();
+  const minDateStr = getISODate(todayDateObj);
+  const maxDateObj = new Date();
+  maxDateObj.setDate(todayDateObj.getDate() + 7);
+  const maxDateStr = getISODate(maxDateObj);
 
   // ── Computed ──
   const basePricePerSlot = selectedClub?.price_per_court || PRICE_PER_SLOT;
@@ -641,7 +649,8 @@ export function CourtBooking() {
                                 <input
                                   type="date"
                                   value={selectedDate}
-                                  min={new Date().toISOString().split("T")[0]}
+                                  min={minDateStr}
+                                  max={maxDateStr}
                                   onChange={(e) => setSelectedDate(e.target.value)}
                                   className="w-full h-14 px-6 bg-muted rounded-2xl border-none outline-none font-black text-sm dark:text-white focus:ring-2 ring-accent/50 transition-all cursor-pointer"
                                 />
