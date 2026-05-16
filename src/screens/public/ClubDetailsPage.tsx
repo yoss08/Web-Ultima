@@ -177,6 +177,11 @@ export function ClubDetailsPage() {
     };
   }, []);
 
+  const generatedTimes = useMemo(() => {
+    if (!displayClub) return [];
+    return generateTimeSlots(displayClub.open_time, displayClub.close_time);
+  }, [displayClub]);
+
   if (loading || !displayClub) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -184,11 +189,6 @@ export function ClubDetailsPage() {
       </div>
     );
   }
-
-  const generatedTimes = useMemo(() => {
-    if (!displayClub) return [];
-    return generateTimeSlots(displayClub.open_time, displayClub.close_time);
-  }, [displayClub]);
 
   const selectedCourtDetails = displayClub.courts.find((c: any) => c.id === selectedCourt);
   const selectedDurObj = DURATIONS.find(d => d.id === selectedDuration);
@@ -259,7 +259,7 @@ export function ClubDetailsPage() {
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email: formData.email,
         token: otpCode.trim(),
-        type: 'magiclink',
+        type: 'email',
       });
       if (verifyError) {
         setOtpError("Invalid or expired code. Please try again.");
